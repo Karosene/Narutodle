@@ -366,7 +366,9 @@ export default function Site() {
                   setActiveSuggestion(-1);
                 }
               }}
-              className="flex-1 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white/5"
+              role="combobox"
+              aria-activedescendant={activeSuggestion >= 0 ? `suggestion-${activeSuggestion}` : undefined}
+              className="flex-1 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white text-black dark:bg-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               placeholder="Who is this?"
               aria-autocomplete="list"
               aria-expanded={showSuggestions}
@@ -377,6 +379,7 @@ export default function Site() {
               <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 mt-12 z-50 bg-white/95 dark:bg-gray-800 rounded-md shadow-lg max-h-60 overflow-auto border border-gray-200 dark:border-gray-700">
                 {suggestions.map((s, i) => (
                   <div
+                    id={`suggestion-${i}`}
                     key={s.name + i}
                     role="option"
                     aria-selected={i === activeSuggestion}
