@@ -1,5 +1,6 @@
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export function Welcome() {
   return (
@@ -87,3 +88,438 @@ const resources = [
     ),
   },
 ];
+
+// -- Site component (moved from app/routes/home.tsx)
+type Character = {
+  name: string;
+  file: string;
+  aliases?: string[];
+  gender?: string;
+  age?: string;
+  clan?: string;
+  affiliations?: string[];
+  rank?: string;
+  natureAffinity?: string[];
+  firstAppearance?: string;
+};
+
+function normalize(s: string) {
+  return s
+    .normalize?.('NFD')
+    .replace(/\p{M}/gu, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+export default function Site() {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const suggRef = useRef<HTMLFormElement | null>(null);
+  const [suggestions, setSuggestions] = useState<Character[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const [characters, setCharacters] = useState<Character[] | null>(null);
+  const [idx, setIdx] = useState<number | null>(null);
+  const [guess, setGuess] = useState("");
+  const [revealed, setRevealed] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [showClues, setShowClues] = useState(false);
+  const [guesses, setGuesses] = useState<
+    { char: Character; matches: Record<string, boolean>; ageComparison?: string | null; arcComparison?: string | null }[]
+  >([]);
+  const mounted = useRef(false);
+
+  const TRIES_REQUIRED = 10;
+  const CLUE_COUNT = 7;
+  const triesLeft = Math.max(0, TRIES_REQUIRED - guesses.length);
+  const cluesUnlocked = guesses.length >= TRIES_REQUIRED ? CLUE_COUNT : 0;
+  const cluesLocked = guesses.length < TRIES_REQUIRED;
+
+  useEffect(() => {
+    fetch("/characters.json")
+      .then((r) => r.json())
+      .then((data: Character[]) => {
+        const map = new Map<string, Character>();
+        for (const c of data) {
+          const key = normalize(c.name);
+          const existing = map.get(key);
+          if (!existing) {
+            map.set(key, c);
+            continue;
+          }
+          const existingHasFile = !!existing.file && existing.file.trim() !== "";
+          const cHasFile = !!c.file && c.file.trim() !== "";
+          if (!existingHasFile && cHasFile) {
+            map.set(key, c);
+            continue;
+          }
+        }
+
+        const uniq = Array.from(map.values());
+        setCharacters(uniq);
+        if (uniq.length) setIdx(Math.floor(Math.random() * uniq.length));
+      })
+      .catch((e) => {
+        console.error(e);
+        setFeedback("Failed to load characters.json");
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!characters) return;
+    const q = guess.trim();
+    if (!q) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      setActiveSuggestion(-1);
+      return;
+    }
+
+    const nq = normalize(q);
+    const guessedSet = new Set((guesses || []).map((g) => normalize(g.char.name)));
+
+    const matches = characters
+      .filter((c) => {
+        if (guessedSet.has(normalize(c.name))) return false;
+        if (normalize(c.name).includes(nq)) return true;
+        if (c.aliases && c.aliases.some((a) => normalize(a).includes(nq))) return true;
+        return false;
+      })
+      .slice(0, 8);
+
+    setSuggestions(matches);
+    setShowSuggestions(matches.length > 0);
+    setActiveSuggestion(-1);
+  }, [guess, characters, guesses]);
+
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (!suggRef.current) return;
+      if (suggRef.current.contains(e.target as Node)) return;
+      setShowSuggestions(false);
+      setActiveSuggestion(-1);
+    }
+    document.addEventListener('click', onDoc);
+    return () => document.removeEventListener('click', onDoc);
+  }, []);
+
+  useEffect(() => {
+    if (mounted.current) {
+      setGuess("");
+      setRevealed(false);
+      setFeedback(null);
+    }
+    mounted.current = true;
+  }, [idx]);
+
+  const current = useMemo(() => {
+    if (!characters || idx === null) return null;
+    return characters[idx];
+  }, [characters, idx]);
+
+  function checkGuess(e?: React.FormEvent) {
+    e?.preventDefault();
+    if (!current || !characters) return;
+    const n = normalize(guess || "");
+
+    const guessed = characters.find((c) =>
+      [c.name, ...(c.aliases || [])].map(normalize).includes(n)
+    );
+
+    if (!guessed) {
+      setFeedback("Character not found in database.");
+      return;
+    }
+
+    const arrayOverlap = (a?: string[], b?: string[]) => {
+      if (!a || !b) return false;
+      const A = a.map(normalize);
+      const B = b.map(normalize);
+      return A.some((x) => B.includes(x));
+    };
+
+    const parseAge = (ageStr?: string) => {
+      if (!ageStr) return null;
+      const num = parseInt(ageStr, 10);
+      return isNaN(num) ? null : num;
+    };
+
+    const guessedAge = parseAge(guessed.age);
+    const currentAge = parseAge(current.age);
+    const ageComparison =
+      guessedAge !== null && currentAge !== null
+        ? guessedAge < currentAge ? 'higher' : guessedAge > currentAge ? 'lower' : 'equal'
+        : null;
+
+    const ARC_ORDER = [
+      'Land of Waves',
+      'Chūnin Exams',
+      'Konoha Crush',
+      'Search for Tsunade',
+      'Sasuke Recovery Mission',
+      'Kazekage Rescue Mission',
+      'Tenchi Bridge Reconnaissance Mission',
+      'Akatsuki Suppression Mission',
+      'Itachi Pursuit Mission',
+      'Tale of Jiraiya the Gallant',
+      'Fated Battle Between Brothers',
+      "Pain's Assault",
+      'Five Kage Summit',
+      'Fourth Shinobi World War',
+    ];
+
+    const getArcIndex = (arc?: string | null) => {
+      if (!arc) return null;
+      const a = arc.trim();
+      const idx = ARC_ORDER.findIndex((x) => x.toLowerCase() === a.toLowerCase());
+      return idx === -1 ? null : idx;
+    };
+
+    const guessedArcIdx = getArcIndex(guessed.firstAppearance as string | undefined | null);
+    const currentArcIdx = getArcIndex(current.firstAppearance as string | undefined | null);
+    const arcComparison =
+      guessedArcIdx !== null && currentArcIdx !== null
+        ? guessedArcIdx < currentArcIdx
+          ? 'later'
+          : guessedArcIdx > currentArcIdx
+          ? 'earlier'
+          : 'equal'
+        : null;
+
+    const matches: Record<string, boolean> = {
+      name: normalize(guessed.name) === normalize(current.name),
+      gender:
+        !!guessed.gender && !!current.gender
+          ? normalize(guessed.gender) === normalize(current.gender)
+          : false,
+      age:
+        !!guessed.age && !!current.age
+          ? normalize(guessed.age) === normalize(current.age)
+          : false,
+      clan:
+        !!guessed.clan && !!current.clan
+          ? normalize(guessed.clan) === normalize(current.clan)
+          : false,
+      affiliations: arrayOverlap(guessed.affiliations, current.affiliations),
+      rank:
+        !!guessed.rank && !!current.rank
+          ? normalize(guessed.rank) === normalize(current.rank)
+          : false,
+      nature: arrayOverlap(guessed.natureAffinity, current.natureAffinity),
+      firstAppearance:
+        !!guessed.firstAppearance && !!current.firstAppearance
+          ? normalize(guessed.firstAppearance) === normalize(current.firstAppearance)
+          : false,
+    };
+
+    const tries = guesses.length + 1;
+    setGuesses((s) => [{ char: guessed, matches, ageComparison, arcComparison }, ...s].slice(0, 20));
+
+    if (matches.name) {
+      setRevealed(true);
+      setFeedback(`Correct! It's ${current.name}. You guessed it in ${tries} ${tries === 1 ? 'try' : 'tries'}.`);
+    } else {
+      setFeedback("Guess recorded — see comparison row below.");
+    }
+  }
+
+  function pickNext() {
+    if (!characters || characters.length === 0) return;
+    if (characters.length === 1) return;
+    let next = Math.floor(Math.random() * characters.length);
+    if (next === idx) next = (next + 1) % characters.length;
+    setGuesses([]);
+    setIdx(next);
+  }
+
+  return (
+    <main className="flex items-start justify-center min-h-screen p-8 mt-10">
+      <div className="w-full max-w-6xl">
+        <h1 className="text-5xl sm:text-6xl font-extrabold mb-2 text-center">Narutodle</h1>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-10 text-center">Refresh the page (or press New) to get a new character — type your guess and submit.</p>
+
+        <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm">
+
+          <form onSubmit={checkGuess} className="flex gap-2 mb-3 relative" ref={suggRef}>
+            <input
+              ref={inputRef}
+              value={guess}
+              onChange={(e) => setGuess(e.target.value)}
+              onKeyDown={(e) => {
+                if (!showSuggestions) return;
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  setActiveSuggestion((i) => Math.min(i + 1, suggestions.length - 1));
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  setActiveSuggestion((i) => Math.max(i - 1, 0));
+                } else if (e.key === 'Enter') {
+                  if (activeSuggestion >= 0 && suggestions[activeSuggestion]) {
+                    e.preventDefault();
+                    const s = suggestions[activeSuggestion];
+                    setGuess(s.name);
+                    setShowSuggestions(false);
+                    setActiveSuggestion(-1);
+                  }
+                } else if (e.key === 'Escape') {
+                  setShowSuggestions(false);
+                  setActiveSuggestion(-1);
+                }
+              }}
+              className="flex-1 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white/5"
+              placeholder="Who is this?"
+              aria-autocomplete="list"
+              aria-expanded={showSuggestions}
+              aria-controls="suggestions-list"
+            />
+
+            {showSuggestions && suggestions.length > 0 ? (
+              <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 mt-12 z-50 bg-white/95 dark:bg-gray-800 rounded-md shadow-lg max-h-60 overflow-auto border border-gray-200 dark:border-gray-700">
+                {suggestions.map((s, i) => (
+                  <div
+                    key={s.name + i}
+                    role="option"
+                    aria-selected={i === activeSuggestion}
+                    onMouseDown={(ev) => {
+                      ev.preventDefault();
+                      setGuess(s.name);
+                      setShowSuggestions(false);
+                      setActiveSuggestion(-1);
+                      setTimeout(() => inputRef.current?.focus(), 0);
+                    }}
+                    onMouseEnter={() => setActiveSuggestion(i)}
+                    className={`px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 ${i === activeSuggestion ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                  >
+                    <div className="font-medium">{s.name}</div>
+                    {s.aliases && s.aliases.length > 0 ? <div className="text-xs text-gray-500">Aliases: {s.aliases.join(', ')}</div> : null}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            <button type="submit" className="px-3 py-2 rounded-md bg-yellow-400 text-black font-semibold">Guess</button>
+            <button type="button" onClick={pickNext} className="px-3 py-2 rounded-md bg-blue-600 text-white">New</button>
+            <button
+              type="button"
+              onClick={() => { if (cluesLocked) return; setShowClues((s) => !s); }}
+              disabled={cluesLocked}
+              className={"px-3 py-2 rounded-md bg-slate-600 text-white " + (cluesLocked ? 'opacity-50 cursor-not-allowed' : '')}
+            >
+              {showClues ? 'Hide Clues' : (cluesLocked ? `Show Clues (${triesLeft} tries left)` : 'Show Clues')}
+            </button>
+          </form>
+
+          <div className="min-h-5 text-sm text-amber-200">{feedback}</div>
+
+          {current && (revealed || cluesUnlocked > 0) ? (
+            (() => {
+              const fields = [
+                { key: 'gender', label: 'Gender', value: current.gender ?? '—' },
+                { key: 'age', label: 'Age', value: current.age ?? '—' },
+                { key: 'clan', label: 'Clan', value: current.clan ?? '—' },
+                { key: 'rank', label: 'Rank', value: current.rank ?? '—' },
+                { key: 'affiliations', label: 'Affiliations', value: current.affiliations?.join(', ') ?? '—', colSpan: 2 },
+                { key: 'nature', label: 'Nature', value: current.natureAffinity?.join(', ') ?? '—' },
+                { key: 'firstAppearance', label: 'First Appearance', value: current.firstAppearance ?? '—' },
+              ];
+
+              const toShow = (revealed || cluesUnlocked > 0) ? fields : fields.slice(0, cluesUnlocked);
+
+              return (
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-200">
+                  {toShow.length === 0 ? (
+                    <div className="text-sm text-gray-400">No clues unlocked yet — make guesses to unlock clues.</div>
+                  ) : null}
+                  {toShow.map((f) => (
+                    <div key={f.key} className={f.colSpan === 2 ? 'sm:col-span-2' : ''}>
+                      <strong>{f.label}:</strong> {f.value}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()
+          ) : null}
+        </div>
+
+        {guesses.length > 0 ? (
+          <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm mt-6">
+            <div className="overflow-auto">
+              <div className="grid grid-cols-8 gap-3 items-center mb-3">
+                {[
+                  'Name',
+                  'Gender',
+                  'Age',
+                  'Clan',
+                  'Affiliation',
+                  'Rank',
+                  'Nature',
+                  'First Arc',
+                ].map((h) => (
+                  <div
+                    key={h}
+                    className="px-3 py-1 bg-white/90 dark:bg-gray-800 rounded-full text-xs shadow-md border border-gray-200 dark:border-gray-700 text-center"
+                  >
+                    {h}
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3">
+                {guesses.map(({ char, matches, ageComparison, arcComparison }, i) => (
+                  <div
+                    key={i}
+                    className="grid grid-cols-8 gap-3 items-center text-sm bg-white/5 p-3 rounded-lg shadow-inner"
+                  >
+                    <div className={`px-3 py-2 rounded-md font-semibold text-center ${matches.name ? 'bg-emerald-500 text-white shadow' : 'bg-red-500 text-white shadow'}`}>
+                      {char.name}
+                    </div>
+
+                    <div className={`px-3 py-2 rounded-md text-center ${matches.gender ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      {char.gender ?? '—'}
+                    </div>
+
+                    <div className={`px-3 py-2 rounded-md text-center ${matches.age ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      <div className="flex items-center justify-center gap-1">
+                        <span>{char.age ?? '—'}</span>
+                        {ageComparison === 'higher' && <span className="text-lg">↑</span>}
+                        {ageComparison === 'lower' && <span className="text-lg">↓</span>}
+                      </div>
+                    </div>
+
+                    <div className={`px-3 py-2 rounded-md text-center ${matches.clan ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      {char.clan ?? '—'}
+                    </div>
+
+                    <div className={`px-3 py-2 rounded-md text-center ${matches.affiliations ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      {char.affiliations?.join(', ') ?? '—'}
+                    </div>
+
+                    <div className={`px-3 py-2 rounded-md text-center ${matches.rank ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      {char.rank ?? '—'}
+                    </div>
+
+                    <div className={`px-3 py-2 rounded-md text-center ${matches.nature ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      {char.natureAffinity?.join(', ') ?? '—'}
+                    </div>
+
+                    <div className={`px-3 py-2 rounded-md text-center ${matches.firstAppearance ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      <div className="flex items-center justify-center gap-1">
+                        <span>{char.firstAppearance ?? '—'}</span>
+                        {(typeof arcComparison !== 'undefined' && arcComparison !== null) ? (
+                          arcComparison === 'later' ? <span className="text-lg" title="Target appears later than guessed">↑</span>
+                          : arcComparison === 'earlier' ? <span className="text-lg" title="Target appears earlier than guessed">↓</span>
+                          : null
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        <footer className="mt-4 text-xs text-gray-500">Add images to <code>/public/images</code> and entries to <code>/public/characters.json</code>.</footer>
+      </div>
+    </main>
+  );
+}
