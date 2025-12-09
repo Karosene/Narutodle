@@ -93,10 +93,11 @@ const resources = [
 type Character = {
   name: string;
   file: string;
-  aliases?: string[];
   gender?: string;
   age?: string;
+  height?: string;
   clan?: string;
+  team?: string;
   affiliations?: string[];
   rank?: string;
   natureAffinity?: string[];
@@ -123,17 +124,16 @@ export default function Site() {
   const [guess, setGuess] = useState("");
   const [revealed, setRevealed] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [showClues, setShowClues] = useState(false);
   const [guesses, setGuesses] = useState<
-    { char: Character; matches: Record<string, boolean>; ageComparison?: string | null; arcComparison?: string | null; rankComparison?: string | null }[]
+    { char: Character; matches: Record<string, boolean>; ageComparison?: string | null; arcComparison?: string | null; rankComparison?: string | null; heightComparison?: string | null }[]
   >([]);
+  const [showAttributes, setShowAttributes] = useState(false);
   const mounted = useRef(false);
 
   const TRIES_REQUIRED = 10;
   const CLUE_COUNT = 7;
-  const triesLeft = Math.max(0, TRIES_REQUIRED - guesses.length);
   const cluesUnlocked = guesses.length >= TRIES_REQUIRED ? CLUE_COUNT : 0;
-  const cluesLocked = guesses.length < TRIES_REQUIRED;
+  const AFFILIATION_UNLOCK_TRIES = 7;
 
   useEffect(() => {
     fetch("/characters.json")
@@ -178,14 +178,25 @@ export default function Site() {
     const nq = normalize(q);
     const guessedSet = new Set((guesses || []).map((g) => normalize(g.char.name)));
 
-    const matches = characters
-      .filter((c) => {
-        if (guessedSet.has(normalize(c.name))) return false;
-        if (normalize(c.name).includes(nq)) return true;
-        if (c.aliases && c.aliases.some((a) => normalize(a).includes(nq))) return true;
-        return false;
-      })
-      .slice(0, 8);
+    const firstNameMatches: Character[] = [];
+    const lastNameMatches: Character[] = [];
+
+    characters.forEach((c) => {
+      if (guessedSet.has(normalize(c.name))) return;
+      const nameParts = c.name.split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
+
+      if (normalize(firstName).startsWith(nq)) {
+        firstNameMatches.push(c);
+      } else if (lastName && normalize(lastName).startsWith(nq)) {
+        lastNameMatches.push(c);
+      }
+    });
+
+    const matches = [...firstNameMatches, ...lastNameMatches]
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+      .slice(0, 12);
 
     setSuggestions(matches);
     setShowSuggestions(matches.length > 0);
@@ -253,6 +264,7 @@ export default function Site() {
     'Genin',
     'Chūnin',
     'Jōnin',
+    'Tokubetsu Jōnin',
     'Anbu',
     'Kage',
   ];
@@ -315,9 +327,17 @@ export default function Site() {
         !!guessed.age && !!currentChar?.age
           ? normalize(guessed.age) === normalize(currentChar!.age!)
           : false,
+      height:
+        !!guessed.height && !!currentChar?.height
+          ? normalize(guessed.height) === normalize(currentChar!.height!)
+          : false,
       clan:
         !!guessed.clan && !!currentChar?.clan
           ? normalize(guessed.clan) === normalize(currentChar!.clan!)
+          : false,
+      team:
+        !!guessed.team && !!currentChar?.team
+          ? normalize(guessed.team) === normalize(currentChar!.team!)
           : false,
       affiliations: arrayOverlap(guessed.affiliations, currentChar?.affiliations),
       rank:
@@ -331,7 +351,18 @@ export default function Site() {
           : false,
     };
 
-    return { matches, ageComparison, arcComparison, rankComparison };
+    const guessedHeightNum = guessed.height ? parseFloat(guessed.height.match(/[\d.]+/)?.[0] ?? '') : null;
+    const currentHeightNum = currentChar?.height ? parseFloat(currentChar.height.match(/[\d.]+/)?.[0] ?? '') : null;
+    const heightComparison =
+      guessedHeightNum !== null && currentHeightNum !== null && !isNaN(guessedHeightNum) && !isNaN(currentHeightNum)
+        ? guessedHeightNum < currentHeightNum
+          ? 'taller'
+          : guessedHeightNum > currentHeightNum
+          ? 'shorter'
+          : 'equal'
+        : null;
+
+    return { matches, ageComparison, arcComparison, rankComparison, heightComparison };
   }
 
   function checkGuess(e?: React.FormEvent) {
@@ -339,7 +370,7 @@ export default function Site() {
     if (!current || !characters) return;
     const n = normalize(guess || "");
     const guessed = characters.find((c) =>
-      [c.name, ...(c.aliases || [])].map(normalize).includes(n)
+      normalize(c.name) === n
     );
 
     if (!guessed) {
@@ -347,16 +378,28 @@ export default function Site() {
       return;
     }
 
-    const { matches, ageComparison, arcComparison, rankComparison } = computeComparison(guessed, current);
+    if (guesses.some((g) => g.char.name === guessed.name)) {
+      setFeedback("You already guessed this character!");
+      setGuess("");
+      setShowSuggestions(false);
+      return;
+    }
+
+    const { matches, ageComparison, arcComparison, rankComparison, heightComparison } = computeComparison(guessed, current);
     const tries = guesses.length + 1;
-    setGuesses((s) => [{ char: guessed, matches, ageComparison, arcComparison, rankComparison }, ...s].slice(0, 20));
+    setGuesses((s) => [{ char: guessed, matches, ageComparison, arcComparison, rankComparison, heightComparison }, ...s].slice(0, 20));
+    setGuess("");
+    setShowSuggestions(false);
 
     if (matches.name) {
       setRevealed(true);
-      setFeedback(`Correct! It's ${current.name}. You guessed it in ${tries} ${tries === 1 ? 'try' : 'tries'}.`);
-    } else {
-      setFeedback("Guess recorded — see comparison row below.");
     }
+  }
+
+  function giveUp() {
+    if (!current) return;
+    setShowAttributes(true);
+    setFeedback(`Revealed: ${current.name}`);
   }
 
   function pickNext() {
@@ -365,18 +408,19 @@ export default function Site() {
     let next = Math.floor(Math.random() * characters.length);
     if (next === idx) next = (next + 1) % characters.length;
     setGuesses([]);
+    setShowAttributes(false);
     setIdx(next);
   }
 
+
   return (
-    <main className="flex items-start justify-center min-h-screen p-8 mt-10">
-      <div className="w-full max-w-6xl">
+    <main className={`flex items-start justify-center min-h-screen p-8 mt-10 ${guesses.length === 0 ? 'overflow-hidden' : 'overflow-auto'}`}>
+      <div className="w-full max-w-6xl space-y-6">
         <h1 className="text-5xl sm:text-6xl font-extrabold mb-2 text-center">Narutodle</h1>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-10 text-center">Refresh the page (or press New) to get a new character — type your guess and submit.</p>
 
-        <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm">
-
-          <form onSubmit={checkGuess} className="flex gap-2 mb-3 relative items-center" ref={suggRef}>
+        <div className="bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 rounded-2xl p-6 shadow-lg border border-white/10 dark:border-white/5 w-1/2 mx-auto">
+          <form onSubmit={checkGuess} className="flex gap-3 relative items-center" ref={suggRef}>
             <input
               ref={inputRef}
               value={guess}
@@ -398,14 +442,11 @@ export default function Site() {
                       setActiveSuggestion(-1);
                       // submit the selected suggestion as a guess immediately
                       if (current) {
-                        const { matches, ageComparison, arcComparison, rankComparison } = computeComparison(s, current);
+                        const { matches, ageComparison, arcComparison, rankComparison, heightComparison } = computeComparison(s, current);
                         const tries = guesses.length + 1;
-                        setGuesses((st) => [{ char: s, matches, ageComparison, arcComparison, rankComparison }, ...st].slice(0, 20));
+                        setGuesses((st) => [{ char: s, matches, ageComparison, arcComparison, rankComparison, heightComparison }, ...st].slice(0, 20));
                         if (matches.name) {
                           setRevealed(true);
-                          setFeedback(`Correct! It's ${current.name}. You guessed it in ${tries} ${tries === 1 ? 'try' : 'tries'}.`);
-                        } else {
-                          setFeedback('Guess recorded — see comparison row below.');
                         }
                       }
                     }
@@ -416,7 +457,7 @@ export default function Site() {
               }}
               role="combobox"
               aria-activedescendant={activeSuggestion >= 0 ? `suggestion-${activeSuggestion}` : undefined}
-              className="flex-1 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white text-black dark:bg-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              className="flex-1 px-4 py-3 rounded-lg border-2 border-transparent bg-white/80 dark:bg-gray-800/80 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition"
               placeholder="Who is this?"
               aria-autocomplete="list"
               aria-expanded={showSuggestions}
@@ -424,7 +465,7 @@ export default function Site() {
             />
 
             {showSuggestions && suggestions.length > 0 ? (
-              <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 top-full mt-2 z-50 bg-white/95 dark:bg-gray-800 rounded-md shadow-lg max-h-60 overflow-auto border border-gray-200 dark:border-gray-700">
+              <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 top-full mt-2 z-50 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-xl max-h-96 overflow-auto border border-white/20 dark:border-gray-700/50">
                 {suggestions.map((s, i) => (
                   <div
                     id={`suggestion-${i}`}
@@ -439,75 +480,86 @@ export default function Site() {
                       setTimeout(() => inputRef.current?.focus(), 0);
                     }}
                     onMouseEnter={() => setActiveSuggestion(i)}
-                    className={`px-4 py-6 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 ${i === activeSuggestion ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                    className={`px-4 py-3 cursor-pointer transition ${i === activeSuggestion ? 'bg-blue-500/20 dark:bg-blue-500/30 border-l-4 border-blue-500' : 'hover:bg-gray-100/50 dark:hover:bg-gray-700/50'}`}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 h-20">
                       {s.file ? (
-                        <div className="w-16 h-16 flex items-center justify-center">
-                          <img src={s.file} alt={`${s.name} photo`} className="w-16 h-16 rounded-md object-cover" />
+                        <div className="w-20 h-20 flex items-center justify-center shrink-0 rounded-lg bg-white/50 dark:bg-gray-700/50">
+                          <img src={s.file} alt={`${s.name} photo`} style={{ height: '95%', width: '95%' }} className="rounded-md object-cover" />
                         </div>
                       ) : null}
                       <div>
-                        <div className="font-medium">{s.name}</div>
-                        {s.aliases && s.aliases.length > 0 ? <div className="text-xs text-gray-500">Aliases: {s.aliases.join(', ')}</div> : null}
+                        <div className="font-semibold text-base text-gray-900 dark:text-white">{s.name}</div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : null}
-            <button type="submit" className="px-3 py-2 rounded-md bg-yellow-400 text-black font-semibold">Guess</button>
-            <button type="button" onClick={pickNext} className="px-3 py-2 rounded-md bg-blue-600 text-white">New</button>
-            <button
-              type="button"
-              onClick={() => { if (cluesLocked) return; setShowClues((s) => !s); }}
-              disabled={cluesLocked}
-              className={"px-3 py-2 rounded-md bg-slate-600 text-white " + (cluesLocked ? 'opacity-50 cursor-not-allowed' : '')}
-            >
-              {showClues ? 'Hide Clues' : (cluesLocked ? `Show Clues (${triesLeft} tries left)` : 'Show Clues')}
-            </button>
+            <button type="submit" className="px-6 py-3 rounded-lg bg-linear-to-r from-yellow-400 to-yellow-500 text-black font-bold shadow-md hover:shadow-lg hover:from-yellow-300 hover:to-yellow-400 transition transform hover:scale-105 active:scale-95">Guess</button>
+            {guesses.length > 0 && !revealed && !showAttributes ? (
+              <button type="button" onClick={giveUp} className="px-6 py-3 rounded-lg bg-linear-to-r from-red-500 to-red-600 text-white font-bold shadow-md hover:shadow-lg hover:from-red-400 hover:to-red-500 transition transform hover:scale-105 active:scale-95">Give Up</button>
+            ) : null}
           </form>
-
-          <div className="min-h-5 text-sm text-amber-200">{feedback}</div>
-
-          {current && (revealed || cluesUnlocked > 0) ? (
+          {current && (revealed || showAttributes) ? (
+            <div className="mt-2 p-6 rounded-xl bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 border border-white/10 dark:border-white/5 shadow-lg">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-72 h-72 flex items-center justify-center shrink-0 rounded-lg bg-white/10 dark:bg-gray-700/20">
+                  {current.file ? (
+                    <img src={current.file} alt={current.name} style={{ width: '95%', height: '95%' }} className="rounded-md object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center rounded-md bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-100 font-bold text-4xl">{(current.name || '').split(' ').map(s => s[0]).slice(0,2).join('')}</div>
+                  )}
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">{current.name}</div>
+                </div>
+              </div>
+              <div className="mt-4 flex justify-center">
+                <button type="button" onClick={pickNext} className="px-5 py-2 rounded-lg bg-linear-to-r from-green-500 to-green-600 text-white font-bold shadow-md hover:shadow-lg hover:from-green-400 hover:to-green-500 transition">New Game</button>
+              </div>
+            </div>
+          ) : current && guesses.length >= 10 ? (
             (() => {
-              const fields = [
-                { key: 'gender', label: 'Gender', value: current.gender ?? '—' },
-                { key: 'age', label: 'Age', value: current.age ?? '—' },
-                { key: 'clan', label: 'Clan', value: current.clan ?? '—' },
-                { key: 'rank', label: 'Rank', value: current.rank ?? '—' },
-                { key: 'affiliations', label: 'Affiliations', value: current.affiliations?.join(', ') ?? '—', colSpan: 2 },
-                { key: 'nature', label: 'Nature', value: current.natureAffinity?.join(', ') ?? '—' },
-                { key: 'firstAppearance', label: 'First Appearance', value: current.firstAppearance ?? '—' },
-              ];
-
-              const toShow = (revealed || cluesUnlocked > 0) ? fields : fields.slice(0, cluesUnlocked);
-
+              const blurAmount = Math.max(0, (20 - guesses.length) * 2);
               return (
-                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-200">
-                  {toShow.length === 0 ? (
-                    <div className="text-sm text-gray-400">No clues unlocked yet — make guesses to unlock clues.</div>
-                  ) : null}
-                  {toShow.map((f) => (
-                    <div key={f.key} className={f.colSpan === 2 ? 'sm:col-span-2' : ''}>
-                      <strong>{f.label}:</strong> {f.value}
+                <div className="mt-2 p-6 rounded-xl bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 border border-white/10 dark:border-white/5 shadow-lg">
+                  <h3 className="text-lg font-bold text-white mb-4 text-center">Character Hint</h3>
+                  <div className="flex justify-center">
+                    <div className="w-40 h-40 rounded-lg overflow-hidden bg-gray-700">
+                      {current.file ? (
+                        <img 
+                          src={current.file} 
+                          alt={current.name} 
+                          style={{ filter: `blur(${blurAmount}px)`, width: '100%', height: '100%' }} 
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white font-bold text-xl">{(current.name || '').split(' ').map(s => s[0]).slice(0,2).join('')}</div>
+                      )}
                     </div>
-                  ))}
+                  </div>
+                  <div className="text-center text-xs text-gray-400 mt-3">Blur clears with each guess (guesses: {guesses.length}/20)</div>
                 </div>
               );
             })()
           ) : null}
 
+          
+        </div>
+
+        <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm">
           {guesses.length > 0 ? (
-            <div className="mt-6 overflow-auto">
-              <div className="grid grid-cols-9 gap-3 items-center mb-3">
+            <div className="overflow-auto">
+              <div className="grid grid-cols-11 gap-2 items-center mb-3">
                 {[
                   'Photo',
                   'Name',
                   'Gender',
                   'Age',
+                  'Height',
                   'Clan',
+                  'Team',
                   'Affiliation',
                   'Rank',
                   'Nature',
@@ -515,7 +567,7 @@ export default function Site() {
                 ].map((h) => (
                   <div
                     key={h}
-                    className="px-3 py-1 bg-white/90 dark:bg-gray-800 rounded-full text-xs shadow-md border border-gray-200 dark:border-gray-700 text-center"
+                    className="px-2 py-1 bg-white/90 dark:bg-gray-800 rounded-full text-xs shadow-md border border-gray-200 dark:border-gray-700 text-center truncate"
                   >
                     {h}
                   </div>
@@ -523,30 +575,30 @@ export default function Site() {
               </div>
 
               <div className="space-y-3">
-                {guesses.map(({ char, matches, ageComparison, arcComparison, rankComparison }, i) => (
+                {guesses.map(({ char, matches, ageComparison, arcComparison, rankComparison, heightComparison }, i) => (
                   <div
                     key={i}
-                    className="grid grid-cols-9 gap-3 items-center text-sm bg-white/5 p-6 min-h-24 rounded-lg shadow-inner"
+                    className="grid grid-cols-11 gap-2 items-center text-xs bg-white/5 p-4 min-h-20 rounded-lg shadow-inner"
                   >
-                    <div className={`px-3 rounded-md text-center ${matches.name ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
-                      <div className="h-24 flex items-center justify-center">
+                    <div className={`px-2 rounded-md text-center ${matches.name ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      <div className="h-20 flex items-center justify-center">
                         {char.file ? (
                           <img src={char.file} alt={`${char.name} photo`} style={{ height: '85%' }} className="rounded-md object-cover" />
                         ) : (
-                          <div className="w-[72px] h-[72px] rounded-md bg-gray-200 dark:bg-gray-700" />
+                          <div className="w-16 h-16 rounded-md bg-gray-200 dark:bg-gray-700" />
                         )}
                       </div>
                     </div>
 
-                    <div className={`px-3 rounded-md text-center flex items-center justify-center h-24 font-semibold ${matches.name ? 'bg-emerald-500 text-white shadow' : 'bg-red-500 text-white shadow'}`}>
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 font-semibold wrap-break-word ${matches.name ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                       {char.name}
                     </div>
 
-                    <div className={`px-3 rounded-md text-center flex items-center justify-center h-24 ${matches.gender ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 wrap-break-word ${matches.gender ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                       {char.gender ?? '—'}
                     </div>
 
-                    <div className={`px-3 rounded-md text-center flex items-center justify-center h-24 ${matches.age ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 ${matches.age ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                       <div className="flex items-center justify-center gap-1">
                         <span>{char.age ?? '—'}</span>
                         {ageComparison === 'higher' && <span className="text-lg">↑</span>}
@@ -554,15 +606,27 @@ export default function Site() {
                       </div>
                     </div>
 
-                    <div className={`px-3 rounded-md text-center flex items-center justify-center h-24 ${matches.clan ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 truncate ${matches.height ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      <div className="flex items-center justify-center gap-1">
+                        <span>{char.height ?? '—'}</span>
+                        {heightComparison === 'taller' && <span className="text-lg">↑</span>}
+                        {heightComparison === 'shorter' && <span className="text-lg">↓</span>}
+                      </div>
+                    </div>
+
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 wrap-break-word ${matches.clan ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                       {char.clan ?? '—'}
                     </div>
 
-                    <div className={`px-3 rounded-md text-center flex items-center justify-center h-24 ${matches.affiliations ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 wrap-break-word ${matches.team ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                      {char.team ?? '—'}
+                    </div>
+
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 wrap-break-word ${matches.affiliations ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                       {char.affiliations?.join(', ') ?? '—'}
                     </div>
 
-                    <div className={`px-3 rounded-md text-center flex items-center justify-center h-24 ${matches.rank ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 ${matches.rank ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                       <div className="flex items-center justify-center gap-1">
                         <span>{char.rank ?? '—'}</span>
                         {rankComparison === 'higher' && <span className="text-lg" title="Target has higher rank">↑</span>}
@@ -570,11 +634,11 @@ export default function Site() {
                       </div>
                     </div>
 
-                    <div className={`px-3 rounded-md text-center flex items-center justify-center h-24 ${matches.nature ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 wrap-break-word ${matches.nature ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                       {char.natureAffinity?.join(', ') ?? '—'}
                     </div>
 
-                    <div className={`px-3 rounded-md text-center flex items-center justify-center h-24 ${matches.firstAppearance ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                    <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 wrap-break-word ${matches.firstAppearance ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                       <div className="flex items-center justify-center gap-1">
                         <span>{char.firstAppearance ?? '—'}</span>
                         {(typeof arcComparison !== 'undefined' && arcComparison !== null) ? (
@@ -588,7 +652,9 @@ export default function Site() {
                 ))}
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div className="text-sm text-gray-600 dark:text-gray-300">No guesses yet — start typing to make your first guess!</div>
+          )}
         </div>
 
         <footer className="mt-4 text-xs text-gray-500">Add images to <code>/public/images</code> and entries to <code>/public/characters.json</code>.</footer>

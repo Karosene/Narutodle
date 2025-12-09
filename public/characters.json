@@ -1,8 +1,7 @@
 [
   {
     "name": "Mahiru",
-    "file": "",
-    "aliases": [],
+    "file": "/images/mahiru.png",
     "gender": "Male",
     "age": "24",
     "natureAffinity": ["Earth Release"],
@@ -15,8 +14,7 @@
   },
   {
     "name": "Saiken",
-    "file": "",
-    "aliases": [],
+    "file": "/images/saiken.png",
     "gender": "Male",
     "age": "Unknown",
     "natureAffinity": ["Water Release"],
@@ -29,8 +27,7 @@
   },
   {
     "name": "Ittan",
-    "file": "",
-    "aliases": [],
+    "file": "/images/ittan.png",
     "gender": "Male",
     "age": "23",
     "natureAffinity": ["Earth Release"],
@@ -43,8 +40,7 @@
   },
   {
     "name": "Yahiko",
-    "file": "",
-    "aliases": [],
+    "file": "/images/yahiko.png",
     "gender": "Male",
     "age": "15",
     "natureAffinity": ["Water Release"],
@@ -57,7 +53,7 @@
   },
   {
     "name": "Yamato",
-    "file": "",
+    "file": "/images/yamato.png",
     "aliases": [],
     "gender": "Male",
     "age": "26-27",
@@ -71,7 +67,7 @@
   },
   {
     "name": "Tobirama Senju",
-    "file": "",
+    "file": "/images/tobiramaSenju.png",
     "aliases": ["Tobirama"],
     "gender": "Male",
     "age": "Unknown",
@@ -85,7 +81,7 @@
   },
   {
     "name": "Karin",
-    "file": "",
+    "file": "/images/karin.png",
     "aliases": [],
     "gender": "Female",
     "age": "17",
@@ -99,7 +95,7 @@
   },
   {
     "name": "Izuna Uchiha",
-    "file": "",
+    "file": "/images/izunaUchiha.png",
     "aliases": [],
     "gender": "Male",
     "age": "24",
@@ -113,7 +109,7 @@
   },
   {
     "name": "Jirōbō",
-    "file": "",
+    "file": "/images/jirobo.png",
     "aliases": [],
     "gender": "Male",
     "age": "14",
@@ -141,7 +137,7 @@
   },
   {
     "name": "Kyūsuke",
-    "file": "",
+    "file": "/images/kyusuke.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -155,7 +151,7 @@
   },
   {
     "name": "Itachi Uchiha",
-    "file": "",
+    "file": "/images/itachiUchiha.png",
     "aliases": [],
     "gender": "Male",
     "age": "21",
@@ -169,7 +165,7 @@
   },
   {
     "name": "Tekka Uchiha",
-    "file": "",
+    "file": "/images/tekkaUchiha.png",
     "aliases": [],
     "gender": "Male",
     "age": "21",
@@ -183,7 +179,7 @@
   },
   {
     "name": "Jūzō Biwa",
-    "file": "",
+    "file": "/images/juzoBiwa.png",
     "aliases": [],
     "gender": "Male",
     "age": "31",
@@ -197,7 +193,7 @@
   },
   {
     "name": "Danzō Shimura",
-    "file": "",
+    "file": "/images/danzoShimura.png",
     "aliases": ["Danzō"],
     "gender": "Male",
     "age": "73",
@@ -211,7 +207,7 @@
   },
   {
     "name": "Nagato",
-    "file": "",
+    "file": "/images/nagato.png",
     "aliases": [],
     "gender": "Male",
     "age": "35",
@@ -239,7 +235,7 @@
   },
   {
     "name": "Fugaku Uchiha",
-    "file": "",
+    "file": "/images/fugakuUchiha.png",
     "aliases": [],
     "gender": "Male",
     "age": "40",
@@ -253,7 +249,7 @@
   },
   {
     "name": "Gamatatsu",
-    "file": "",
+    "file": "/images/gamatatsu.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -267,7 +263,7 @@
   },
   {
     "name": "Han",
-    "file": "",
+    "file": "/images/han.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -281,7 +277,7 @@
   },
   {
     "name": "Kabuto Yakushi",
-    "file": "",
+    "file": "/images/kabutoYakushi.png",
     "aliases": ["Kabuto"],
     "gender": "Male",
     "age": "24",
@@ -295,7 +291,7 @@
   },
   {
     "name": "Yugito Nii",
-    "file": "",
+    "file": "/images/yugitoNii.png",
     "aliases": [],
     "gender": "Female",
     "age": "29",
@@ -309,7 +305,7 @@
   },
   {
     "name": "Oboro",
-    "file": "",
+    "file": "/images/oboro.png",
     "aliases": [],
     "gender": "Male",
     "age": "17",
@@ -323,7 +319,7 @@
   },
   {
     "name": "Killer B",
-    "file": "",
+    "file": "/images/killerB.png",
     "aliases": ["Killer B"],
     "gender": "Male",
     "age": "36",
@@ -337,7 +333,7 @@
   },
   {
     "name": "Rasa",
-    "file": "",
+    "file": "/images/rasa.png",
     "aliases": [],
     "gender": "Male",
     "age": "40",
@@ -351,7 +347,7 @@
   },
   {
     "name": "Rin Nohara",
-    "file": "",
+    "file": "/images/rinNohara.png",
     "aliases": [],
     "gender": "Female",
     "age": "Unknown",
@@ -365,7 +361,7 @@
   },
   {
     "name": "Chōjūrō",
-    "file": "",
+    "file": "/images/chojuro.png",
     "aliases": [],
     "gender": "Male",
     "age": "19",
@@ -379,7 +375,7 @@
   },
   {
     "name": "C",
-    "file": "",
+    "file": "/images/c.png",
     "aliases": [],
     "gender": "Male",
     "age": "26",
@@ -393,7 +389,7 @@
   },
   {
     "name": "Maruten Akimichi",
-    "file": "",
+    "file": "/images/marutenAkimichi.png",
     "aliases": [],
     "gender": "Male",
     "age": "21",
@@ -407,7 +403,7 @@
   },
   {
     "name": "Atsui",
-    "file": "",
+    "file": "/images/atsui.png",
     "aliases": [],
     "gender": "Male",
     "age": "19",
@@ -421,7 +417,7 @@
   },
   {
     "name": "Mubi",
-    "file": "",
+    "file": "/images/mubi.png",
     "aliases": [],
     "gender": "Male",
     "age": "17",
@@ -449,7 +445,7 @@
   },
   {
     "name": "Makaro Akimichi",
-    "file": "",
+    "file": "/images/makaroAkimichi.png",
     "aliases": [],
     "gender": "Male",
     "age": "17",
@@ -463,7 +459,7 @@
   },
   {
     "name": "Kokuō",
-    "file": "",
+    "file": "/images/kokuo.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -477,7 +473,7 @@
   },
   {
     "name": "Hashirama Senju",
-    "file": "",
+    "file": "/images/hashiramaSenju.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -491,7 +487,7 @@
   },
   {
     "name": "Jūgo",
-    "file": "",
+    "file": "/images/jugo.png",
     "aliases": [],
     "gender": "Male",
     "age": "19",
@@ -505,7 +501,7 @@
   },
   {
     "name": "Sakura Haruno",
-    "file": "",
+    "file": "/images/sakuraHaruno.png",
     "aliases": [],
     "gender": "Female",
     "age": "17",
@@ -533,7 +529,7 @@
   },
   {
     "name": "Sasuke Uchiha",
-    "file": "",
+    "file": "/images/sasukeUchiha.png",
     "aliases": ["Sasuke"],
     "gender": "Male",
     "age": "17",
@@ -547,7 +543,7 @@
   },
   {
     "name": "Gaara",
-    "file": "",
+    "file": "/images/gaara.png",
     "aliases": [],
     "gender": "Male",
     "age": "17",
@@ -561,7 +557,7 @@
   },
   {
     "name": "Kisame Hoshigaki",
-    "file": "",
+    "file": "/images/kisameHoshigaki.png",
     "aliases": [],
     "gender": "Male",
     "age": "33",
@@ -575,7 +571,7 @@
   },
   {
     "name": "Kaguya Ōtsutsuki",
-    "file": "",
+    "file": "/images/kaguyaOtsutsuki.png",
     "aliases": [],
     "gender": "Female",
     "age": "Unknown",
@@ -589,7 +585,7 @@
   },
   {
     "name": "Blue B",
-    "file": "",
+    "file": "/images/blueB.png",
     "aliases": [],
     "gender": "Male",
     "age": "22",
@@ -603,7 +599,7 @@
   },
   {
     "name": "Indra Ōtsutsuki",
-    "file": "",
+    "file": "/images/indraOtsutsuki.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -617,7 +613,7 @@
   },
   {
     "name": "Shukaku",
-    "file": "",
+    "file": "/images/shukaku.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -631,7 +627,7 @@
   },
   {
     "name": "Tayuya",
-    "file": "",
+    "file": "/images/tayuya.png",
     "aliases": [],
     "gender": "Female",
     "age": "14",
@@ -659,7 +655,7 @@
   },
   {
     "name": "Akatsuchi",
-    "file": "",
+    "file": "/images/akatsuchi.png",
     "aliases": [],
     "gender": "Male",
     "age": "20",
@@ -673,7 +669,7 @@
   },
   {
     "name": "Konan",
-    "file": "",
+    "file": "/images/konan.png",
     "aliases": [],
     "gender": "Female",
     "age": "35",
@@ -701,7 +697,7 @@
   },
   {
     "name": "Meizu",
-    "file": "",
+    "file": "/images/meizu.png",
     "aliases": [],
     "gender": "Male",
     "age": "25",
@@ -729,7 +725,7 @@
   },
   {
     "name": "Shino Aburame",
-    "file": "",
+    "file": "/images/shinoAburame.png",
     "aliases": [],
     "gender": "Male",
     "age": "17",
@@ -743,7 +739,7 @@
   },
   {
     "name": "Kasuga Nara",
-    "file": "",
+    "file": "/images/kasugaNara.png",
     "aliases": [],
     "gender": "Male",
     "age": "25",
@@ -785,7 +781,7 @@
   },
   {
     "name": "Kussaku",
-    "file": "",
+    "file": "/images/kussaku.png",
     "aliases": [],
     "gender": "Male",
     "age": "20",
@@ -799,7 +795,7 @@
   },
   {
     "name": "Dan Katō",
-    "file": "",
+    "file": "/images/danKato.png",
     "aliases": [],
     "gender": "Male",
     "age": "27",
@@ -813,7 +809,7 @@
   },
   {
     "name": "Sumashi",
-    "file": "",
+    "file": "/images/sumashi.png",
     "aliases": [],
     "gender": "Male",
     "age": "26",
@@ -939,7 +935,7 @@
   },
   {
     "name": "Iruka Umino",
-    "file": "",
+    "file": "/images/irukaUmino.png",
     "aliases": [],
     "gender": "Male",
     "age": "27",
@@ -1135,7 +1131,7 @@
   },
   {
     "name": "Hinata Hyūga",
-    "file": "",
+    "file": "/images/hinataHyuga.png",
     "aliases": [],
     "gender": "Female",
     "age": "16",
@@ -1149,7 +1145,7 @@
   },
   {
     "name": "Yoroi Akadō",
-    "file": "",
+    "file": "/images/yoroiAkado.png",
     "aliases": [],
     "gender": "Male",
     "age": "23",
@@ -1177,7 +1173,7 @@
   },
   {
     "name": "Ōnoki",
-    "file": "",
+    "file": "/images/onoki.png",
     "aliases": [],
     "gender": "Male",
     "age": "79",
@@ -1191,7 +1187,7 @@
   },
   {
     "name": "Chūkichi",
-    "file": "",
+    "file": "/images/chukichi.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1219,7 +1215,7 @@
   },
   {
     "name": "Aoba Yamashiro",
-    "file": "",
+    "file": "/images/aobaYamashiro.png",
     "aliases": [],
     "gender": "Male",
     "age": "34",
@@ -1233,7 +1229,7 @@
   },
   {
     "name": "Chōji Akimichi",
-    "file": "",
+    "file": "/images/chojiAkimichi.png",
     "aliases": [],
     "gender": "Male",
     "age": "17",
@@ -1247,7 +1243,7 @@
   },
   {
     "name": "Fukasaku",
-    "file": "",
+    "file": "/images/fukasaku.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1275,7 +1271,7 @@
   },
   {
     "name": "Pakura",
-    "file": "",
+    "file": "/images/pakura.png",
     "aliases": [],
     "gender": "Female",
     "age": "Unknown",
@@ -1289,7 +1285,7 @@
   },
   {
     "name": "Shikaku Nara",
-    "file": "",
+    "file": "/images/shikakuNara.png",
     "aliases": [],
     "gender": "Male",
     "age": "42",
@@ -1303,7 +1299,7 @@
   },
   {
     "name": "Madara Uchiha",
-    "file": "",
+    "file": "/images/madaraUchiha.png",
     "aliases": ["Madara"],
     "gender": "Male",
     "age": "Unknown",
@@ -1317,7 +1313,7 @@
   },
   {
     "name": "Gōzu",
-    "file": "",
+    "file": "/images/gozu.png",
     "aliases": [],
     "gender": "Male",
     "age": "25",
@@ -1345,7 +1341,7 @@
   },
   {
     "name": "Ishikawa",
-    "file": "",
+    "file": "/images/ishikawa.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1359,7 +1355,7 @@
   },
   {
     "name": "Maen Nara",
-    "file": "",
+    "file": "/images/maenNara.png",
     "aliases": [],
     "gender": "Male",
     "age": "27",
@@ -1373,7 +1369,7 @@
   },
   {
     "name": "Gari",
-    "file": "",
+    "file": "/images/gari.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1387,7 +1383,7 @@
   },
   {
     "name": "Kurotsuchi",
-    "file": "",
+    "file": "/images/kurotsuchi.png",
     "aliases": [],
     "gender": "Female",
     "age": "18",
@@ -1401,7 +1397,7 @@
   },
   {
     "name": "Omoi",
-    "file": "",
+    "file": "/images/omoi.png",
     "aliases": [],
     "gender": "Male",
     "age": "16",
@@ -1415,7 +1411,7 @@
   },
   {
     "name": "Hamura Ōtsutsuki",
-    "file": "",
+    "file": "/images/hamuraOtsutsuki.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1429,7 +1425,7 @@
   },
   {
     "name": "Misumi Tsurugi",
-    "file": "",
+    "file": "/images/misumiTsurugi.png",
     "aliases": [],
     "gender": "Male",
     "age": "23",
@@ -1443,7 +1439,7 @@
   },
   {
     "name": "Shima",
-    "file": "",
+    "file": "/images/shima.png",
     "aliases": [],
     "gender": "Female",
     "age": "Unknown",
@@ -1457,7 +1453,7 @@
   },
   {
     "name": "Matatabi",
-    "file": "",
+    "file": "/images/matatabi.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1471,7 +1467,7 @@
   },
   {
     "name": "Chōza Akimichi",
-    "file": "",
+    "file": "/images/chozaAkimichi.png",
     "aliases": [],
     "gender": "Male",
     "age": "42",
@@ -1625,7 +1621,7 @@
   },
   {
     "name": "Shitō Akimichi",
-    "file": "",
+    "file": "/images/shitoAkimichi.png",
     "aliases": [],
     "gender": "Male",
     "age": "32",
@@ -1639,7 +1635,7 @@
   },
   {
     "name": "Hanzō",
-    "file": "",
+    "file": "/images/hanzo.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1653,7 +1649,7 @@
   },
   {
     "name": "Suigetsu Hōzuki",
-    "file": "",
+    "file": "/images/suigetsuHozuki.png",
     "aliases": [],
     "gender": "Male",
     "age": "17",
@@ -1667,7 +1663,7 @@
   },
   {
     "name": "Dodai",
-    "file": "",
+    "file": "/images/dodai.png",
     "aliases": [],
     "gender": "Male",
     "age": "54",
@@ -1681,7 +1677,7 @@
   },
   {
     "name": "Ameyuri Ringo",
-    "file": "",
+    "file": "/images/ameyuriRingo.png",
     "aliases": [],
     "gender": "Female",
     "age": "Unknown",
@@ -1695,7 +1691,7 @@
   },
   {
     "name": "Kin Tsuchi",
-    "file": "",
+    "file": "/images/kinTsuchi.png",
     "aliases": [],
     "gender": "Female",
     "age": "14",
@@ -1704,12 +1700,40 @@
     "affiliations": ["Otogakure"],
     "team": "Team Dosu",
     "clan": "None",
-    "rank": "Chūnin Exams",
+    "rank": "None",
+    "firstAppearance": "Chūnin Exams"
+  },
+  {
+    "name": "Dosu Kinuta",
+    "file": "/images/dosuKinuta.png",
+    "aliases": [],
+    "gender": "Male",
+    "age": "14",
+    "natureAffinity": ["None"],
+    "height": "156",
+    "affiliations": ["Otogakure"],
+    "team": "Team Dosu",
+    "clan": "None",
+    "rank": "None",
+    "firstAppearance": "Chūnin Exams"
+  },
+  {
+    "name": "Zaku Abumi",
+    "file": "/images/zakuAbumi.png",
+    "aliases": [],
+    "gender": "Male",
+    "age": "14",
+    "natureAffinity": ["None"],
+    "height": "157",
+    "affiliations": ["Otogakure"],
+    "team": "Team Dosu",
+    "clan": "None",
+    "rank": "None",
     "firstAppearance": "Chūnin Exams"
   },
   {
     "name": "Mizuki",
-    "file": "",
+    "file": "/images/mizuki.png",
     "aliases": [],
     "gender": "Male",
     "age": "27",
@@ -1723,7 +1747,7 @@
   },
   {
     "name": "Shisui Uchiha",
-    "file": "",
+    "file": "/images/shisuiUchiha.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1751,7 +1775,7 @@
   },
   {
     "name": "Matsuri",
-    "file": "",
+    "file": "/images/matsuri.png",
     "aliases": [],
     "gender": "Female",
     "age": "17",
@@ -1779,7 +1803,7 @@
   },
   {
     "name": "Inabi Uchiha",
-    "file": "",
+    "file": "/images/inabiUchiha.png",
     "aliases": [],
     "gender": "Male",
     "age": "25",
@@ -1793,7 +1817,7 @@
   },
   {
     "name": "Neji Hyūga",
-    "file": "",
+    "file": "/images/nejiHyuga.png",
     "aliases": [],
     "gender": "Male",
     "age": "18",
@@ -1807,7 +1831,7 @@
   },
   {
     "name": "Giant Clam",
-    "file": "",
+    "file": "/images/giantClam.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1821,7 +1845,7 @@
   },
   {
     "name": "Hiruzen Sarutobi",
-    "file": "",
+    "file": "/images/hiruzenSarutobi.png",
     "aliases": [],
     "gender": "Male",
     "age": "69",
@@ -1835,7 +1859,7 @@
   },
   {
     "name": "Temari",
-    "file": "",
+    "file": "/images/temari.png",
     "aliases": [],
     "gender": "Female",
     "age": "20",
@@ -1849,7 +1873,7 @@
   },
   {
     "name": "Ebisu",
-    "file": "",
+    "file": "/images/ebisu.png",
     "aliases": [],
     "gender": "Male",
     "age": "33",
@@ -1863,7 +1887,7 @@
   },
   {
     "name": "Darui",
-    "file": "",
+    "file": "/images/darui.png",
     "aliases": [],
     "gender": "Male",
     "age": "26",
@@ -1877,7 +1901,7 @@
   },
   {
     "name": "Kitsuchi",
-    "file": "",
+    "file": "/images/kitsuchi.png",
     "aliases": [],
     "gender": "Male",
     "age": "44",
@@ -1891,7 +1915,7 @@
   },
   {
     "name": "Ao",
-    "file": "",
+    "file": "/images/ao.png",
     "aliases": [],
     "gender": "Male",
     "age": "46",
@@ -1905,7 +1929,7 @@
   },
   {
     "name": "Anko Mitarashi",
-    "file": "",
+    "file": "/images/ankoMitarashi.png",
     "aliases": [],
     "gender": "Female",
     "age": "28",
@@ -1919,7 +1943,7 @@
   },
   {
     "name": "Gamabunta",
-    "file": "",
+    "file": "/images/gamabunta.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1933,7 +1957,7 @@
   },
   {
     "name": "Ino Yamanaka",
-    "file": "",
+    "file": "/images/inoYamanaka.png",
     "aliases": [],
     "gender": "Female",
     "age": "17",
@@ -1947,7 +1971,7 @@
   },
   {
     "name": "Shikamaru Nara",
-    "file": "",
+    "file": "/images/shikamaruNara.png",
     "aliases": [],
     "gender": "Male",
     "age": "17",
@@ -1961,7 +1985,7 @@
   },
   {
     "name": "Mū",
-    "file": "",
+    "file": "/images/mu.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -1975,7 +1999,7 @@
   },
   {
     "name": "Izumo Kamizuki",
-    "file": "",
+    "file": "/images/izumoKamizuki.png",
     "aliases": [],
     "gender": "Male",
     "age": "28",
@@ -1989,7 +2013,7 @@
   },
   {
     "name": "Konohamaru Sarutobi",
-    "file": "",
+    "file": "/images/konohamaruSarutobi.png",
     "aliases": [],
     "gender": "Male",
     "age": "12",
@@ -2003,7 +2027,7 @@
   },
   {
     "name": "Raiga Kurosuki",
-    "file": "",
+    "file": "/images/raigaKurosuki.png",
     "aliases": [],
     "gender": "Male",
     "age": "Unknown",
@@ -2017,7 +2041,7 @@
   },
   {
     "name": "Utakata",
-    "file": "",
+    "file": "/images/utakata.png",
     "aliases": [],
     "gender": "Male",
     "age": "26",
@@ -2031,7 +2055,7 @@
   },
   {
     "name": "Zabuza Momochi",
-    "file": "",
+    "file": "/images/zabuzaMomochi.png",
     "aliases": [],
     "gender": "Male",
     "age": "26",
@@ -2042,5 +2066,19 @@
     "clan": "None",
     "rank": "Anbu",
     "firstAppearance": "Land of Waves"
+  },
+  {
+    "name": "Rōshi",
+    "file": "/images/roshi.png",
+    "aliases": [],
+    "gender": "Male",
+    "age": "Unknown",
+    "natureAffinity": ["Lava Release"],
+    "height": "149",
+    "affiliations": ["Iwagakure" ],
+    "team": "None",
+    "clan": "None",
+    "rank": "None",
+    "firstAppearance": "Itachi Pursuit Mission"
   }
 ]
