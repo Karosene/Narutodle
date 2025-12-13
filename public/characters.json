@@ -2037,7 +2037,7 @@
     "team": "Seven Ninja Swordsmen of the Mist",
     "clan": "None",
     "rank": "None",
-    "firstAppearance": "Unknown"
+    "firstAppearance": "Fourth Shinobi World War"
   },
   {
     "name": "Utakata",
@@ -2080,5 +2080,33 @@
     "clan": "None",
     "rank": "None",
     "firstAppearance": "Itachi Pursuit Mission"
+  },
+  {
+    "name": "Hanabi Hyūga",
+    "file": "/images/hanabiHyuga.png",
+    "aliases": [],
+    "gender": "Female",
+    "age": "11",
+    "natureAffinity": ["Fire Release"],
+    "height": "170",
+    "affiliations": ["Konohagakure" ],
+    "team": "Team 15",
+    "clan": "Hyūga clan",
+    "rank": "Jōnin",
+    "firstAppearance": "Chūnin Exams"
+  },
+  {
+    "name": "Tenten",
+    "file": "/images/tenten.png",
+    "aliases": [],
+    "gender": "Female",
+    "age": "18",
+    "natureAffinity": ["Wind Release"],
+    "height": "164",
+    "affiliations": ["Konohagakure"],
+    "team": "Team Guy",
+    "clan": "None",
+    "rank": "Chūnin",
+    "firstAppearance": "Chūnin Exams"
   }
 ]
