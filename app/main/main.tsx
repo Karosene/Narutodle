@@ -401,6 +401,7 @@ export default function Site() {
     if (!current) return;
     setShowAttributes(true);
     setFeedback(`Revealed: ${current.name}`);
+    setRevealed(true);
   }
 
   function pickNext() {
