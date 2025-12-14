@@ -428,7 +428,7 @@ export default function Site() {
           </div>
         </div>
 
-        <div className="bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 rounded-2xl p-6 shadow-lg border border-white/10 dark:border-white/5 w-full px-4">
+        <div className="bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 rounded-2xl p-6 shadow-lg border border-white/10 dark:border-white/5 w-full md:w-1/2 mx-auto">
           <form onSubmit={checkGuess} className="flex flex-col md:flex-row gap-3" ref={suggRef}>
             <div className="flex gap-3 md:order-2">
               <button type="submit" disabled={guesses.length >= 25 && !revealed} className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-lg bg-linear-to-r from-yellow-400 to-yellow-500 text-black font-bold shadow-md hover:shadow-lg hover:from-yellow-300 hover:to-yellow-400 transition transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Guess</button>
