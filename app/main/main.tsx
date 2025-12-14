@@ -368,7 +368,7 @@ export default function Site() {
 
   function checkGuess(e?: React.FormEvent) {
     e?.preventDefault();
-    if (!current || !characters) return;
+    if (!current || !characters || guesses.length >= 25) return;
     const n = normalize(guess || "");
     const guessed = characters.find((c) =>
       normalize(c.name) === n
@@ -415,10 +415,18 @@ export default function Site() {
 
 
   return (
-    <main className={`flex items-start justify-center min-h-screen p-8 mt-10 ${guesses.length === 0 ? 'overflow-hidden' : 'overflow-auto'}`}>
+    <main className={`flex items-start justify-center min-h-screen p-8 mt-20 ${guesses.length === 0 ? 'overflow-hidden' : 'overflow-auto'}`}>
       <div className="w-full max-w-6xl space-y-6">
         <h1 className="text-5xl sm:text-6xl font-extrabold mb-2 text-center">Narutodle</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-10 text-center">Refresh the page (or press New) to get a new character — type your guess and submit.</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-10 text-center">Character guessing from Naruto and Naruto Shippuden</p>
+
+        <div className="w-1/2 mx-auto mb-6 flex justify-center">
+          <div className="bg-white/5 dark:bg-white/3 rounded-lg px-4 py-3 shadow-sm border border-white/10 dark:border-white/5">
+            <span className="text-lg text-white font-semibold">
+              Guesses: {guesses.length}
+            </span>
+          </div>
+        </div>
 
         <div className="bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 rounded-2xl p-6 shadow-lg border border-white/10 dark:border-white/5 w-1/2 mx-auto">
           <form onSubmit={checkGuess} className="flex gap-3 relative items-center" ref={suggRef}>
@@ -458,11 +466,12 @@ export default function Site() {
               }}
               role="combobox"
               aria-activedescendant={activeSuggestion >= 0 ? `suggestion-${activeSuggestion}` : undefined}
-              className="flex-1 px-4 py-3 rounded-lg border-2 border-transparent bg-white/80 dark:bg-gray-800/80 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition"
+              className="flex-1 px-4 py-3 rounded-lg border-2 border-transparent bg-white/80 dark:bg-gray-800/80 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="Who is this?"
               aria-autocomplete="list"
               aria-expanded={showSuggestions}
               aria-controls="suggestions-list"
+              disabled={revealed}
             />
 
             {showSuggestions && suggestions.length > 0 ? (
@@ -497,8 +506,8 @@ export default function Site() {
                 ))}
               </div>
             ) : null}
-            <button type="submit" className="px-6 py-3 rounded-lg bg-linear-to-r from-yellow-400 to-yellow-500 text-black font-bold shadow-md hover:shadow-lg hover:from-yellow-300 hover:to-yellow-400 transition transform hover:scale-105 active:scale-95">Guess</button>
-            {guesses.length > 0 && !revealed && !showAttributes ? (
+            <button type="submit" disabled={guesses.length >= 25 && !revealed} className="px-6 py-3 rounded-lg bg-linear-to-r from-yellow-400 to-yellow-500 text-black font-bold shadow-md hover:shadow-lg hover:from-yellow-300 hover:to-yellow-400 transition transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Guess</button>
+            {guesses.length > 0 && !revealed && !showAttributes && guesses.length < 25 ? (
               <button type="button" onClick={giveUp} className="px-6 py-3 rounded-lg bg-linear-to-r from-red-500 to-red-600 text-white font-bold shadow-md hover:shadow-lg hover:from-red-400 hover:to-red-500 transition transform hover:scale-105 active:scale-95">Give Up</button>
             ) : null}
           </form>
@@ -520,9 +529,29 @@ export default function Site() {
                 <button type="button" onClick={pickNext} className="px-5 py-2 rounded-lg bg-linear-to-r from-green-500 to-green-600 text-white font-bold shadow-md hover:shadow-lg hover:from-green-400 hover:to-green-500 transition">New Game</button>
               </div>
             </div>
+          ) : current && guesses.length >= 25 && !revealed ? (
+            <div className="mt-2 p-6 rounded-xl bg-linear-to-br from-red-900/20 via-red-800/10 to-red-900/20 dark:from-red-900/30 dark:via-red-800/20 dark:to-red-900/30 border border-red-500/30 dark:border-red-500/20 shadow-lg">
+              <div className="flex flex-col items-center gap-4">
+                <h3 className="text-2xl font-bold text-red-500 mb-2">Game Over!</h3>
+                <p className="text-gray-300 mb-4">You've used all 25 guesses</p>
+                <div className="w-72 h-72 flex items-center justify-center shrink-0 rounded-lg bg-white/10 dark:bg-gray-700/20">
+                  {current.file ? (
+                    <img src={current.file} alt={current.name} style={{ width: '95%', height: '95%' }} className="rounded-md object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center rounded-md bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-100 font-bold text-4xl">{(current.name || '').split(' ').map(s => s[0]).slice(0,2).join('')}</div>
+                  )}
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">{current.name}</div>
+                </div>
+              </div>
+              <div className="mt-4 flex justify-center">
+                <button type="button" onClick={pickNext} className="px-5 py-2 rounded-lg bg-linear-to-r from-green-500 to-green-600 text-white font-bold shadow-md hover:shadow-lg hover:from-green-400 hover:to-green-500 transition">New Game</button>
+              </div>
+            </div>
           ) : current && guesses.length >= 10 ? (
             (() => {
-              const blurAmount = Math.max(0, (20 - guesses.length) * 2);
+              const blurAmount = (20 - guesses.length) * 3 + 15;
               return (
                 <div className="mt-2 p-6 rounded-xl bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 border border-white/10 dark:border-white/5 shadow-lg">
                   <h3 className="text-lg font-bold text-white mb-4 text-center">Character Hint</h3>
@@ -540,7 +569,6 @@ export default function Site() {
                       )}
                     </div>
                   </div>
-                  <div className="text-center text-xs text-gray-400 mt-3">Blur clears with each guess (guesses: {guesses.length}/20)</div>
                 </div>
               );
             })()
@@ -549,8 +577,8 @@ export default function Site() {
           
         </div>
 
-        <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm">
-          {guesses.length > 0 ? (
+        {guesses.length > 0 && (
+          <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm">
             <div className="overflow-auto">
               <div className="grid grid-cols-11 gap-2 items-center mb-3">
                 {[
@@ -653,12 +681,8 @@ export default function Site() {
                 ))}
               </div>
             </div>
-          ) : (
-            <div className="text-sm text-gray-600 dark:text-gray-300">No guesses yet — start typing to make your first guess!</div>
-          )}
-        </div>
-
-        <footer className="mt-4 text-xs text-gray-500">Add images to <code>/public/images</code> and entries to <code>/public/characters.json</code>.</footer>
+          </div>
+        )}
       </div>
     </main>
   );
