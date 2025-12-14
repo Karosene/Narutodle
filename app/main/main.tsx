@@ -401,7 +401,6 @@ export default function Site() {
     if (!current) return;
     setShowAttributes(true);
     setFeedback(`Revealed: ${current.name}`);
-    setRevealed(true);
   }
 
   function pickNext() {
@@ -416,7 +415,7 @@ export default function Site() {
 
 
   return (
-    <main className={`flex items-start justify-center min-h-screen p-8 mt-20 ${guesses.length === 0 ? 'overflow-hidden' : 'overflow-auto'}`}>
+    <main className="flex items-start justify-center min-h-screen p-8 mt-20">
       <div className="w-full max-w-6xl space-y-6">
         <h1 className="text-5xl sm:text-6xl font-extrabold mb-2 text-center">Narutodle</h1>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-10 text-center">Character guessing from Naruto and Naruto Shippuden</p>
@@ -429,88 +428,93 @@ export default function Site() {
           </div>
         </div>
 
-        <div className="bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 rounded-2xl p-6 shadow-lg border border-white/10 dark:border-white/5 w-1/2 mx-auto">
-          <form onSubmit={checkGuess} className="flex gap-3 relative items-center" ref={suggRef}>
-            <input
-              ref={inputRef}
-              value={guess}
-              onChange={(e) => setGuess(e.target.value)}
-              onKeyDown={(e) => {
-                if (!showSuggestions) return;
-                if (e.key === 'ArrowDown') {
-                  e.preventDefault();
-                  setActiveSuggestion((i) => Math.min(i + 1, suggestions.length - 1));
-                } else if (e.key === 'ArrowUp') {
-                  e.preventDefault();
-                  setActiveSuggestion((i) => Math.max(i - 1, 0));
-                } else if (e.key === 'Enter') {
-                    if (activeSuggestion >= 0 && suggestions[activeSuggestion]) {
-                      e.preventDefault();
-                      const s = suggestions[activeSuggestion];
-                      setGuess(s.name);
-                      setShowSuggestions(false);
-                      setActiveSuggestion(-1);
-                      // submit the selected suggestion as a guess immediately
-                      if (current) {
-                        const { matches, ageComparison, arcComparison, rankComparison, heightComparison } = computeComparison(s, current);
-                        const tries = guesses.length + 1;
-                        setGuesses((st) => [{ char: s, matches, ageComparison, arcComparison, rankComparison, heightComparison }, ...st].slice(0, 20));
-                        if (matches.name) {
-                          setRevealed(true);
+        <div className="bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 rounded-2xl p-6 shadow-lg border border-white/10 dark:border-white/5 w-full px-4">
+          <form onSubmit={checkGuess} className="flex flex-col md:flex-row gap-3" ref={suggRef}>
+            <div className="flex gap-3 md:order-2">
+              <button type="submit" disabled={guesses.length >= 25 && !revealed} className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-lg bg-linear-to-r from-yellow-400 to-yellow-500 text-black font-bold shadow-md hover:shadow-lg hover:from-yellow-300 hover:to-yellow-400 transition transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Guess</button>
+              {guesses.length > 0 && !revealed && !showAttributes && guesses.length < 25 ? (
+                <button type="button" onClick={giveUp} className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-lg bg-linear-to-r from-red-500 to-red-600 text-white font-bold shadow-md hover:shadow-lg hover:from-red-400 hover:to-red-500 transition transform hover:scale-105 active:scale-95">Give Up</button>
+              ) : null}
+            </div>
+            
+            <div className="relative md:flex-1 md:order-1">
+              <input
+                ref={inputRef}
+                value={guess}
+                onChange={(e) => setGuess(e.target.value)}
+                onKeyDown={(e) => {
+                  if (!showSuggestions) return;
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setActiveSuggestion((i) => Math.min(i + 1, suggestions.length - 1));
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setActiveSuggestion((i) => Math.max(i - 1, 0));
+                  } else if (e.key === 'Enter') {
+                      if (activeSuggestion >= 0 && suggestions[activeSuggestion]) {
+                        e.preventDefault();
+                        const s = suggestions[activeSuggestion];
+                        setGuess(s.name);
+                        setShowSuggestions(false);
+                        setActiveSuggestion(-1);
+                        // submit the selected suggestion as a guess immediately
+                        if (current) {
+                          const { matches, ageComparison, arcComparison, rankComparison, heightComparison } = computeComparison(s, current);
+                          const tries = guesses.length + 1;
+                          setGuesses((st) => [{ char: s, matches, ageComparison, arcComparison, rankComparison, heightComparison }, ...st].slice(0, 20));
+                          if (matches.name) {
+                            setRevealed(true);
+                          }
                         }
                       }
-                    }
-                } else if (e.key === 'Escape') {
-                  setShowSuggestions(false);
-                  setActiveSuggestion(-1);
-                }
-              }}
-              role="combobox"
-              aria-activedescendant={activeSuggestion >= 0 ? `suggestion-${activeSuggestion}` : undefined}
-              className="flex-1 px-4 py-3 rounded-lg border-2 border-transparent bg-white/80 dark:bg-gray-800/80 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder="Who is this?"
-              aria-autocomplete="list"
-              aria-expanded={showSuggestions}
-              aria-controls="suggestions-list"
-              disabled={revealed}
-            />
+                  } else if (e.key === 'Escape') {
+                    setShowSuggestions(false);
+                    setActiveSuggestion(-1);
+                  }
+                }}
+                role="combobox"
+                aria-activedescendant={activeSuggestion >= 0 ? `suggestion-${activeSuggestion}` : undefined}
+                className="w-full px-4 py-3 rounded-lg border-2 border-transparent bg-white/80 dark:bg-gray-800/80 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                placeholder="Who is this?"
+                aria-autocomplete="list"
+                aria-expanded={showSuggestions}
+                aria-controls="suggestions-list"
+                disabled={revealed}
+              />
 
-            {showSuggestions && suggestions.length > 0 ? (
-              <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 top-full mt-2 z-50 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-xl max-h-96 overflow-auto border border-white/20 dark:border-gray-700/50">
-                {suggestions.map((s, i) => (
-                  <div
-                    id={`suggestion-${i}`}
-                    key={s.name + i}
-                    role="option"
-                    aria-selected={i === activeSuggestion}
-                    onMouseDown={(ev) => {
-                      ev.preventDefault();
-                      setGuess(s.name);
-                      setShowSuggestions(false);
-                      setActiveSuggestion(-1);
-                      setTimeout(() => inputRef.current?.focus(), 0);
-                    }}
-                    onMouseEnter={() => setActiveSuggestion(i)}
-                    className={`px-4 py-3 cursor-pointer transition ${i === activeSuggestion ? 'bg-blue-500/20 dark:bg-blue-500/30 border-l-4 border-blue-500' : 'hover:bg-gray-100/50 dark:hover:bg-gray-700/50'}`}
-                  >
-                    <div className="flex items-center gap-4 h-20">
-                      {s.file ? (
-                        <div className="w-20 h-20 flex items-center justify-center shrink-0 rounded-lg bg-white/50 dark:bg-gray-700/50">
-                          <img src={s.file} alt={`${s.name} photo`} style={{ height: '95%', width: '95%' }} className="rounded-md object-cover" />
+              {showSuggestions && suggestions.length > 0 ? (
+                <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 top-full mt-2 z-50 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-xl max-h-96 overflow-auto border border-white/20 dark:border-gray-700/50">
+                  {suggestions.map((s, i) => (
+                    <div
+                      id={`suggestion-${i}`}
+                      key={s.name + i}
+                      role="option"
+                      aria-selected={i === activeSuggestion}
+                      onMouseDown={(ev) => {
+                        ev.preventDefault();
+                        setGuess(s.name);
+                        setShowSuggestions(false);
+                        setActiveSuggestion(-1);
+                        setTimeout(() => inputRef.current?.focus(), 0);
+                      }}
+                      onMouseEnter={() => setActiveSuggestion(i)}
+                      className={`px-4 py-3 cursor-pointer transition ${i === activeSuggestion ? 'bg-blue-500/20 dark:bg-blue-500/30 border-l-4 border-blue-500' : 'hover:bg-gray-100/50 dark:hover:bg-gray-700/50'}`}
+                    >
+                      <div className="flex items-center gap-4 h-20">
+                        {s.file ? (
+                          <div className="w-20 h-20 flex items-center justify-center shrink-0 rounded-lg bg-white/50 dark:bg-gray-700/50">
+                            <img src={s.file} alt={`${s.name} photo`} style={{ height: '95%', width: '95%' }} className="rounded-md object-cover" />
+                          </div>
+                        ) : null}
+                        <div>
+                          <div className="font-semibold text-base text-gray-900 dark:text-white">{s.name}</div>
                         </div>
-                      ) : null}
-                      <div>
-                        <div className="font-semibold text-base text-gray-900 dark:text-white">{s.name}</div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : null}
-            <button type="submit" disabled={guesses.length >= 25 && !revealed} className="px-6 py-3 rounded-lg bg-linear-to-r from-yellow-400 to-yellow-500 text-black font-bold shadow-md hover:shadow-lg hover:from-yellow-300 hover:to-yellow-400 transition transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Guess</button>
-            {guesses.length > 0 && !revealed && !showAttributes && guesses.length < 25 ? (
-              <button type="button" onClick={giveUp} className="px-6 py-3 rounded-lg bg-linear-to-r from-red-500 to-red-600 text-white font-bold shadow-md hover:shadow-lg hover:from-red-400 hover:to-red-500 transition transform hover:scale-105 active:scale-95">Give Up</button>
-            ) : null}
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </form>
           {current && (revealed || showAttributes) ? (
             <div className="mt-2 p-6 rounded-xl bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 border border-white/10 dark:border-white/5 shadow-lg">
@@ -579,8 +583,9 @@ export default function Site() {
         </div>
 
         {guesses.length > 0 && (
-          <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm">
-            <div className="overflow-auto">
+          <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm md:w-full w-fit overflow-x-auto mr-4">
+            {/* Desktop view - horizontal grid */}
+            <div className="hidden md:block">
               <div className="grid grid-cols-11 gap-2 items-center mb-3">
                 {[
                   'Photo',
@@ -676,6 +681,97 @@ export default function Site() {
                           : arcComparison === 'earlier' ? <span className="text-lg" title="Target appears earlier than guessed">↓</span>
                           : null
                         ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile view - vertical columns */}
+            <div className="md:hidden">
+              <div className="flex gap-4">
+                {guesses.map(({ char, matches, ageComparison, arcComparison, rankComparison, heightComparison }, i) => (
+                  <div key={i} className="shrink-0 w-48 bg-white/5 p-3 rounded-lg shadow-inner">
+                    <div className="space-y-2 text-xs">
+                      <div className={`p-2 rounded-md ${matches.name ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Photo</div>
+                        <div className="flex justify-center">
+                          {char.file ? (
+                            <img src={char.file} alt={`${char.name} photo`} className="w-20 h-20 rounded-md object-cover" />
+                          ) : (
+                            <div className="w-20 h-20 rounded-md bg-gray-200 dark:bg-gray-700" />
+                          )}
+                        </div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.name ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Name</div>
+                        <div className="text-center font-semibold wrap-break-word">{char.name}</div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.gender ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Gender</div>
+                        <div className="text-center">{char.gender ?? '—'}</div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.age ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Age</div>
+                        <div className="text-center flex items-center justify-center gap-1">
+                          <span>{char.age ?? '—'}</span>
+                          {ageComparison === 'higher' && <span className="text-base">↑</span>}
+                          {ageComparison === 'lower' && <span className="text-base">↓</span>}
+                        </div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.height ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Height</div>
+                        <div className="text-center flex items-center justify-center gap-1">
+                          <span>{char.height ?? '—'}</span>
+                          {heightComparison === 'taller' && <span className="text-base">↑</span>}
+                          {heightComparison === 'shorter' && <span className="text-base">↓</span>}
+                        </div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.clan ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Clan</div>
+                        <div className="text-center wrap-break-word">{char.clan ?? '—'}</div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.team ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Team</div>
+                        <div className="text-center wrap-break-word">{char.team ?? '—'}</div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.affiliations ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Affiliation</div>
+                        <div className="text-center wrap-break-word">{char.affiliations?.join(', ') ?? '—'}</div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.rank ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Rank</div>
+                        <div className="text-center flex items-center justify-center gap-1">
+                          <span>{char.rank ?? '—'}</span>
+                          {rankComparison === 'higher' && <span className="text-base">↑</span>}
+                          {rankComparison === 'lower' && <span className="text-base">↓</span>}
+                        </div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.nature ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">Nature</div>
+                        <div className="text-center wrap-break-word">{char.natureAffinity?.join(', ') ?? '—'}</div>
+                      </div>
+
+                      <div className={`p-2 rounded-md ${matches.firstAppearance ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
+                        <div className="text-center font-bold mb-1 text-[10px] opacity-70">First Arc</div>
+                        <div className="text-center wrap-break-word flex items-center justify-center gap-1">
+                          <span>{char.firstAppearance ?? '—'}</span>
+                          {(typeof arcComparison !== 'undefined' && arcComparison !== null) ? (
+                            arcComparison === 'later' ? <span className="text-base">↑</span>
+                            : arcComparison === 'earlier' ? <span className="text-base">↓</span>
+                            : null
+                          ) : null}
+                        </div>
                       </div>
                     </div>
                   </div>
