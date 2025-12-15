@@ -415,7 +415,7 @@ export default function Site() {
 
 
   return (
-    <main className="flex items-start justify-center min-h-screen p-8 mt-20">
+    <main className="flex items-start justify-center min-h-screen p-8 mt-20 overflow-x-hidden overflow-y-auto">
       <div className="w-full max-w-6xl space-y-6">
         <h1 className="text-5xl sm:text-6xl font-extrabold mb-2 text-center">Narutodle</h1>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-10 text-center">Character guessing from Naruto and Naruto Shippuden</p>
@@ -583,7 +583,7 @@ export default function Site() {
         </div>
 
         {guesses.length > 0 && (
-          <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm md:w-full w-fit overflow-x-auto mr-4">
+          <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm w-full overflow-x-auto">
             {/* Desktop view - horizontal grid */}
             <div className="hidden md:block">
               <div className="grid grid-cols-11 gap-2 items-center mb-3">
