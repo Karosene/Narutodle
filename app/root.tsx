@@ -1,11 +1,13 @@
 import {
   isRouteErrorResponse,
   Links,
+  NavLink,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { useState } from "react";
 
 
 import type { Route } from "./+types/root";
@@ -47,10 +49,94 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 import { Analytics } from "@vercel/analytics/react";
 
+const navLinks = [
+  { to: "/", label: "Home" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" },
+  { to: "/privacy", label: "Privacy" },
+];
+
 export default function App() {
+  const [open, setOpen] = useState(false);
+
+  const toggle = () => setOpen((v) => !v);
+  const close = () => setOpen(false);
+
   return (
-    <div>
-      <Outlet />
+    <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50">
+      <header className="sticky top-0 z-50 border-b border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur supports-backdrop-filter:bg-white/70 dark:supports-backdrop-filter:bg-slate-900/70">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 font-bold text-lg">
+            <span role="img" aria-label="Crystal ball" className="select-none">
+              🔮
+            </span>
+            <span className="tracking-tight">Narutodle</span>
+          </div>
+          <button
+            type="button"
+            onClick={toggle}
+            className="sm:hidden inline-flex items-center px-3 py-2 rounded-full border border-slate-200/70 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm focus:outline-none focus-visible:outline-none focus:ring-0"
+            aria-label="Toggle navigation"
+            aria-expanded={open}
+          >
+            <span className="text-lg">☰</span>
+          </button>
+          <nav
+            aria-label="Primary"
+            className="hidden sm:flex flex-wrap items-center gap-2 text-sm font-semibold"
+          >
+            {navLinks.map(({ to, label }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-full transition hover:bg-slate-100 dark:hover:bg-slate-800 ${
+                    isActive
+                      ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+                      : "text-slate-700 dark:text-slate-200"
+                  }`
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+        <div className={`${open ? "max-h-96" : "max-h-0"} sm:hidden overflow-hidden transition-[max-height] duration-300`}>
+          <nav aria-label="Mobile" className="px-4 pb-4 flex flex-col gap-2 text-sm font-semibold">
+            {navLinks.map(({ to, label }) => (
+              <NavLink
+                key={to}
+                to={to}
+                onClick={close}
+                className={({ isActive }) =>
+                  `block w-full px-3 py-2 rounded-lg border border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/70 transition hover:border-slate-300 dark:hover:border-slate-700 ${
+                    isActive
+                      ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+                      : "text-slate-700 dark:text-slate-200"
+                  }`
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      <main className="flex-1">
+        <Outlet />
+      </main>
+
+      <footer className="mt-6 border-t border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-700 dark:text-slate-300">
+          <div className="font-semibold text-slate-900 dark:text-slate-100">Narutodle</div>
+          <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
+            <span>Naruto character guessing game</span>
+          </div>
+        </div>
+      </footer>
+
       <Analytics />
     </div>
   );

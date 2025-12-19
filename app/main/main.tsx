@@ -129,6 +129,7 @@ export default function Site() {
     { char: Character; matches: Record<string, boolean>; ageComparison?: string | null; arcComparison?: string | null; rankComparison?: string | null; heightComparison?: string | null }[]
   >([]);
   const [showAttributes, setShowAttributes] = useState(false);
+  const [showHintCard, setShowHintCard] = useState(false);
   const mounted = useRef(false);
 
   const TRIES_REQUIRED = 10;
@@ -216,9 +217,16 @@ export default function Site() {
   }, []);
 
   useEffect(() => {
+    if (revealed) {
+      setShowHintCard(false);
+    }
+  }, [revealed]);
+
+  useEffect(() => {
     if (mounted.current) {
       setGuess("");
       setRevealed(false);
+      setShowHintCard(false);
       setFeedback(null);
     }
     mounted.current = true;
@@ -391,6 +399,7 @@ export default function Site() {
     setGuesses((s) => [{ char: guessed, matches, ageComparison, arcComparison, rankComparison, heightComparison }, ...s].slice(0, 20));
     setGuess("");
     setShowSuggestions(false);
+    setShowHintCard(false);
 
     if (matches.name) {
       setRevealed(true);
@@ -415,7 +424,7 @@ export default function Site() {
 
 
   return (
-    <main className="flex items-start justify-center min-h-screen p-8 mt-20 overflow-x-hidden overflow-y-auto">
+    <main className="flex items-start justify-center min-h-screen p-8 mt-0 sm:mt-6 lg:mt-12 overflow-x-hidden overflow-y-auto md:overflow-visible">
       <div className="w-full max-w-6xl space-y-6">
         <h1 className="text-5xl sm:text-6xl font-extrabold mb-2 text-center">Narutodle</h1>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-10 text-center">Character guessing from Naruto and Naruto Shippuden</p>
@@ -429,6 +438,16 @@ export default function Site() {
         </div>
 
         <div className="bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 rounded-2xl p-6 shadow-lg border border-white/10 dark:border-white/5 w-full md:w-1/2 mx-auto">
+          {guesses.length > 0 && !revealed && !showAttributes ? (
+            <button
+              type="button"
+              onClick={() => setShowHintCard((v) => !v)}
+              disabled={revealed}
+              className="w-full mb-4 md:hidden px-4 py-3 rounded-lg bg-linear-to-r from-blue-500 to-blue-600 text-white font-bold shadow-md hover:shadow-lg hover:from-blue-400 hover:to-blue-500 transition transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {showHintCard ? 'Hide' : 'Show'} Progress Hint
+            </button>
+          ) : null}
           <form onSubmit={checkGuess} className="flex flex-col md:flex-row gap-3" ref={suggRef}>
             <div className="flex gap-3 md:order-2">
               <button type="submit" disabled={guesses.length >= 25 && !revealed} className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-lg bg-linear-to-r from-yellow-400 to-yellow-500 text-black font-bold shadow-md hover:shadow-lg hover:from-yellow-300 hover:to-yellow-400 transition transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Guess</button>
@@ -516,6 +535,63 @@ export default function Site() {
               ) : null}
             </div>
           </form>
+
+          {showHintCard && current && guesses.length > 0 && !revealed && !showAttributes ? (
+            (() => {
+              const revealedAttrs = new Set<string>();
+              guesses.forEach(({ matches }) => {
+                Object.entries(matches).forEach(([key, isMatch]) => {
+                  if (isMatch) revealedAttrs.add(key);
+                });
+              });
+
+              return (
+                <div className="mt-3 p-3 rounded-xl bg-linear-to-br from-indigo-900/30 via-indigo-800/20 to-indigo-900/30 border border-indigo-500/30 shadow-lg md:hidden">
+                  <h3 className="text-sm font-bold text-white mb-2 text-center">Progress Hint</h3>
+                  <div className="grid grid-cols-2 gap-1.5 text-xs">
+                    <div className="bg-white/10 dark:bg-gray-700/20 rounded-lg p-2">
+                      <div className="text-xs text-gray-400 mb-1">Gender</div>
+                      <div className="font-semibold text-white">{revealedAttrs.has('gender') ? current.gender : '?'}</div>
+                    </div>
+                    <div className="bg-white/10 dark:bg-gray-700/20 rounded-lg p-2">
+                      <div className="text-xs text-gray-400 mb-1">Age</div>
+                      <div className="font-semibold text-white">{revealedAttrs.has('age') ? current.age : '?'}</div>
+                    </div>
+                    <div className="bg-white/10 dark:bg-gray-700/20 rounded-lg p-2">
+                      <div className="text-xs text-gray-400 mb-1">Height</div>
+                      <div className="font-semibold text-white">{revealedAttrs.has('height') ? current.height : '?'}</div>
+                    </div>
+                    <div className="bg-white/10 dark:bg-gray-700/20 rounded-lg p-2">
+                      <div className="text-xs text-gray-400 mb-1">Clan</div>
+                      <div className="font-semibold text-white">{revealedAttrs.has('clan') ? current.clan : '?'}</div>
+                    </div>
+                    <div className="bg-white/10 dark:bg-gray-700/20 rounded-lg p-2">
+                      <div className="text-xs text-gray-400 mb-1">Team</div>
+                      <div className="font-semibold text-white">{revealedAttrs.has('team') ? current.team : '?'}</div>
+                    </div>
+                    <div className="bg-white/10 dark:bg-gray-700/20 rounded-lg p-2">
+                      <div className="text-xs text-gray-400 mb-1">Rank</div>
+                      <div className="font-semibold text-white">{revealedAttrs.has('rank') ? current.rank : '?'}</div>
+                    </div>
+                    <div className="bg-white/10 dark:bg-gray-700/20 rounded-lg p-2 col-span-2">
+                      <div className="text-xs text-gray-400 mb-1">Affiliations</div>
+                      <div className="font-semibold text-white">{revealedAttrs.has('affiliations') ? (current.affiliations?.join(', ') || '—') : '?'}</div>
+                    </div>
+                    <div className="bg-white/10 dark:bg-gray-700/20 rounded-lg p-2 col-span-2">
+                      <div className="text-xs text-gray-400 mb-1">Nature Affinity</div>
+                      <div className="font-semibold text-white">{revealedAttrs.has('nature') ? (current.natureAffinity?.join(', ') || '—') : '?'}</div>
+                    </div>
+                    <div className="bg-white/10 dark:bg-gray-700/20 rounded-lg p-2 col-span-2">
+                      <div className="text-xs text-gray-400 mb-1">First Appearance</div>
+                      <div className="font-semibold text-white">{revealedAttrs.has('firstAppearance') ? current.firstAppearance : '?'}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
+          ) : null}
+
+
           {current && (revealed || showAttributes) ? (
             <div className="mt-2 p-6 rounded-xl bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 border border-white/10 dark:border-white/5 shadow-lg">
               <div className="flex flex-col items-center gap-4">
