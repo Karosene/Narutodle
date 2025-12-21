@@ -31,10 +31,21 @@ export default function Privacy() {
         </article>
 
         <article className="rounded-2xl border border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/70 p-4 sm:p-5 shadow-sm">
+          <h2 className="text-base sm:text-lg font-semibold mb-2">Advertising and third-party cookies</h2>
+          <ul className="list-disc list-inside space-y-1 sm:space-y-1.5">
+            <li>We use Google AdSense to display advertisements on this site.</li>
+            <li>Third parties (including Google) may place and read cookies on your browser, or use web beacons to collect information, in the course of ads being served.</li>
+            <li>Google uses cookies to serve ads based on your prior visits to this website or other websites.</li>
+            <li>You may opt out of personalized advertising by visiting <a className="text-indigo-600 dark:text-indigo-300 font-semibold" href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Ads Settings</a>.</li>
+            <li>For more information about how Google uses data, visit <a className="text-indigo-600 dark:text-indigo-300 font-semibold" href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">How Google uses data when you use our partners' sites or apps</a>.</li>
+          </ul>
+        </article>
+
+        <article className="rounded-2xl border border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/70 p-4 sm:p-5 shadow-sm">
           <h2 className="text-base sm:text-lg font-semibold mb-2">Cookies and storage</h2>
           <ul className="list-disc list-inside space-y-1 sm:space-y-1.5">
-            <li>No marketing or tracking cookies are set by Narutodle.</li>
-            <li>Third-party scripts are limited to analytics; disable them via your browser if desired.</li>
+            <li>This site uses cookies for analytics and advertising purposes.</li>
+            <li>Third-party advertising partners may set cookies; you can disable them via your browser settings.</li>
             <li>Images are served from our /public/images directory to avoid remote tracking pixels.</li>
           </ul>
         </article>

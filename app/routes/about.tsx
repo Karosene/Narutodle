@@ -19,13 +19,21 @@ export default function About() {
         </p>
       </div>
 
+      <div className="rounded-2xl border border-amber-200/70 bg-amber-50/70 dark:bg-amber-900/20 dark:border-amber-800/60 p-4 sm:p-5 text-sm">
+        <div className="font-semibold mb-2 text-amber-900 dark:text-amber-100">Copyright Notice</div>
+        <p className="text-amber-900 dark:text-amber-100">
+          Naruto and all related characters, names, and imagery are trademarks and copyrights of Masashi Kishimoto, Shueisha, and their respective owners. This is a non-commercial fan-made project for educational and entertainment purposes only. We do not claim ownership of any copyrighted materials. All character data is used under fair use for transformative purposes.
+        </p>
+      </div>
+
       <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         <article className="rounded-2xl border border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/70 p-5 sm:p-6 shadow-sm">
           <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Quality & originality</h2>
           <ul className="list-disc list-inside space-y-1.5 sm:space-y-2 text-sm text-slate-700 dark:text-slate-300">
-            <li>Character data is curated and deduped to keep entries accurate and unique.</li>
-            <li>Images stay family-friendly; no violent, hateful, or adult material.</li>
-            <li>Game copy and hints are written for this site to avoid scraped or low-value content.</li>
+            <li>Character data is manually curated, verified, and deduped to ensure accuracy.</li>
+            <li>Game mechanics, hints, and UI are original creations designed for this site.</li>
+            <li>Images are carefully selected to remain family-friendly; no violent, hateful, or adult material.</li>
+            <li>All content and copy are written specifically for Narutodle to provide unique value.</li>
           </ul>
         </article>
 

@@ -31,7 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        
+        <meta name="description" content="Narutodle - Test your Naruto knowledge with this fun character guessing game. Family-friendly fan-made quiz game." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         
         <Meta />
@@ -129,10 +129,17 @@ export default function App() {
       </main>
 
       <footer className="mt-6 border-t border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-700 dark:text-slate-300">
-          <div className="font-semibold text-slate-900 dark:text-slate-100">Narutodle</div>
-          <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
-            <span>Naruto character guessing game</span>
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-700 dark:text-slate-300">
+            <div className="font-semibold text-slate-900 dark:text-slate-100">Narutodle</div>
+            <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
+              <span>Naruto character guessing game</span>
+              <span className="hidden sm:inline">•</span>
+              <span className="text-xs">© {new Date().getFullYear()} Fan-made project</span>
+            </div>
+          </div>
+          <div className="text-xs text-slate-600 dark:text-slate-400 text-center sm:text-left">
+            <p>Naruto and all related content are trademarks of Masashi Kishimoto and Shueisha. This is an unofficial fan-made project for entertainment purposes only.</p>
           </div>
         </div>
       </footer>
