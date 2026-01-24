@@ -1,0 +1,23 @@
+1. spravit funkcionalitu hry
+2. spravit design kariet
+3. spravit attributy charakterom
+4. pridat php aby sa mohlo na LANke hrat oproti kamaratovi
+
+FUNGOVANIE HRY:
+    1. hracom sa rozda 8 nahodnych kariet z decku ktore si vylozia pred seba aby na nich videl protihrac
+    2. o prvy tah: 
+        - hraci daju pred seba 1 kartu, koho karta je vyssia, ten ide ako prvy
+    3. hrac si potahne kartu z attribute booster decku a moze si kartu nechat alebo ju pouzit 
+       attibute booster karty si dava charakter nad alebo pod karty na ktoru to chce pouzit a musi tam ostat
+    4. prehrava ten kto pred sebou uz nema karty
+
+
+NAPADY:
+    1. budu 2 decky:
+        1. character deck z ktoreho sa vylosuju hracom karty a uz zonho nebude nikto moznost brat karty
+        2. attribute booster deck z ktoreho hraci mozu ziskat karty ako "kunai/shuriken", "doplnenie zivotou na jednom characterovi", "Chakra recovery", "form change" - niektore charaktery budu mat 
+           viacej form ako napr.: Naruto(Default: Sage Mode; Upgraded: Kurama Sage Mode), Obito (Default: MS form; Upgraded: Juubito form)...
+    2. animacie pri robeni tahu
+    3. rozne charaktery mozu mat full alebo half resistance oproti nejakym tupom utoku, napr taijutsu nefunguje na clenov Hyuga clanu alebo Obita kvoli Kamui, taijustu ma polovicny ucinok na ludi co maju Sharingan
+    4. Kazdy charakter ma limitovany pocet chakry, chakra sa da doplnuje po tahu hraca alebo kartou Chakra recovery 
+    5. 
