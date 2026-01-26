@@ -138,7 +138,7 @@ export default function PlayGame() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-600"></div>
           <p className="mt-4 text-slate-600 dark:text-slate-400">Loading characters...</p>
@@ -149,7 +149,7 @@ export default function PlayGame() {
 
   if (showCoinFlip) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="text-8xl animate-bounce mb-6">🪙</div>
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{coinFlipResult}</p>
@@ -160,7 +160,7 @@ export default function PlayGame() {
 
   if (!gameStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 py-8 px-4">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-5xl font-bold mb-4 text-slate-900 dark:text-slate-50">
@@ -174,7 +174,7 @@ export default function PlayGame() {
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 mb-6 border border-slate-200 dark:border-slate-800">
             <button 
               onClick={startGame}
-              className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-xl text-xl transition-all transform hover:scale-105 shadow-lg"
+              className="w-full bg-linear-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-xl text-xl transition-all transform hover:scale-105 shadow-lg"
             >
               Start Game
             </button>
@@ -237,7 +237,7 @@ export default function PlayGame() {
   const opponent = players[currentPlayerIndex === 0 ? 1 : 0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 px-4 flex items-center justify-center">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 px-4 pt-2 flex items-start justify-center">
       {/* Control Box - Left Side (Always Visible) */}
       <div className="fixed left-16 top-20 bottom-20 py-4 w-40 z-10">
         <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-3 border border-slate-200 dark:border-slate-800 h-full flex flex-col">
@@ -260,11 +260,8 @@ export default function PlayGame() {
       {/* Game Board - Center */}
       <div className="max-w-[2200px] mx-auto space-y-3">
           {/* Player 1 Cards - Top Box */}
-          <div className="rounded-lg bg-white dark:bg-slate-900 shadow-lg p-3 border border-slate-200 dark:border-slate-800">
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50 text-center mb-2">
-              CARDS
-            </h3>
-            <div className="flex flex-wrap gap-3 justify-center">
+          <div className="rounded-lg bg-white dark:bg-slate-900 shadow-lg p-2 border border-slate-200 dark:border-slate-800">
+            <div className="flex flex-wrap gap-2 justify-center">
               {players[0].hand.map((card, index) => (
                 <div key={index} className="w-36">
                   <CharacterCardComponent 
@@ -277,7 +274,7 @@ export default function PlayGame() {
           </div>
 
           {/* Playing Area - Center Box */}
-          <div className="rounded-lg bg-white dark:bg-slate-900 shadow-lg p-6 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+          <div className="rounded-lg bg-white dark:bg-slate-900 shadow-lg p-6 border border-slate-200 dark:border-slate-800 flex items-center justify-center h-72">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-50 mb-2">
                 PLAYING AREA
@@ -289,11 +286,8 @@ export default function PlayGame() {
           </div>
 
           {/* Player 2 Cards - Bottom Box */}
-          <div className="rounded-lg bg-white dark:bg-slate-900 shadow-lg p-3 border border-slate-200 dark:border-slate-800">
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50 text-center mb-2">
-              CARDS
-            </h3>
-            <div className="flex flex-wrap gap-3 justify-center">
+          <div className="rounded-lg bg-white dark:bg-slate-900 shadow-lg p-2 border border-slate-200 dark:border-slate-800">
+            <div className="flex flex-wrap gap-2 justify-center">
               {players[1].hand.map((card, index) => (
                 <div key={index} className="w-36">
                   <CharacterCardComponent 

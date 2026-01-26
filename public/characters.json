@@ -2108,5 +2108,19 @@
     "clan": "None",
     "rank": "Chūnin",
     "firstAppearance": "Chūnin Exams"
+  },
+  {
+    "name": "Shizune",
+    "file": "/images/shizune.png",
+    "aliases": [],
+    "gender": "Female",
+    "age": "31",
+    "natureAffinity": ["None"],
+    "height": "168",
+    "affiliations": ["Konohagakure"],
+    "team": "None",
+    "clan": "None",
+    "rank": "Jōnin",
+    "firstAppearance": "Search for Tsunade"
   }
 ]

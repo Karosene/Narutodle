@@ -40,11 +40,11 @@ export function CharacterCardComponent({
           : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600'
         }
         ${card.currentHealth === 0 ? 'opacity-50 grayscale' : 'hover:shadow-xl'}
-        bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900
+        bg-linear-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900
       `}
     >
       {/* Character Image Background */}
-      <div className="relative h-32 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex-shrink-0">
+      <div className="relative h-32 overflow-hidden bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 shrink-0">
         <img 
           src={formData.imageUrl} 
           alt={card.name}
@@ -54,7 +54,7 @@ export function CharacterCardComponent({
             e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23e2e8f0" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="40"%3E%F0%9F%A5%B7%3C/text%3E%3C/svg%3E';
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
         
         {/* Character Name Overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-2">
@@ -94,7 +94,7 @@ export function CharacterCardComponent({
           </div>
           <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-red-500 to-orange-500 transition-all duration-300"
+              className="h-full bg-linear-to-r from-red-500 to-orange-500 transition-all duration-300"
               style={{ width: `${healthPercent}%` }}
             />
           </div>
@@ -110,7 +110,7 @@ export function CharacterCardComponent({
           </div>
           <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-300"
+              className="h-full bg-linear-to-r from-blue-500 to-cyan-500 transition-all duration-300"
               style={{ width: `${chakraPercent}%` }}
             />
           </div>

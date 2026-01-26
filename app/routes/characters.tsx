@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CharacterCardComponent } from '~/components/CharacterCard';
 import type { CharacterCard } from '~/types/tcg';
+import { getCharacterJutsus, type Jutsu } from '../data/jutsus';
 
 interface Character {
   name: string;
@@ -18,6 +19,7 @@ export default function Characters() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClan, setSelectedClan] = useState<string>('all');
+  const [selectedCharacter, setSelectedCharacter] = useState<{ card: CharacterCard; rawData: Character } | null>(null);
 
   useEffect(() => {
     fetch('/characters.json')
@@ -93,11 +95,11 @@ export default function Characters() {
   const uniqueClans = Array.from(new Set(displayCards.map(card => card.clan).filter(Boolean))).sort();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-orange-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-blue-600 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-linear-to-r from-orange-600 to-blue-600 mb-4">
             Naruto Character Cards
           </h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg mb-6">
@@ -151,14 +153,17 @@ export default function Characters() {
         ) : (
           /* Cards Grid */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredCards.map((card) => (
-              <div key={card.id} className="transform transition-transform hover:scale-105 h-full">
-                <CharacterCardComponent
-                  card={card}
-                  onClick={() => {}}
-                />
-              </div>
-            ))}
+            {filteredCards.map((card) => {
+              const rawData = allCharacters.find(c => c.name === card.name);
+              return (
+                <div key={card.id} className="transform transition-transform hover:scale-105 h-full">
+                  <CharacterCardComponent
+                    card={card}
+                    onClick={() => rawData && setSelectedCharacter({ card, rawData })}
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -169,6 +174,203 @@ export default function Characters() {
           </div>
         )}
       </div>
+
+      {/* Character Detail Modal */}
+      {selectedCharacter && (
+        <div 
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedCharacter(null)}
+        >
+          <div 
+            className="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative">
+              {/* Close button */}
+              <button
+                onClick={() => setSelectedCharacter(null)}
+                className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-slate-900/80 hover:bg-slate-900 text-white rounded-full transition-colors"
+              >
+                ✕
+              </button>
+
+              {/* Character Image Header */}
+              <div className="relative h-64 overflow-hidden rounded-t-2xl">
+                <img 
+                  src={selectedCharacter.card.forms.default.imageUrl}
+                  alt={selectedCharacter.card.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-slate-800 via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h2 className="text-4xl font-bold text-white drop-shadow-lg">{selectedCharacter.card.name}</h2>
+                  {selectedCharacter.card.clan && (
+                    <span className="inline-block mt-2 px-3 py-1 bg-orange-500 text-white rounded-full font-semibold">
+                      {selectedCharacter.card.clan}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Character Details */}
+              <div className="p-6 space-y-6">
+                {/* Basic Info */}
+                <div className="grid grid-cols-2 gap-4">
+                  {selectedCharacter.rawData.rank && (
+                    <div className="bg-slate-900 rounded-lg p-4">
+                      <p className="text-slate-400 text-sm mb-1">Rank</p>
+                      <p className="text-white font-bold text-lg">{selectedCharacter.rawData.rank}</p>
+                    </div>
+                  )}
+                  {selectedCharacter.rawData.gender && (
+                    <div className="bg-slate-900 rounded-lg p-4">
+                      <p className="text-slate-400 text-sm mb-1">Gender</p>
+                      <p className="text-white font-bold text-lg">{selectedCharacter.rawData.gender}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Nature Affinity */}
+                {selectedCharacter.rawData.natureAffinity && selectedCharacter.rawData.natureAffinity.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-3">Nature Affinity</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCharacter.rawData.natureAffinity.map((nature, i) => (
+                        <span key={i} className="px-3 py-1 bg-green-600 text-white rounded-full text-sm font-semibold">
+                          {nature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Affiliations */}
+                {selectedCharacter.rawData.affiliations && selectedCharacter.rawData.affiliations.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-3">Affiliations</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCharacter.rawData.affiliations.map((affiliation, i) => (
+                        <span key={i} className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-semibold">
+                          {affiliation}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Stats */}
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-3">Card Stats</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-slate-900 rounded-lg p-4">
+                      <p className="text-slate-400 text-sm mb-1">Power</p>
+                      <p className="text-white font-bold text-2xl">{selectedCharacter.card.forms.default.power}</p>
+                    </div>
+                    <div className="bg-slate-900 rounded-lg p-4">
+                      <p className="text-slate-400 text-sm mb-1">Attack Type</p>
+                      <p className="text-white font-bold text-lg uppercase">{selectedCharacter.card.forms.default.attackType}</p>
+                    </div>
+                    <div className="bg-slate-900 rounded-lg p-4">
+                      <p className="text-slate-400 text-sm mb-1">Health</p>
+                      <p className="text-white font-bold text-2xl">{selectedCharacter.card.forms.default.health}</p>
+                    </div>
+                    <div className="bg-slate-900 rounded-lg p-4">
+                      <p className="text-slate-400 text-sm mb-1">Max Chakra</p>
+                      <p className="text-white font-bold text-2xl">{selectedCharacter.card.forms.default.maxChakra}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Jutsus */}
+                {(() => {
+                  const baseJutsus = getCharacterJutsus(selectedCharacter.card.name, false);
+                  const upgradedJutsu = getCharacterJutsus(selectedCharacter.card.name, true);
+                  const hasUpgradedJutsu = upgradedJutsu && !Array.isArray(upgradedJutsu);
+                  
+                  return baseJutsus && Array.isArray(baseJutsus) ? (
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-3">Signature Jutsus</h3>
+                      
+                      {/* Base Form Jutsus */}
+                      <div className="mb-4">
+                        <h4 className="text-sm font-semibold text-teal-400 mb-2">Base Form</h4>
+                        <div className="space-y-3">
+                          {baseJutsus.map((jutsu: Jutsu, i: number) => (
+                            <div key={i} className="bg-slate-900 rounded-lg p-4 border-l-4 border-purple-500">
+                              <div className="flex justify-between items-start mb-2">
+                                <h4 className="text-lg font-bold text-white">{jutsu.name}</h4>
+                                <span className="px-2 py-1 bg-purple-600 text-white rounded text-xs font-semibold">
+                                  {jutsu.jutsuType}
+                                </span>
+                              </div>
+                              <p className="text-slate-400 text-sm mb-3">{jutsu.description}</p>
+                              <div className="flex gap-4 text-sm">
+                                <div>
+                                  <span className="text-slate-400">Chakra Cost: </span>
+                                  <span className="text-blue-400 font-bold">{jutsu.chakraCost}</span>
+                                </div>
+                                {jutsu.damage && (
+                                  <div>
+                                    <span className="text-slate-400">Damage: </span>
+                                    <span className="text-red-400 font-bold">{jutsu.damage}</span>
+                                  </div>
+                                )}
+                                {jutsu.effect && (
+                                  <div>
+                                    <span className="text-slate-400">Effect: </span>
+                                    <span className="text-green-400 font-bold capitalize">{jutsu.effect.type}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Upgraded Form Jutsu */}
+                      {hasUpgradedJutsu && (
+                        <div>
+                          <h4 className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
+                            <span>Upgraded Form</span>
+                            <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded">⚡ Booster Required</span>
+                          </h4>
+                          <div className="bg-slate-900 rounded-lg p-4 border-l-4 border-orange-500">
+                            <div className="flex justify-between items-start mb-2">
+                              <h4 className="text-lg font-bold text-white">{upgradedJutsu.name}</h4>
+                              <span className="px-2 py-1 bg-orange-600 text-white rounded text-xs font-semibold">
+                                {upgradedJutsu.jutsuType}
+                              </span>
+                            </div>
+                            <p className="text-slate-400 text-sm mb-3">{upgradedJutsu.description}</p>
+                            <div className="flex gap-4 text-sm">
+                              <div>
+                                <span className="text-slate-400">Chakra Cost: </span>
+                                <span className="text-blue-400 font-bold">{upgradedJutsu.chakraCost}</span>
+                              </div>
+                              {upgradedJutsu.damage && (
+                                <div>
+                                  <span className="text-slate-400">Damage: </span>
+                                  <span className="text-red-400 font-bold">{upgradedJutsu.damage}</span>
+                                </div>
+                              )}
+                              {upgradedJutsu.effect && (
+                                <div>
+                                  <span className="text-slate-400">Effect: </span>
+                                  <span className="text-green-400 font-bold capitalize">{upgradedJutsu.effect.type}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : null;
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
