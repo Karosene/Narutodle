@@ -13,7 +13,6 @@ export function BoosterCardComponent({ booster, onClick, selected = false }: Boo
       case 'health': return '❤️';
       case 'chakra': return '💙';
       case 'form_change': return '⚡';
-      case 'power': return '💪';
       default: return '✨';
     }
   };
@@ -24,7 +23,6 @@ export function BoosterCardComponent({ booster, onClick, selected = false }: Boo
       case 'health': return 'from-pink-500 to-red-500';
       case 'chakra': return 'from-blue-500 to-cyan-500';
       case 'form_change': return 'from-yellow-500 to-orange-500';
-      case 'power': return 'from-purple-500 to-pink-500';
       default: return 'from-slate-500 to-slate-600';
     }
   };
@@ -38,7 +36,7 @@ export function BoosterCardComponent({ booster, onClick, selected = false }: Boo
           ? 'border-yellow-400 shadow-2xl shadow-yellow-500/50 scale-105 ring-4 ring-yellow-300' 
           : 'border-purple-300 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-600'
         }
-        bg-gradient-to-br ${getBoosterColor(booster.type)} text-white
+        bg-linear-to-br ${getBoosterColor(booster.type)} text-white
       `}
     >
       {/* Icon */}
@@ -56,11 +54,6 @@ export function BoosterCardComponent({ booster, onClick, selected = false }: Boo
 
       {/* Effects */}
       <div className="flex flex-wrap justify-center gap-2">
-        {booster.effect.powerBoost && (
-          <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-bold">
-            +{booster.effect.powerBoost} ⚔️
-          </span>
-        )}
         {booster.effect.healthBoost && (
           <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-bold">
             +{booster.effect.healthBoost} ❤️

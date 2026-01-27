@@ -10,6 +10,44 @@ import type {
 import { characterDeck } from '../data/characters';
 import { boosterDeck } from '../data/boosters';
 
+export type JutsuType = 'ninjutsu' | 'taijutsu' | 'genjutsu';
+
+export function calculateTypeAdvantage(
+  attackerType: JutsuType,
+  defenderType: JutsuType
+): number {
+  if (attackerType === defenderType) {
+    return 1.0;
+  }
+  
+  if (
+    (attackerType === 'ninjutsu' && defenderType === 'taijutsu') ||
+    (attackerType === 'taijutsu' && defenderType === 'genjutsu') ||
+    (attackerType === 'genjutsu' && defenderType === 'ninjutsu')
+  ) {
+    return 1.5;
+  }
+  
+  if (
+    (attackerType === 'taijutsu' && defenderType === 'ninjutsu') ||
+    (attackerType === 'genjutsu' && defenderType === 'taijutsu') ||
+    (attackerType === 'ninjutsu' && defenderType === 'genjutsu')
+  ) {
+    return 0.75;
+  }
+  
+  return 1.0;
+}
+
+export function calculateJutsuDamage(
+  baseDamage: number,
+  attackerType: JutsuType,
+  defenderType: JutsuType
+): number {
+  const typeMultiplier = calculateTypeAdvantage(attackerType, defenderType);
+  return Math.floor(baseDamage * typeMultiplier);
+}
+
 // Shuffle array using Fisher-Yates algorithm
 export function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -101,16 +139,6 @@ export function calculateDamage(
 }
 
 // Get total power of a character including boosters
-export function getTotalPower(card: CharacterCard): number {
-  const formData = card.forms[card.currentForm];
-  if (!formData) return 0;
-  const basePower = formData.power;
-  const boosterPower = card.boosters.reduce((sum, booster) => {
-    return sum + (booster.effect.powerBoost || 0);
-  }, 0);
-  return basePower + boosterPower;
-}
-
 // Apply booster to character
 export function applyBooster(
   card: CharacterCard,
@@ -175,9 +203,10 @@ export function performAttack(
     return { attacker, defender, damage: 0 };
   }
   
-  const totalPower = getTotalPower(attacker);
+  // Base damage calculation (you can adjust this value)
+  const baseDamage = 30;
   const damage = calculateDamage(
-    totalPower,
+    baseDamage,
     attackerForm.attackType,
     defenderForm.resistances
   );
@@ -194,7 +223,7 @@ export function performAttack(
   };
 }
 
-// Regenerate chakra at end of turn
+
 export function regenerateChakra(card: CharacterCard, amount: number = 10): CharacterCard {
   const formData = card.forms[card.currentForm];
   if (!formData) return card;

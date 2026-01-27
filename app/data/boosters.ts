@@ -1,8 +1,6 @@
 import type { AttributeBoosterCard } from '../types/tcg';
 
-// Attribute Booster deck
 export const boosterDeck: AttributeBoosterCard[] = [
-  // Weapon Boosters
   {
     id: 'kunai-1',
     name: 'Kunai',

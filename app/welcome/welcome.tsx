@@ -1,6 +1,7 @@
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { normalize } from "~/utils/normalize";
 
 export function Welcome() {
   return (
@@ -103,14 +104,6 @@ type Character = {
   firstAppearance?: string;
 };
 
-function normalize(s: string) {
-  return s
-    .normalize?.('NFD')
-    .replace(/\p{M}/gu, '')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
-}
 
 export default function Site() {
   const inputRef = useRef<HTMLInputElement | null>(null);

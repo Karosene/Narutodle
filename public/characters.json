@@ -2122,5 +2122,33 @@
     "clan": "None",
     "rank": "Jōnin",
     "firstAppearance": "Search for Tsunade"
+  },
+  {
+    "name": "Chiyo",
+    "file": "/images/chiyo.png",
+    "aliases": ["Honoured Grandmother Chiyo"],
+    "gender": "Female",
+    "age": "73",
+    "natureAffinity": ["None"],
+    "height": "149",
+    "affiliations": ["Sunagakure"],
+    "team": "Honoured Siblings",
+    "clan": "None",
+    "rank": "Elder",
+    "firstAppearance": "Kazekage Rescue Mission"
+  },
+  {
+    "name": "Hidan",
+    "file": "/images/hidan.png",
+    "aliases": ["Immortal Butcher"],
+    "gender": "Male",
+    "age": "22",
+    "natureAffinity": ["None"],
+    "height": "177",
+    "affiliations": ["Akatsuki"],
+    "team": "Akatsuki",
+    "clan": "None",
+    "rank": "S-rank",
+    "firstAppearance": "Akatsuki Suppression Mission"
   }
 ]

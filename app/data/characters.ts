@@ -1,8 +1,6 @@
 import type { CharacterCard } from '../types/tcg';
 
-// Character deck with all Naruto characters
 export const characterDeck: Omit<CharacterCard, 'currentForm' | 'currentHealth' | 'currentChakra' | 'boosters'>[] = [
-  // Naruto
   {
     id: 'naruto-1',
     name: 'Naruto Uzumaki',
@@ -37,7 +35,6 @@ export const characterDeck: Omit<CharacterCard, 'currentForm' | 'currentHealth' 
     }
   },
   
-  // Sasuke
   {
     id: 'sasuke-1',
     name: 'Sasuke Uchiha',

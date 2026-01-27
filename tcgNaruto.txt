@@ -1,6 +1,6 @@
 1. spravit funkcionalitu hry
 2. spravit design kariet
-3. spravit attributy charakterom
+3. spravit attributy postavam
 4. pridat php aby sa mohlo na LANke hrat oproti kamaratovi
 
 FUNGOVANIE HRY:
@@ -13,11 +13,25 @@ FUNGOVANIE HRY:
 NAPADY:
     1. budu 2 decky:
         1. character deck z ktoreho sa vylosuju hracom karty a uz zonho nebude nikto moznost brat karty
-        2. attribute booster deck z ktoreho hraci mozu ziskat karty ako "kunai/shuriken", "doplnenie zivotou na jednom characterovi", "Chakra recovery", "form change" - niektore charaktery budu mat 
+        2. attribute booster deck z ktoreho hraci mozu ziskat karty ako "kunai/shuriken", "doplnenie zivotou na jednej postave", "Chakra recovery", "form change" - niektore postavy budu mat 
            viacej form ako napr.: Naruto(Default: Sage Mode; Upgraded: Kurama Sage Mode), Obito (Default: MS form; Upgraded: Juubito form)...
     2. animacie pri robeni tahu
-    3. rozne charaktery mozu mat full alebo half resistance oproti nejakym tupom utoku, napr taijutsu nefunguje na clenov Hyuga clanu alebo Obita kvoli Kamui, taijustu ma polovicny ucinok na ludi co maju Sharingan
-    4. Kazdy charakter ma limitovany pocet chakry, chakra sa da doplnuje po tahu hraca alebo kartou Chakra recovery 
-    5. Kazdy charakter ma 2 jutsu ktore maju vlastnu funkcionalitu. Napr Shizune bude mat poison needles ktore budu uberat charakterovi po 10 hp kazdy tah po dobu 3 tahov takze dohromady 30 damage
+    3. rozne postavy mozu mat full alebo half resistance oproti nejakym tupom utoku, napr taijutsu nefunguje na clenov Hyuga clanu alebo Obita kvoli Kamui, taijustu ma polovicny ucinok na ludi co maju Sharingan
+    4. Kazda postava ma limitovany pocet chakry, chakra sa da doplnuje po tahu hraca alebo kartou Chakra recovery 
+    5. Kazda postava ma 2 jutsu ktore maju vlastnu funkcionalitu. Napr Shizune bude mat poison needles ktore budu uberat postave po 10 hp kazdy tah po dobu 3 tahov takze dohromady 30 damage
 
 
+Poznamky:
+    1. Maximalny damage normalneho utoku: 20
+    2. Maximalny damage utoku s Attribute booster kartou: 50
+    3. Attribute booster karta ktora umozni hracovi pouzit 2 jutsu za jeden tah
+    4. Attribute booster karta ktora zvysi damage vybranej postave damage o 20%
+    5. Hrac bude mat moznost si prehadzat karty
+    6. Attribute booster karta ktora umozni zautocit 1 utokom na 3 charakterov ktori stoja vedla seba na 1 tah
+    7. Chakra sa doplni po kazdom kole iba tym co maju nejaku minutu chakru a bude sa doplnat po 15 pointoch 
+    8. Kazde jutsu bude mat cooldown 2 kola
+    9. Hrac moze pouzit iba jednu attibute kartu za 1 tah
+    10. Chakra neni limitovana na 100, hrac moze pouzit attribute kartu ktora mu doplni chakru aj nad 100. Regenerovanie chakry je limitovane na 100.
+
+Pasive attacks:
+    Danzo - ked zomre tak sa moze revivnut, ale musi to byt v tom kole co zomrel

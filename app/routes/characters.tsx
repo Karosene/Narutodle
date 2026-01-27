@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { CharacterCardComponent } from '~/components/CharacterCard';
 import type { CharacterCard } from '~/types/tcg';
 import { getCharacterJutsus, type Jutsu } from '../data/jutsus';
+import { normalize } from '~/utils/normalize';
 
 interface Character {
   name: string;
@@ -27,20 +28,9 @@ export default function Characters() {
       .then((data: Character[]) => {
         setAllCharacters(data);
         
-        // Convert all characters to card format
         const cards: CharacterCard[] = data.map((char, index) => {
-          // Extract clan name from character data
           const clanName = char.clan && char.clan !== 'None' ? char.clan : undefined;
           
-          // Determine power based on rank
-          const basePower = 
-            char.rank === 'Kage' ? 90 :
-            char.rank === 'Sannin' ? 85 :
-            char.rank === 'Jōnin' || char.rank === 'Anbu' ? 75 :
-            char.rank === 'Chūnin' ? 65 :
-            char.rank === 'Genin' ? 55 : 60;
-          
-          // Determine attack type based on nature affinity
           let attackType: 'taijutsu' | 'ninjutsu' | 'genjutsu' = 'taijutsu';
           if (char.natureAffinity && char.natureAffinity.length > 0) {
             attackType = 'ninjutsu';
@@ -58,7 +48,6 @@ export default function Characters() {
             forms: {
               default: {
                 name: 'Base Form',
-                power: basePower,
                 health: 100,
                 maxChakra: 100,
                 attackType,
@@ -85,7 +74,7 @@ export default function Characters() {
 
   // Filter characters based on search and filters
   const filteredCards = displayCards.filter(card => {
-    const matchesSearch = card.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = normalize(card.name).includes(normalize(searchTerm));
     const matchesClan = selectedClan === 'all' || card.clan === selectedClan;
     
     return matchesSearch && matchesClan;
@@ -228,55 +217,49 @@ export default function Characters() {
                       <p className="text-white font-bold text-lg">{selectedCharacter.rawData.gender}</p>
                     </div>
                   )}
+                  {selectedCharacter.rawData.natureAffinity && selectedCharacter.rawData.natureAffinity.length > 0 && (
+                    <div className="bg-slate-900 rounded-lg p-4">
+                      <p className="text-slate-400 text-sm mb-1">Nature Affinity</p>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {selectedCharacter.rawData.natureAffinity.map((nature, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-green-600 text-white rounded-full text-xs font-semibold">
+                            {nature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {selectedCharacter.rawData.affiliations && selectedCharacter.rawData.affiliations.length > 0 && (
+                    <div className="bg-slate-900 rounded-lg p-4">
+                      <p className="text-slate-400 text-sm mb-1">Affiliations</p>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {selectedCharacter.rawData.affiliations.map((affiliation, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-blue-600 text-white rounded-full text-xs font-semibold">
+                            {affiliation}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-
-                {/* Nature Affinity */}
-                {selectedCharacter.rawData.natureAffinity && selectedCharacter.rawData.natureAffinity.length > 0 && (
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-3">Nature Affinity</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCharacter.rawData.natureAffinity.map((nature, i) => (
-                        <span key={i} className="px-3 py-1 bg-green-600 text-white rounded-full text-sm font-semibold">
-                          {nature}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Affiliations */}
-                {selectedCharacter.rawData.affiliations && selectedCharacter.rawData.affiliations.length > 0 && (
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-3">Affiliations</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCharacter.rawData.affiliations.map((affiliation, i) => (
-                        <span key={i} className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-semibold">
-                          {affiliation}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {/* Stats */}
                 <div>
                   <h3 className="text-xl font-bold text-white mb-3">Card Stats</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-slate-900 rounded-lg p-4">
-                      <p className="text-slate-400 text-sm mb-1">Power</p>
-                      <p className="text-white font-bold text-2xl">{selectedCharacter.card.forms.default.power}</p>
-                    </div>
+                  <div className="space-y-4">
                     <div className="bg-slate-900 rounded-lg p-4">
                       <p className="text-slate-400 text-sm mb-1">Attack Type</p>
                       <p className="text-white font-bold text-lg uppercase">{selectedCharacter.card.forms.default.attackType}</p>
                     </div>
-                    <div className="bg-slate-900 rounded-lg p-4">
-                      <p className="text-slate-400 text-sm mb-1">Health</p>
-                      <p className="text-white font-bold text-2xl">{selectedCharacter.card.forms.default.health}</p>
-                    </div>
-                    <div className="bg-slate-900 rounded-lg p-4">
-                      <p className="text-slate-400 text-sm mb-1">Max Chakra</p>
-                      <p className="text-white font-bold text-2xl">{selectedCharacter.card.forms.default.maxChakra}</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-slate-900 rounded-lg p-4">
+                        <p className="text-slate-400 text-sm mb-1">Health</p>
+                        <p className="text-white font-bold text-2xl">{selectedCharacter.card.forms.default.health}</p>
+                      </div>
+                      <div className="bg-slate-900 rounded-lg p-4">
+                        <p className="text-slate-400 text-sm mb-1">Max Chakra</p>
+                        <p className="text-white font-bold text-2xl">{selectedCharacter.card.forms.default.maxChakra}</p>
+                      </div>
                     </div>
                   </div>
                 </div>

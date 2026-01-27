@@ -1,23 +1,17 @@
-// Character Forms
 export type CharacterForm = 'default' | 'upgraded';
 
-// Attack Types
 export type AttackType = 'taijutsu' | 'ninjutsu' | 'genjutsu';
 
-// Resistance Levels
 export type ResistanceLevel = 'none' | 'half' | 'full';
 
-// Character Resistance Map
 export interface Resistances {
   taijutsu?: ResistanceLevel;
   ninjutsu?: ResistanceLevel;
   genjutsu?: ResistanceLevel;
 }
 
-// Character Form Data
 export interface CharacterFormData {
   name: string;
-  power: number;
   health: number;
   maxChakra: number;
   attackType: AttackType;
@@ -25,7 +19,6 @@ export interface CharacterFormData {
   imageUrl?: string;
 }
 
-// Character Card
 export interface CharacterCard {
   id: string;
   name: string;
@@ -40,10 +33,8 @@ export interface CharacterCard {
   boosters: AttributeBoosterCard[];
 }
 
-// Attribute Booster Types
-export type BoosterType = 'weapon' | 'health' | 'chakra' | 'form_change' | 'power';
+export type BoosterType = 'weapon' | 'health' | 'chakra' | 'form_change';
 
-// Attribute Booster Card
 export interface AttributeBoosterCard {
   id: string;
   name: string;

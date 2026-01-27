@@ -46,13 +46,6 @@ export default function PlayGame() {
   const convertToCard = (char: Character, index: number): CharacterCard => {
     const clanName = char.clan && char.clan !== 'None' ? char.clan : undefined;
     
-    const basePower = 
-      char.rank === 'Kage' ? 90 :
-      char.rank === 'Sannin' ? 85 :
-      char.rank === 'Jōnin' || char.rank === 'Anbu' ? 75 :
-      char.rank === 'Chūnin' ? 65 :
-      char.rank === 'Genin' ? 55 : 60;
-    
     let attackType: 'taijutsu' | 'ninjutsu' | 'genjutsu' = 'taijutsu';
     if (char.natureAffinity && char.natureAffinity.length > 0) {
       attackType = 'ninjutsu';
@@ -70,7 +63,6 @@ export default function PlayGame() {
       forms: {
         default: {
           name: 'Base Form',
-          power: basePower,
           health: 100,
           maxChakra: 100,
           attackType,
@@ -101,15 +93,12 @@ export default function PlayGame() {
       return;
     }
 
-    // Shuffle and convert characters to cards
     const shuffled = shuffleArray(allCharacters);
     const allCards = shuffled.slice(0, 16).map((char, index) => convertToCard(char, index));
 
-    // Deal 8 cards to each player
     const player1Hand = allCards.slice(0, 8);
     const player2Hand = allCards.slice(8, 16);
 
-    // Coin flip to determine who goes first
     const coinFlip = Math.random() < 0.5 ? 0 : 1;
     const firstPlayer = coinFlip === 0 ? 'Player 1' : 'Player 2';
     

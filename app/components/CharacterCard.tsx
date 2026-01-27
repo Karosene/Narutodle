@@ -1,5 +1,4 @@
 import type { CharacterCard } from '../types/tcg';
-import { getTotalPower } from '../utils/gameLogic';
 
 interface CharacterCardProps {
   card: CharacterCard;
@@ -17,7 +16,6 @@ export function CharacterCardComponent({
   const formData = card.forms[card.currentForm];
   if (!formData) return null;
   
-  const totalPower = getTotalPower(card);
   const healthPercent = (card.currentHealth / formData.health) * 100;
   const chakraPercent = (card.currentChakra / formData.maxChakra) * 100;
 

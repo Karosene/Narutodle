@@ -31,14 +31,6 @@ export default function CardGame() {
           // Extract clan name from character data
           const clanName = char.clan && char.clan !== 'None' ? char.clan : undefined;
           
-          // Determine power based on rank
-          const basePower = 
-            char.rank === 'Kage' ? 90 :
-            char.rank === 'Sannin' ? 85 :
-            char.rank === 'Jōnin' || char.rank === 'Anbu' ? 75 :
-            char.rank === 'Chūnin' ? 65 :
-            char.rank === 'Genin' ? 55 : 60;
-          
           // Determine attack type based on nature affinity
           let attackType: 'taijutsu' | 'ninjutsu' | 'genjutsu' = 'taijutsu';
           if (char.natureAffinity && char.natureAffinity.length > 0) {
@@ -57,7 +49,6 @@ export default function CardGame() {
             forms: {
               default: {
                 name: 'Base Form',
-                power: basePower,
                 health: 100,
                 maxChakra: 100,
                 attackType,
@@ -101,7 +92,6 @@ export default function CardGame() {
             <p className="mt-4 text-slate-400">Loading characters...</p>
           </div>
         ) : (
-          /* Cards Grid */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
             {displayCards.map((card, index) => (
               <div key={card.id} className="transform transition-transform hover:scale-105 h-full">
@@ -162,10 +152,6 @@ export default function CardGame() {
                   <div className="bg-slate-900 rounded-lg p-3">
                     <p className="text-slate-400 text-sm">Rank</p>
                     <p className="text-white font-semibold">{selectedCharacter.original.rank || 'Unknown'}</p>
-                  </div>
-                  <div className="bg-slate-900 rounded-lg p-3">
-                    <p className="text-slate-400 text-sm">Base Power</p>
-                    <p className="text-white font-semibold">{selectedCharacter.card.forms.default.power}</p>
                   </div>
                   <div className="bg-slate-900 rounded-lg p-3">
                     <p className="text-slate-400 text-sm">Attack Type</p>
