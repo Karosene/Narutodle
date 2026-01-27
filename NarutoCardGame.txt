@@ -1,0 +1,16 @@
+Priebeh hry:
+    1. Coinflipom sa rozhodne kto bude mat prvy tah 
+    2. Kazdy hrac dostane 8 nahodnych kariet z databaze 
+        - jedna z kariet bude karta s Pasivnym utokom
+    3. Tah zacina tym ze si hrac potiahne 1 booster z balicku
+        - maximalny pocet booster kariet je 5
+        - na zaciatku 6. kola si zacina hrac pred kazdym kolom brat 2 booster karty namieto 1
+    4. Po zobrati booster karty ju moze hrac aktivovat alebo priamo pouzivat jutsu
+    5. Postup pouzivania jutsu:
+        - hrac klikne na postavu
+        - vyberie ake jutsu chce pouzit
+        - pokial vybere:
+            = heal, shield, buff - bude abilita pouzita na postavu seba samu alebo hracovu vybranu postavu
+            = poison, stun, chakra drain, nin/gen/tai-jutsu - bude abilita pouzita na vybranu kartu protihraca
+        - 
+        

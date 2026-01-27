@@ -7,7 +7,7 @@ export interface Jutsu {
   chakraCost: number;
   damage?: number;
   effect?: {
-    type: 'poison' | 'stun' | 'heal' | 'buff' | 'debuff' | 'shield' | 'drain';
+    type: 'poison' | 'stun' | 'heal' | 'buff' | 'shield' | 'chakra_drain';
     value: number;
     duration?: number; // in turns
     target?: 'self' | 'opponent' | 'all-opponents' | 'all-allies';

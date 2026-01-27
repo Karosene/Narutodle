@@ -1,6 +1,4 @@
 1. spravit funkcionalitu hry
-2. spravit design kariet
-3. spravit attributy postavam
 4. pridat php aby sa mohlo na LANke hrat oproti kamaratovi
 
 FUNGOVANIE HRY:
@@ -32,6 +30,7 @@ Poznamky:
     8. Kazde jutsu bude mat cooldown 2 kola
     9. Hrac moze pouzit iba jednu attibute kartu za 1 tah
     10. Chakra neni limitovana na 100, hrac moze pouzit attribute kartu ktora mu doplni chakru aj nad 100. Regenerovanie chakry je limitovane na 100.
+    11. Maximalny pocet attibute booster kariet naraz je 5
 
 Pasive attacks:
     Danzo - ked zomre tak sa moze revivnut, ale musi to byt v tom kole co zomrel

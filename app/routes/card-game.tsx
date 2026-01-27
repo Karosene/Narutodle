@@ -75,32 +75,57 @@ export default function CardGame() {
 
   return (
     <div className="min-h-screen bg-slate-900">
-      <div className="container mx-auto px-4 pt-2">
-        {/* Header */}
-        <div className="text-center mb-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-            Naruto Character Cards
-          </h1>
-          <p className="text-slate-400 text-base mb-3">
-            Browse all {displayCards.length} playable characters
-          </p>
-        </div>
-
+      <div className="h-screen flex flex-col p-4">
         {loading ? (
           <div className="text-center py-20">
             <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-slate-400"></div>
             <p className="mt-4 text-slate-400">Loading characters...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-            {displayCards.map((card, index) => (
-              <div key={card.id} className="transform transition-transform hover:scale-105 h-full">
-                <CharacterCardComponent
-                  card={card}
-                  onClick={() => setSelectedCharacter({ card, original: allCharacters[index] })}
-                />
+          <div className="flex-1 flex gap-5">
+            <div className="flex-1 bg-slate-800 rounded-lg p-5">
+              <h2 className="text-xl font-bold text-white mb-4">Player 1 Hand</h2>
+              <div className="grid grid-cols-2 gap-5">
+                {displayCards.slice(0, 8).map((card, index) => (
+                  <div key={card.id} className="transform transition-transform hover:scale-105">
+                    <CharacterCardComponent
+                      card={card}
+                      onClick={() => setSelectedCharacter({ card, original: allCharacters[index] })}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+
+            <div className="flex-1 flex flex-col gap-5">
+              <div className="bg-slate-800 rounded-lg p-5">
+                <div className="text-center">
+                  <h3 className=" text-9xl font-bold text-white">Game Info</h3>
+                  <p className="text-slate-400 text-sm">Turn 1 - Player 1's Turn</p>
+                </div>
+              </div>
+
+              <div className="flex-1 bg-slate-700 rounded-lg p-5 flex items-center justify-center">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-white mb-2">Playing Area</h3>
+                  <p className="text-slate-400">Select a card to play</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 bg-slate-800 rounded-lg p-5">
+              <h2 className="text-xl font-bold text-white mb-4">Player 2 Hand</h2>
+              <div className="grid grid-cols-2 gap-5">
+                {displayCards.slice(8, 16).map((card, index) => (
+                  <div key={card.id} className="transform transition-transform hover:scale-105">
+                    <CharacterCardComponent
+                      card={card}
+                      onClick={() => setSelectedCharacter({ card, original: allCharacters[index + 8] })}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>

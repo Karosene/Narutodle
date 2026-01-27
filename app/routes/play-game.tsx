@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { CharacterCardComponent } from '~/components/CharacterCard';
-import type { CharacterCard } from '~/types/tcg';
+import type { CharacterCard, AttributeBoosterCard } from '~/types/tcg';
+import { boosterDeck } from '~/data/boosters';
 
 interface Character {
   name: string;
@@ -29,6 +30,7 @@ export default function PlayGame() {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState<0 | 1>(0);
   const [coinFlipResult, setCoinFlipResult] = useState<string>('');
   const [showCoinFlip, setShowCoinFlip] = useState(false);
+  const [currentBooster, setCurrentBooster] = useState<AttributeBoosterCard | null>(null);
 
   useEffect(() => {
     fetch('/characters.json')
@@ -123,6 +125,13 @@ export default function PlayGame() {
       { name: 'Player 2', hand: [] }
     ]);
     setCoinFlipResult('');
+    setCurrentBooster(null);
+  };
+
+  const drawBoosterCard = () => {
+    const randomIndex = Math.floor(Math.random() * boosterDeck.length);
+    const drawnBooster = boosterDeck[randomIndex];
+    setCurrentBooster(drawnBooster);
   };
 
   if (loading) {
@@ -226,33 +235,15 @@ export default function PlayGame() {
   const opponent = players[currentPlayerIndex === 0 ? 1 : 0];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 px-4 pt-2 flex items-start justify-center">
-      {/* Control Box - Left Side (Always Visible) */}
-      <div className="fixed left-16 top-20 bottom-20 py-4 w-40 z-10">
-        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-3 border border-slate-200 dark:border-slate-800 h-full flex flex-col">
-          <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-3 text-center">
-            🎴 Card Game
-          </h1>
-          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 text-center">
-              Current Turn:<br/>{currentPlayer.name}
-            </p>
-          </div>
-          <button
-            onClick={resetGame}
-            className="w-full px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-lg transition">
-            Reset Game
-          </button>
-        </div>
-      </div>
-
-      {/* Game Board - Center */}
-      <div className="max-w-[2200px] mx-auto space-y-3">
-          {/* Player 1 Cards - Top Box */}
-          <div className="rounded-lg bg-white dark:bg-slate-900 shadow-lg p-2 border border-slate-200 dark:border-slate-800">
-            <div className="flex flex-wrap gap-2 justify-center">
+    <div className="min-h-screen bg-slate-900 p-4">
+      <div className="h-fit flex gap-3">
+        {/* Player 1 Section - Left Side */}
+        <div className="flex gap-3">
+          {/* Player 1 Hand */}
+          <div className="bg-slate-800 rounded-lg p-3 w-fit">
+            <div className="grid grid-cols-2 gap-3">
               {players[0].hand.map((card, index) => (
-                <div key={index} className="w-36">
+                <div key={index} className="w-32">
                   <CharacterCardComponent 
                     card={card}
                     onClick={() => {}}
@@ -261,24 +252,80 @@ export default function PlayGame() {
               ))}
             </div>
           </div>
+          
+          {/* Player 1 Attribute Card Box */}
+          <div className="bg-slate-800 rounded-lg p-3 w-48 flex items-center justify-center">
+            {currentBooster && currentPlayerIndex === 0 ? (
+              <div className="border-2 border-purple-500 rounded-lg p-3 w-full">
+                <h4 className="text-sm font-bold text-white mb-1">{currentBooster.name}</h4>
+                <p className="text-[10px] text-slate-300 mb-2">{currentBooster.description}</p>
+                <span className="inline-block px-2 py-1 bg-purple-600 text-white rounded-full text-[10px] font-semibold capitalize">
+                  {currentBooster.type}
+                </span>
+              </div>
+            ) : (
+              <div className="text-center text-slate-500 text-xs">
+                Attribute Card
+              </div>
+            )}
+          </div>
+        </div>
 
-          {/* Playing Area - Center Box */}
-          <div className="rounded-lg bg-white dark:bg-slate-900 shadow-lg p-6 border border-slate-200 dark:border-slate-800 flex items-center justify-center h-72">
+        {/* Middle Section - Info + Draw */}
+        <div className="flex-1 flex flex-col gap-3">
+          {/* Game Info - Top */}
+          <div className="bg-slate-800 rounded-lg p-5">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-50 mb-2">
-                PLAYING AREA
-              </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Select your card and choose an opponent's card to attack
-              </p>
+              <h3 className="text-3xl font-bold text-white mb-3">Game Info</h3>
+              <p className="text-slate-300 text-base mb-4">Turn: {currentPlayer.name}</p>
+              <button
+                onClick={resetGame}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition">
+                Reset Game
+              </button>
             </div>
           </div>
 
-          {/* Player 2 Cards - Bottom Box */}
-          <div className="rounded-lg bg-white dark:bg-slate-900 shadow-lg p-2 border border-slate-200 dark:border-slate-800">
-            <div className="flex flex-wrap gap-2 justify-center">
+          {/* Draw Booster Button */}
+          <div className="bg-slate-700 rounded-lg p-5 flex items-center justify-center h-full">
+            <div className="text-center">
+              {!currentBooster && (
+                <button
+                  onClick={drawBoosterCard}
+                  className="w-24 h-24 mx-auto bg-slate-600 rounded-lg border-2 border-dashed border-slate-500 flex items-center justify-center hover:bg-slate-500 transition-colors cursor-pointer mb-2"
+                >
+                  <span className="text-5xl">✨</span>
+                </button>
+              )}
+              {!currentBooster && <p className="text-slate-400 text-sm">Draw Booster Card</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Player 2 Section - Right Side */}
+        <div className="flex gap-3">
+          {/* Player 2 Attribute Card Box */}
+          <div className="bg-slate-800 rounded-lg p-3 w-48 flex items-center justify-center">
+            {currentBooster && currentPlayerIndex === 1 ? (
+              <div className="border-2 border-purple-500 rounded-lg p-3 w-full">
+                <h4 className="text-sm font-bold text-white mb-1">{currentBooster.name}</h4>
+                <p className="text-[10px] text-slate-300 mb-2">{currentBooster.description}</p>
+                <span className="inline-block px-2 py-1 bg-purple-600 text-white rounded-full text-[10px] font-semibold capitalize">
+                  {currentBooster.type}
+                </span>
+              </div>
+            ) : (
+              <div className="text-center text-slate-500 text-xs">
+                Attribute Card
+              </div>
+            )}
+          </div>
+          
+          {/* Player 2 Hand */}
+          <div className="bg-slate-800 rounded-lg p-3 w-fit">
+            <div className="grid grid-cols-2 gap-3">
               {players[1].hand.map((card, index) => (
-                <div key={index} className="w-36">
+                <div key={index} className="w-32">
                   <CharacterCardComponent 
                     card={card}
                     onClick={() => {}}
@@ -287,6 +334,7 @@ export default function PlayGame() {
               ))}
             </div>
           </div>
+        </div>
       </div>
     </div>
   );

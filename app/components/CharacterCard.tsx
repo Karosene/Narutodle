@@ -42,7 +42,7 @@ export function CharacterCardComponent({
       `}
     >
       {/* Character Image Background */}
-      <div className="relative h-32 overflow-hidden bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 shrink-0">
+      <div className="relative h-28 overflow-hidden bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 shrink-0">
         <img 
           src={formData.imageUrl} 
           alt={card.name}
@@ -58,60 +58,56 @@ export function CharacterCardComponent({
         <div className="absolute bottom-0 left-0 right-0 p-2">
           <h3 className="text-white font-bold text-sm drop-shadow-lg truncate">{card.name}</h3>
           {card.clan && (
-            <span className="inline-block px-1.5 py-0.5 text-xs font-semibold bg-orange-500 text-white rounded-full">
+            <span className="inline-block px-1 py-0.5 text-[10px] font-semibold bg-orange-500 text-white rounded-full">
               {card.clan}
             </span>
           )}
         </div>
 
         {/* Form Badge */}
-        <div className="absolute top-1 right-1">
-          <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold bg-blue-500 text-white rounded-md shadow-lg">
+        <div className="absolute top-0.5 right-0.5">
+          <span className="inline-flex items-center px-1 py-0.5 text-[9px] font-bold bg-blue-500 text-white rounded-md shadow-lg">
             {formData.name}
-            {card.currentForm === 'upgraded' && <span className="ml-1">⚡</span>}
+            {card.currentForm === 'upgraded' && <span className="ml-0.5">⚡</span>}
           </span>
         </div>
       </div>
 
       {/* Card Stats */}
-      <div className="p-2.5 space-y-2 flex-1 flex flex-col">
+      <div className="p-1.5 space-y-1 flex-1 flex flex-col">
         {/* Attack Type */}
         <div className="flex items-center justify-center">
-          <span className={`px-2 py-0.5 text-xs font-bold rounded-md ${getAttackTypeColor(formData.attackType)}`}>
+          <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md ${getAttackTypeColor(formData.attackType)}`}>
             {formData.attackType.toUpperCase()}
           </span>
         </div>
 
-        {/* Health Bar */}
-        <div>
-          <div className="flex justify-between items-center mb-0.5">
-            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">HP</span>
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              {card.currentHealth}/{formData.health}
-            </span>
-          </div>
-          <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+        {/* Health */}
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-red-500">❤️</span>
+          <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
             <div 
               className="h-full bg-linear-to-r from-red-500 to-orange-500 transition-all duration-300"
               style={{ width: `${healthPercent}%` }}
             />
           </div>
+          <span className="text-[9px] font-bold text-slate-700 dark:text-slate-300">
+            {card.currentHealth}
+          </span>
         </div>
 
-        {/* Chakra Bar */}
-        <div>
-          <div className="flex justify-between items-center mb-0.5">
-            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Chakra</span>
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              {card.currentChakra}/{formData.maxChakra}
-            </span>
-          </div>
-          <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+        {/* Chakra */}
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-blue-500">💧</span>
+          <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
             <div 
               className="h-full bg-linear-to-r from-blue-500 to-cyan-500 transition-all duration-300"
               style={{ width: `${chakraPercent}%` }}
             />
           </div>
+          <span className="text-[9px] font-bold text-slate-700 dark:text-slate-300">
+            {card.currentChakra}
+          </span>
         </div>
 
         {/* Resistances */}

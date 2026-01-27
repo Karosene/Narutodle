@@ -467,37 +467,7 @@
       "damage": 52
     }
   },
-  {
-    "name": "Konan",
-    "jutsus": [
-      {
-        "name": "Paper Shuriken",
-        "description": "Launches razor-sharp paper shuriken dealing 22 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 20,
-        "damage": 22
-      },
-      {
-        "name": "Dance of the Shikigami",
-        "description": "Transforms body into paper to evade attacks (70% dodge chance for 2 turns)",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 24,
-        "effect": {
-          "type": "dodge",
-          "value": 70,
-          "duration": 2,
-          "target": "self"
-        }
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Paper Person of God Technique",
-      "description": "600 billion explosive tags unleashed dealing 60 damage",
-      "jutsuType": "ninjutsu",
-      "chakraCost": 55,
-      "damage": 60
-    }
-  },
+
   {
     "name": "Yamato",
     "jutsus": [
@@ -648,79 +618,16 @@
     }
   },
   {
-    "name": "Sai",
-    "jutsus": [
-      {
-        "name": "Ink Lion",
-        "description": "Draws a lion that attacks enemies dealing 28 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 25,
-        "damage": 28
-      },
-      {
-        "name": "Ink Snake Binding",
-        "description": "Creates ink snakes that restrain enemies dealing 20 damage and stunning for 1 turn",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 22,
-        "damage": 20,
-        "effect": {
-          "type": "stun",
-          "duration": 1,
-          "target": "opponent"
-        }
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Super God Imitating Drawing",
-      "description": "Creates massive ink warrior resembling Benevolent Kings dealing 48 damage",
-      "jutsuType": "ninjutsu",
-      "chakraCost": 45,
-      "damage": 48
-    }
-  },
-  {
-    "name": "Kankuro",
-    "jutsus": [
-      {
-        "name": "Puppet: Iron Maiden",
-        "description": "Kuroari puppet captures and impales target with hidden blades dealing 32 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 28,
-        "damage": 32
-      },
-      {
-        "name": "Poison Mist Barrage",
-        "description": "Puppet releases poisonous needles dealing 24 damage and poisoning for 7 per turn",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 26,
-        "damage": 24,
-        "effect": {
-          "type": "poison",
-          "value": 7,
-          "duration": 3,
-          "target": "opponent"
-        }
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Black Secret Technique Machine Triple Shot",
-      "description": "All three puppets coordinate attack dealing 52 damage",
-      "jutsuType": "ninjutsu",
-      "chakraCost": 50,
-      "damage": 52
-    }
-  },
-  {
     "name": "Mei Terumi",
     "jutsus": [
       {
         "name": "Lava Release: Melting Apparition",
-        "description": "Spits acidic lava that melts defenses dealing 35 damage and reducing defense",
+        "description": "Spits acidic lava that melts defenses dealing 35 damage across 2 round",
         "jutsuType": "ninjutsu",
         "chakraCost": 32,
         "damage": 35,
         "effect": {
-          "type": "debuff",
+          "type": "poison",
           "value": 15,
           "duration": 2,
           "target": "opponent"
@@ -749,38 +656,6 @@
     }
   },
   {
-    "name": "Asuma Sarutobi",
-    "jutsus": [
-      {
-        "name": "Flying Swallow",
-        "description": "Wind chakra-enhanced blade attack dealing 32 damage",
-        "jutsuType": "taijutsu",
-        "chakraCost": 26,
-        "damage": 32
-      },
-      {
-        "name": "Chakra Blade Strike",
-        "description": "Extended chakra blade cuts from distance dealing 28 damage",
-        "jutsuType": "taijutsu",
-        "chakraCost": 24,
-        "damage": 28
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Fire Release: Ash Pile Burning",
-      "description": "Explosive ash cloud ignites dealing 50 damage and causing burns",
-      "jutsuType": "ninjutsu",
-      "chakraCost": 45,
-      "damage": 50,
-      "effect": {
-        "type": "damage_boost",
-        "value": 10,
-        "duration": 2,
-        "target": "self"
-      }
-    }
-  },
-  {
     "name": "Choji Akimichi",
     "jutsus": [
       {
@@ -806,48 +681,7 @@
       "damage": 58
     }
   },
-  {
-    "name": "Shino Aburame",
-    "jutsus": [
-      {
-        "name": "Parasitic Insects Attack",
-        "description": "Kikaichū swarm drains opponent chakra dealing 22 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 24,
-        "damage": 22,
-        "effect": {
-          "type": "chakra_drain",
-          "value": 15,
-          "target": "opponent"
-        }
-      },
-      {
-        "name": "Insect Clone Technique",
-        "description": "Creates insect decoy that dodges next attack",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 28,
-        "effect": {
-          "type": "dodge",
-          "value": 1,
-          "duration": 1,
-          "target": "self"
-        }
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Secret Technique: Insect Sphere",
-      "description": "Massive insect cage traps enemy dealing 45 damage over time",
-      "jutsuType": "ninjutsu",
-      "chakraCost": 42,
-      "damage": 45,
-      "effect": {
-        "type": "chakra_drain",
-        "value": 20,
-        "target": "opponent"
-      }
-    }
-  },
-  {
+ {
     "name": "Neji Hyuga",
     "jutsus": [
       {
@@ -883,33 +717,7 @@
       "damage": 62
     }
   },
-  {
-    "name": "Tenten",
-    "jutsus": [
-      {
-        "name": "Twin Rising Dragons",
-        "description": "Scroll summons weapon barrage dealing 28 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 26,
-        "damage": 28
-      },
-      {
-        "name": "Manipulated Tools: Heavenly Chain",
-        "description": "Wire-guided weapon rain deals 32 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 30,
-        "damage": 32
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Bashosen",
-      "description": "Legendary fan generates elemental attacks dealing 52 damage",
-      "jutsuType": "ninjutsu",
-      "chakraCost": 48,
-      "damage": 52
-    }
-  },
-  {
+{
     "name": "Shikamaru Nara",
     "jutsus": [
       {
@@ -945,73 +753,7 @@
       }
     }
   },
-  {
-    "name": "Ino Yamanaka",
-    "jutsus": [
-      {
-        "name": "Mind Body Switch Technique",
-        "description": "Possess opponent's body stunning for 2 turns (leaves user vulnerable)",
-        "jutsuType": "genjutsu",
-        "chakraCost": 26,
-        "damage": 0,
-        "effect": {
-          "type": "stun",
-          "duration": 2,
-          "target": "opponent"
-        }
-      },
-      {
-        "name": "Mystical Palm Technique",
-        "description": "Medical ninjutsu heals 26 HP",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 24,
-        "effect": {
-          "type": "heal",
-          "value": 26,
-          "target": "self"
-        }
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Mind Clone Switch Technique",
-      "description": "Control multiple targets simultaneously for 48 damage",
-      "jutsuType": "genjutsu",
-      "chakraCost": 44,
-      "damage": 48,
-      "effect": {
-        "type": "stun",
-        "duration": 1,
-        "target": "opponent"
-      }
-    }
-  },
-  {
-    "name": "Temari",
-    "jutsus": [
-      {
-        "name": "Sickle Weasel Technique",
-        "description": "Giant fan creates slicing whirlwinds dealing 32 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 28,
-        "damage": 32
-      },
-      {
-        "name": "Great Sickle Weasel Technique",
-        "description": "Enhanced wind blades counter sound waves and genjutsu for 38 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 32,
-        "damage": 38
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Wind Release: Cast Net",
-      "description": "Wind net technique injures even Third Raikage for 58 damage",
-      "jutsuType": "ninjutsu",
-      "chakraCost": 50,
-      "damage": 58
-    }
-  },
-  {
+ {
     "name": "Kurenai Yuhi",
     "jutsus": [
       {
@@ -1080,15 +822,10 @@
       },
       {
         "name": "Samehada Slash",
-        "description": "Chakra-absorbing sword shaves and drains opponent for 28 damage",
+        "description": "Chakra-absorbing sword shaves opponent dealing 35 damage",
         "jutsuType": "taijutsu",
         "chakraCost": 26,
-        "damage": 28,
-        "effect": {
-          "type": "drain",
-          "value": 18,
-          "target": "opponent"
-        }
+        "damage": 35
       }
     ],
     "upgradedJutsu": {
@@ -1099,39 +836,7 @@
       "damage": 58
     }
   },
-  {
-    "name": "Zabuza Momochi",
-    "jutsus": [
-      {
-        "name": "Silent Killing",
-        "description": "Kubikiribōchō strike through zero visibility dealing 30 damage",
-        "jutsuType": "taijutsu",
-        "chakraCost": 28,
-        "damage": 30
-      },
-      {
-        "name": "Hiding in Mist Technique",
-        "description": "Creates thick mist reducing opponent accuracy by 35% for 2 turns",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 24,
-        "damage": 0,
-        "effect": {
-          "type": "debuff",
-          "value": 35,
-          "duration": 2,
-          "target": "opponent"
-        }
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Water Release: Great Waterfall Technique",
-      "description": "Massive water torrent devastating enemies for 52 damage",
-      "jutsuType": "ninjutsu",
-      "chakraCost": 48,
-      "damage": 52
-    }
-  },
-  {
+ {
     "name": "Orochimaru",
     "jutsus": [
       {
@@ -1175,15 +880,10 @@
       },
       {
         "name": "Wood Dragon",
-        "description": "Summons massive wood dragon that drains chakra dealing 30 damage",
+        "description": "Summons massive wood dragon dealing 40 damage",
         "jutsuType": "ninjutsu",
         "chakraCost": 35,
-        "damage": 30,
-        "effect": {
-          "type": "drain",
-          "value": 20,
-          "target": "opponent"
-        }
+        "damage": 40
       }
     ],
     "upgradedJutsu": {
@@ -1340,32 +1040,6 @@
       "jutsuType": "ninjutsu",
       "chakraCost": 60,
       "damage": 60
-    }
-  },
-  {
-    "name": "Anko Mitarashi",
-    "jutsus": [
-      {
-        "name": "Hidden Shadow Snake Hands",
-        "description": "Summons snakes from sleeves to bind foes dealing 30 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 25,
-        "damage": 30
-      },
-      {
-        "name": "Fire Release: Dragon Fire Technique",
-        "description": "Breathes concentrated stream of fire dealing 35 damage",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 30,
-        "damage": 35
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Many Hidden Shadow Snake Hands",
-      "description": "Massive swarm of serpents overwhelm enemies dealing 50 damage",
-      "jutsuType": "ninjutsu",
-      "chakraCost": 45,
-      "damage": 50
     }
   },
   {
@@ -1783,15 +1457,10 @@
     "jutsus": [
       {
         "name": "Eight Trigrams Sixty-Four Palms",
-        "description": "Strikes 64 chakra points with Gentle Fist dealing 40 damage and draining 15 chakra",
+        "description": "Strikes 64 chakra points with Gentle Fist dealing 50 damage",
         "jutsuType": "taijutsu",
         "chakraCost": 45,
-        "damage": 40,
-        "effect": {
-          "type": "drain",
-          "value": 15,
-          "target": "opponent"
-        }
+        "damage": 50
       },
       {
         "name": "Eight Trigrams Vacuum Palm",
@@ -1803,15 +1472,10 @@
     ],
     "upgradedJutsu": {
       "name": "Gentle Step Twin Lion Fists",
-      "description": "Creates twin lion-shaped chakra that drains opponent's chakra dealing 55 damage",
+      "description": "Creates twin lion-shaped chakra dealing 65 damage",
       "jutsuType": "taijutsu",
       "chakraCost": 55,
-      "damage": 55,
-      "effect": {
-        "type": "drain",
-        "value": 20,
-        "target": "opponent"
-      }
+      "damage": 65
     }
   },
   {
@@ -1819,25 +1483,21 @@
     "jutsus": [
       {
         "name": "Parasitic Destruction Insect Technique",
-        "description": "Commands chakra-eating insects to drain opponent's chakra dealing 30 damage",
+        "description": "Commands insects to swarm and devour opponent dealing 38 damage",
         "jutsuType": "ninjutsu",
         "chakraCost": 35,
-        "damage": 30,
-        "effect": {
-          "type": "drain",
-          "value": 15,
-          "target": "opponent"
-        }
+        "damage": 38
       },
       {
         "name": "Secret Technique: Insect Sphere",
-        "description": "Surrounds opponent with insects dealing 35 damage and draining chakra",
+        "description": "Surrounds opponent with insects dealing 35 damage with poison",
         "jutsuType": "ninjutsu",
         "chakraCost": 40,
         "damage": 35,
         "effect": {
-          "type": "drain",
-          "value": 10,
+          "type": "poison",
+          "value": 8,
+          "duration": 3,
           "target": "opponent"
         }
       }
