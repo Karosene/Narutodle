@@ -2150,5 +2150,19 @@
     "clan": "None",
     "rank": "S-rank",
     "firstAppearance": "Akatsuki Suppression Mission"
+  },
+  {
+    "name": "A (Fourth Raikage)",
+    "file": "/images/aFourthRaikage.png",
+    "aliases": [""],
+    "gender": "Male",
+    "age": "47",
+    "natureAffinity": ["Lightning Release"],
+    "height": "198",
+    "affiliations": ["Kumogakure"],
+    "team": "A-B Combo",
+    "clan": "None",
+    "rank": "Kage",
+    "firstAppearance": "Five Kage Summit"
   }
 ]

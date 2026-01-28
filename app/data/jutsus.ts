@@ -1,4 +1,4 @@
-import jutsusData from '../../public/jutsus-data.json';
+import jutsusData from '../../public/jutsusData.json';
 
 export interface Jutsu {
   name: string;
@@ -15,7 +15,7 @@ export interface Jutsu {
 }
 
 export interface CharacterJutsus {
-  characterName: string;
+  name: string;
   jutsus: [Jutsu, Jutsu]; // Each character has exactly 2 jutsus in base form
   upgradedJutsu?: Jutsu; // 1 upgraded version when boosted
 }
@@ -24,7 +24,7 @@ export const characterJutsus: CharacterJutsus[] = jutsusData as CharacterJutsus[
 
 export function getCharacterJutsus(characterName: string, upgraded: boolean = false): [Jutsu, Jutsu] | Jutsu | undefined {
   const characterData = characterJutsus.find(
-    (c) => c.characterName.toLowerCase() === characterName.toLowerCase()
+    (c) => c.name.toLowerCase() === characterName.toLowerCase()
   );
   
   if (!characterData) return undefined;

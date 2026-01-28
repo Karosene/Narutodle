@@ -4,7 +4,6 @@ Priebeh hry:
         - jedna z kariet bude karta s Pasivnym utokom
     3. Tah zacina tym ze si hrac potiahne 1 booster z balicku
         - maximalny pocet booster kariet je 5
-        - na zaciatku 6. kola si zacina hrac pred kazdym kolom brat 2 booster karty namieto 1
     4. Po zobrati booster karty ju moze hrac aktivovat alebo priamo pouzivat jutsu
     5. Postup pouzivania jutsu:
         - hrac klikne na postavu
@@ -12,5 +11,61 @@ Priebeh hry:
         - pokial vybere:
             = heal, shield, buff - bude abilita pouzita na postavu seba samu alebo hracovu vybranu postavu
             = poison, stun, chakra drain, nin/gen/tai-jutsu - bude abilita pouzita na vybranu kartu protihraca
-        - 
-        
+    6. Po pouziti jutsu sa konci tah hraca
+    7. Hra sa pokym niekto z hracov nema ziadne karty
+
+
+Booster karty:
+    - Booster karta sa vzdy berie iba 
+    - Maximalny pocet booster kariet je 5
+    - Vsetky booster karty su jednorazove a hned po pouziti sa smažú
+    - Typy booster kariet:
+        = Heal: Prida vybranej postave 15 health pointov (sanca 25%)
+        = Chakra Restore: Doplni vybranej postave 20 chakry (sanca 20%)
+        = Jutsu Mastery: Vybrana postava unlockne na 5 kol specialne Jutsu (sanca 15%)
+        = Jutsu Damage Boost: Zvysi damage vybranej postave o 20% (sanca 10%)
+        = Splash Damage: Umoznuje zautocit 1 utokom na 3 vybranych charakterov (sanca 10%)
+        = Jutsu recovery: Zrusi cooldown vybraneho jutsu (sanca 10%)
+        = Double Attack: Umoznuje hracovi pouzit 2 jutsu za 1 kolo (sanca 5%)
+        = Shield Pierce: Umoznuje zautocit na vybranu kartu protihraca aj ked ma aktivny shield (sanca 5%)
+
+Chakra system:
+    - Na pouzitie nejakeho jutsu potrebuje hrac dany pocet chakry
+    - Zakladne ma kazda postava 100 chakry
+    - Doplnuje sa po 10 pointoch pred kazdym tahom hraca
+    - Maximálny počet chakry je 100, ale použitím karty Chakra Restore sa dá doplniť aj nad 100
+
+Jutsu system:
+    - Kazda postava ma 2 zakladne jutsu a 1 specialne jutsu ktora sa da odomknut pouzitim karty Jutsu Mastery
+    - Kazde jutsu ma cooldown 2 kola
+    - Su 3 typy jutsu: 
+        = Ninjutsu
+            - Je silnejsie oproti Taijutsu
+            - Je slabsie oproti genjutsu
+        = Taijutsu
+            - Je silnejsie oproti Genjutsu
+            - Je slabsie oproti Ninjutsu
+        = Genjutsu
+            - Je silnejsie oproti Ninjutsu
+            - Je slabsie oproti Taijutsu
+    - Su 2 typy efektov pre jutsu:
+        = Jutsu pouzite na postavy hraca:
+            - Heal: Prida zivoty postave zvolenej hracom
+            - Shield: Dava postave nerozbitny stit na urcity pocet kol
+            - Buff: Zlepsuje utoky postavy na urcity pocet kol
+            - 
+        = Jutsu pouzite na postavy protihraca:
+            - Poison: Ubera zivoty vybranej postave pocas niekolkych kol
+            - Stun: Zamrazuje vybranu postavu na urcity pocet kol
+            - Chakra Drain: Zoberie protihracovi dany pocet chakry
+
+Pasivne utoky:
+    - Danzō Shimura     -> ked zomre tak sa moze revivnut, ale musi to byt v tom kole co zomrel
+    - Naruto Uzumaki    -> ak má menej ako 20 HP a je v Sage Mode, automaticky prejde do Kurama Sage Mode, v ktorom majú jeho jutsu o 30 damage viac
+    - Tsunade Senju     -> pri pouziti jutsu je 25% sanca ze prida 10 zivotov kazdej postave hraca
+    - Minato Namikaze   -> pokial je pod utokom protihraca je 25% sanca ze sa mu mu vyhne pomocou Flying Raijin
+    - Hinata Hyūga      -> pri taijutsu útoku má 50 % šancu, že dostane iba polovicu damage
+    - Shino Aburame     -> pokial pouzije poison utok, je 25% sanca ze poison bude trva 1 kolo dlhsie
+    - Sasuke Uchiha     -> po použití jutsu Kirin má 20 % šancu aktivovať teleport cez Rinnegan a vyhnúť sa nasledujúcemu útoku protihráča
+    - Kaguya Otsutsuki  -> pokial je pod utokom protihraca 3-krat, jej regenerácia chakry sa zvýši z 10 na 20 bodov za kolo
+    - Madara Uchiha     -> 

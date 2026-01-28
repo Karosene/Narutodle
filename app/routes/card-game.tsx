@@ -21,23 +21,23 @@ export default function CardGame() {
   const [selectedCharacter, setSelectedCharacter] = useState<{ card: CharacterCard; original: Character } | null>(null);
 
   useEffect(() => {
-    fetch('/characters.json')
-      .then(res => res.json())
-      .then((data: Character[]) => {
-        setAllCharacters(data);
+    // Load both attack types and characters
+    Promise.all([
+      fetch('/tcg-attackTypes.json').then(res => res.json()),
+      fetch('/characters.json').then(res => res.json())
+    ])
+      .then(([attackTypesData, charactersData]: [Record<string, 'taijutsu' | 'ninjutsu' | 'genjutsu'>, Character[]]) => {
+        console.log('Attack Types Data:', attackTypesData);
+        setAllCharacters(charactersData);
         
         // Convert all characters to card format
-        const cards: CharacterCard[] = data.map((char, index) => {
+        const cards: CharacterCard[] = charactersData.map((char, index) => {
           // Extract clan name from character data
           const clanName = char.clan && char.clan !== 'None' ? char.clan : undefined;
           
-          // Determine attack type based on nature affinity
-          let attackType: 'taijutsu' | 'ninjutsu' | 'genjutsu' = 'taijutsu';
-          if (char.natureAffinity && char.natureAffinity.length > 0) {
-            attackType = 'ninjutsu';
-          } else if (char.name.includes('Uchiha') || char.name.includes('Genjutsu')) {
-            attackType = 'genjutsu';
-          }
+          // Get attack type from mapping file, default to taijutsu
+          const attackType = attackTypesData[char.name] || 'taijutsu';
+          console.log(`${char.name}: ${attackType}`);
           
           return {
             id: `char-${index}`,
@@ -68,7 +68,7 @@ export default function CardGame() {
         setLoading(false);
       })
       .catch(err => {
-        console.error('Failed to load characters:', err);
+        console.error('Failed to load data:', err);
         setLoading(false);
       });
   }, []);
@@ -85,7 +85,7 @@ export default function CardGame() {
           <div className="flex-1 flex gap-5">
             <div className="flex-1 bg-slate-800 rounded-lg p-5">
               <h2 className="text-xl font-bold text-white mb-4">Player 1 Hand</h2>
-              <div className="grid grid-cols-2 gap-5">
+      attackTypes        <div className="grid grid-cols-2 gap-5">
                 {displayCards.slice(0, 8).map((card, index) => (
                   <div key={card.id} className="transform transition-transform hover:scale-105">
                     <CharacterCardComponent
@@ -150,11 +150,6 @@ export default function CardGame() {
               <div className="absolute inset-0 bg-linear-to-t from-slate-800 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
                 <h2 className="text-4xl font-bold text-white mb-2">{selectedCharacter.card.name}</h2>
-                {selectedCharacter.card.clan && (
-                  <span className="inline-block px-3 py-1 bg-orange-500 text-white rounded-full text-sm font-semibold">
-                    {selectedCharacter.card.clan} Clan
-                  </span>
-                )}
               </div>
               <button 
                 onClick={() => setSelectedCharacter(null)}

@@ -57,11 +57,6 @@ export function CharacterCardComponent({
         {/* Character Name Overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-2">
           <h3 className="text-white font-bold text-sm drop-shadow-lg truncate">{card.name}</h3>
-          {card.clan && (
-            <span className="inline-block px-1 py-0.5 text-[10px] font-semibold bg-orange-500 text-white rounded-full">
-              {card.clan}
-            </span>
-          )}
         </div>
 
         {/* Form Badge */}

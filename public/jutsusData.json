@@ -53,12 +53,11 @@
       },
       {
         "name": "Water Style: Water Wall",
-        "description": "Creates massive water barrier that shields 20 damage for 2 turns",
+        "description": "Creates massive water barrier that shields for 2 turns",
         "jutsuType": "ninjutsu",
         "chakraCost": 25,
         "effect": {
           "type": "shield",
-          "value": 20,
           "duration": 2,
           "target": "self"
         }
@@ -92,12 +91,12 @@
     ],
     "upgradedJutsu": {
       "name": "Sage Mode",
-      "description": "Perfect natural energy absorption increasing all combat prowess by 18 for 3 turns",
+      "description": "Perfect natural energy absorption increasing all combat prowess by 15 for 3 turns",
       "jutsuType": "ninjutsu",
       "chakraCost": 40,
       "effect": {
         "type": "buff",
-        "value": 18,
+        "value": 15,
         "duration": 3,
         "target": "self"
       }
@@ -222,32 +221,6 @@
     }
   },
   {
-    "name": "Hinata Hyuga",
-    "jutsus": [
-      {
-        "name": "Gentle Fist",
-        "description": "Byakugan-guided chakra point strike dealing 24 damage",
-        "jutsuType": "taijutsu",
-        "chakraCost": 20,
-        "damage": 24
-      },
-      {
-        "name": "Eight Trigrams Vacuum Palm",
-        "description": "Pressurized air attack outside physical range dealing 28 damage",
-        "jutsuType": "taijutsu",
-        "chakraCost": 25,
-        "damage": 28
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Eight Trigrams Sixty-Four Palms",
-      "description": "Precise strikes closing 64 tenketsu points, dealing 40 damage",
-      "jutsuType": "taijutsu",
-      "chakraCost": 38,
-      "damage": 40
-    }
-  },
-  {
     "name": "Gaara",
     "jutsus": [
       {
@@ -259,12 +232,11 @@
       },
       {
         "name": "Shield of Sand",
-        "description": "Automatic absolute defense blocking 22 damage for 2 turns",
+        "description": "Automatic absolute defense blocking damage for 2 turns",
         "jutsuType": "ninjutsu",
         "chakraCost": 25,
         "effect": {
           "type": "shield",
-          "value": 22,
           "duration": 2,
           "target": "self"
         }
@@ -329,12 +301,11 @@
     ],
     "upgradedJutsu": {
       "name": "Susanoo",
-      "description": "Spectral warrior with Sword of Totsuka and Yata Mirror boosting defense by 25 for 3 turns",
+      "description": "Spectral warrior with Sword of Totsuka and Yata Mirror that shield a character for 3 turns",
       "jutsuType": "ninjutsu",
       "chakraCost": 50,
       "effect": {
         "type": "shield",
-        "value": 25,
         "duration": 3,
         "target": "self"
       }
@@ -390,8 +361,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 25,
         "effect": {
-          "type": "dodge",
-          "value": 100,
+          "type": "shield",
           "duration": 1,
           "target": "self"
         }
@@ -520,7 +490,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 24,
         "effect": {
-          "type": "prevent_dodge",
+          "type": "stun",
           "duration": 2,
           "target": "opponent"
         }
@@ -698,12 +668,11 @@
       },
       {
         "name": "Eight Trigrams Palms Revolving Heaven",
-        "description": "Defensive spin deflects attacks shielding 25 damage",
+        "description": "Defensive spin that deflects attacks ",
         "jutsuType": "taijutsu",
         "chakraCost": 30,
         "effect": {
           "type": "shield",
-          "value": 25,
           "duration": 2,
           "target": "self"
         }
@@ -751,37 +720,6 @@
         "duration": 1,
         "target": "opponent"
       }
-    }
-  },
- {
-    "name": "Kurenai Yuhi",
-    "jutsus": [
-      {
-        "name": "Demonic Illusion: Tree Binding Death",
-        "description": "Genjutsu traps opponent in trees stunning for 2 turns",
-        "jutsuType": "genjutsu",
-        "chakraCost": 25,
-        "damage": 0,
-        "effect": {
-          "type": "stun",
-          "duration": 2,
-          "target": "opponent"
-        }
-      },
-      {
-        "name": "Genjutsu: Flower Petal Escape",
-        "description": "Flower petal illusions dealing 28 damage",
-        "jutsuType": "genjutsu",
-        "chakraCost": 26,
-        "damage": 28
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Demonic Illusion: Mirror Heaven and Earth Change",
-      "description": "Reverse genjutsu onto opponent dealing 50 damage",
-      "jutsuType": "genjutsu",
-      "chakraCost": 42,
-      "damage": 50
     }
   },
   {
@@ -904,8 +842,7 @@
         "chakraCost": 35,
         "damage": 0,
         "effect": {
-          "type": "buff",
-          "value": 100,
+          "type": "shield",
           "duration": 2,
           "target": "self"
         }
@@ -931,13 +868,12 @@
     "jutsus": [
       {
         "name": "Earth Spear",
-        "description": "Hardens skin to diamond strength dealing 20 damage and shielding",
+        "description": "Hardens skin to diamond and shields the character",
         "jutsuType": "ninjutsu",
         "chakraCost": 25,
         "damage": 20,
         "effect": {
           "type": "shield",
-          "value": 20,
           "duration": 2,
           "target": "self"
         }
@@ -1047,13 +983,14 @@
     "jutsus": [
       {
         "name": "Lightning Release Chakra Mode",
-        "description": "Lightning armor increases speed and power",
+        "description": "Lightning armor",
         "jutsuType": "ninjutsu",
         "chakraCost": 30,
-        "damage": 0,
-        "effect": "buff",
-        "effectValue": 15,
-        "effectDuration": 3
+        "effect": {
+          "type": "shield",
+          "duration": 3,
+          "target": "self"
+        }
       },
       {
         "name": "Lariat",
@@ -1182,15 +1119,15 @@
         "name": "Eighty Gods Vacuum Attack",
         "description": "Materializes enormous chakra fists for devastating assault dealing 65 damage",
         "jutsuType": "ninjutsu",
-        "chakraCost": 55,
-        "damage": 65
+        "chakraCost": 35,
+        "damage": 35
       },
       {
         "name": "All-Killing Ash Bones",
         "description": "Weaponized bone projectiles disintegrate victims on contact dealing 60 damage",
         "jutsuType": "ninjutsu",
-        "chakraCost": 50,
-        "damage": 60
+        "chakraCost": 35,
+        "damage": 40
       }
     ],
     "upgradedJutsu": {
@@ -1206,7 +1143,7 @@
     "jutsus": [
       {
         "name": "Hydrification Technique",
-        "description": "Liquefies body to become invulnerable to physical attacks dealing 35 damage",
+        "description": "Liquefies body to become invulnerable to physical attacks",
         "jutsuType": "ninjutsu",
         "chakraCost": 40,
         "damage": 35,
@@ -1236,8 +1173,7 @@
         "description": "Absorbs natural energy for monstrous physical transformation dealing 40 damage",
         "jutsuType": "taijutsu",
         "chakraCost": 45,
-        "damage": 40,
-        "effect": "buff"
+        "damage": 40
       },
       {
         "name": "Piston Fist",
@@ -1363,7 +1299,7 @@
       },
       {
         "name": "Elite Training Techniques",
-        "description": "Uses superior teaching methods to enhance combat efficiency dealing 25 damage and buffing attack",
+        "description": "Uses superior teaching methods to enhance combat efficiency dealing 25 damage and buffing attack by 10 for 3 turns",
         "jutsuType": "taijutsu",
         "chakraCost": 30,
         "damage": 25,
@@ -1538,13 +1474,7 @@
       "description": "Wields legendary fan to unleash elemental attacks dealing 55 damage",
       "jutsuType": "ninjutsu",
       "chakraCost": 55,
-      "damage": 55,
-      "effect": {
-        "type": "buff",
-        "value": 15,
-        "duration": 2,
-        "target": "self"
-      }
+      "damage": 55
     }
   },
   {
