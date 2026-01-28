@@ -36,7 +36,7 @@ export function BoosterCardComponent({ booster, onClick, selected = false }: Boo
           ? 'border-yellow-400 shadow-2xl shadow-yellow-500/50 scale-105 ring-4 ring-yellow-300' 
           : 'border-purple-300 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-600'
         }
-        bg-linear-to-br ${getBoosterColor(booster.type)} text-white
+        bg-gradient-to-br ${getBoosterColor(booster.type)} text-white
       `}
     >
       {/* Icon */}

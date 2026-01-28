@@ -4,7 +4,7 @@
     "jutsus": [
       {
         "name": "Prepared Needle Shot",
-        "description": "Fires poison senbon from wrist-mounted launcher dealing 18 damage and poisoning target for 6 per turn (3 turns)",
+        "description": "Fires poison senbon from wrist-mounted launcher dealing 18 damage and poisoning target for 6 per roun (3 rounds)",
         "jutsuType": "ninjutsu",
         "chakraCost": 20,
         "damage": 18,
@@ -53,7 +53,7 @@
       },
       {
         "name": "Water Style: Water Wall",
-        "description": "Creates massive water barrier that shields for 2 turns",
+        "description": "Creates massive water barrier that shields for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 25,
         "effect": {
@@ -91,7 +91,7 @@
     ],
     "upgradedJutsu": {
       "name": "Sage Mode",
-      "description": "Perfect natural energy absorption increasing all combat prowess by 15 for 3 turns",
+      "description": "Perfect natural energy absorption increasing all combat prowess by 15 for 3 rounds",
       "jutsuType": "ninjutsu",
       "chakraCost": 40,
       "effect": {
@@ -126,7 +126,7 @@
     ],
     "upgradedJutsu": {
       "name": "Strength of a Hundred Seal",
-      "description": "Released seal with accumulated chakra boosting power by 22 for 3 turns",
+      "description": "Released seal with accumulated chakra boosting power by 22 for 3 rounds",
       "jutsuType": "ninjutsu",
       "chakraCost": 40,
       "effect": {
@@ -183,7 +183,7 @@
     ],
     "upgradedJutsu": {
       "name": "Night Guy",
-      "description": "Eighth Gate ultimate kick distorting space itself, boosting power by 28 for 2 turns",
+      "description": "Eighth Gate ultimate kick distorting space itself, boosting power by 28 for 2 rounds",
       "jutsuType": "taijutsu",
       "chakraCost": 50,
       "effect": {
@@ -232,7 +232,7 @@
       },
       {
         "name": "Shield of Sand",
-        "description": "Automatic absolute defense blocking damage for 2 turns",
+        "description": "Automatic absolute defense blocking damage for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 25,
         "effect": {
@@ -288,7 +288,7 @@
       },
       {
         "name": "Tsukuyomi",
-        "description": "Powerful genjutsu trapping opponent in illusory world, stunning for 2 turns",
+        "description": "Powerful genjutsu trapping opponent in illusory world, stunning for 2 rounds",
         "jutsuType": "genjutsu",
         "chakraCost": 35,
         "effect": {
@@ -301,7 +301,7 @@
     ],
     "upgradedJutsu": {
       "name": "Susanoo",
-      "description": "Spectral warrior with Sword of Totsuka and Yata Mirror that shield a character for 3 turns",
+      "description": "Spectral warrior with Sword of Totsuka and Yata Mirror that shield a character for 3 rounds",
       "jutsuType": "ninjutsu",
       "chakraCost": 50,
       "effect": {
@@ -335,7 +335,7 @@
     ],
     "upgradedJutsu": {
       "name": "Creation Rebirth",
-      "description": "Releases Strength of a Hundred Seal to heal 50 HP and regenerate 8 HP per turn (3 turns)",
+      "description": "Releases Strength of a Hundred Seal to heal 50 HP and regenerate 8 HP per round (3 rounds)",
       "jutsuType": "ninjutsu",
       "chakraCost": 45,
       "effect": {
@@ -387,24 +387,19 @@
       },
       {
         "name": "Dead Soul Technique",
-        "description": "Reanimates corpses temporarily to confuse opponent (reduces their accuracy by 30%)",
+        "description": "Reanimates corpses temporarily to confuse opponent and dealing 40 damage",
         "jutsuType": "ninjutsu",
         "chakraCost": 20,
-        "effect": {
-          "type": "accuracy_down",
-          "value": 30,
-          "duration": 2,
-          "target": "opponent"
-        }
+        "damage": 40
       }
     ],
     "upgradedJutsu": {
       "name": "Sage Mode Transformation",
-      "description": "Ryūchi Cave Sage Mode boosts all stats, increases damage by 35% (3 turns)",
+      "description": "Ryūchi Cave Sage Mode boosts all stats, increases damage by 35% (3 rounds)",
       "jutsuType": "ninjutsu",
       "chakraCost": 40,
       "effect": {
-        "type": "damage_boost",
+        "type": "buff",
         "value": 35,
         "duration": 3,
         "target": "self"
@@ -443,12 +438,11 @@
     "jutsus": [
       {
         "name": "Wood Release: Wood Locking Wall",
-        "description": "Creates defensive wooden dome reducing incoming damage by 40% (2 turns)",
+          "description": "Creates defensive wooden dome shielding for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 22,
         "effect": {
-          "type": "defense_boost",
-          "value": 40,
+          "type": "shield",
           "duration": 2,
           "target": "self"
         }
@@ -486,7 +480,7 @@
       },
       {
         "name": "Universal Pull",
-        "description": "Bansho Ten'in pulls opponent closer, preventing dodge (2 turns)",
+        "description": "Bansho Ten'in pulls opponent closer, preventing dodge (2 rounds)",
         "jutsuType": "ninjutsu",
         "chakraCost": 24,
         "effect": {
@@ -691,7 +685,7 @@
     "jutsus": [
       {
         "name": "Shadow Imitation Technique",
-        "description": "Connect shadow to target restraining movement for 2 turns",
+        "description": "Connect shadow to target restraining movement for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 24,
         "damage": 0,
@@ -837,7 +831,7 @@
     "jutsus": [
       {
         "name": "Kamui",
-        "description": "Space-time ninjutsu makes user intangible evading attacks for 2 turns",
+        "description": "Space-time ninjutsu makes user intangible evading attacks for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 35,
         "damage": 0,
@@ -1260,7 +1254,7 @@
     "jutsus": [
       {
         "name": "Shadow Imitation Technique",
-        "description": "Extends shadow to bind opponent's movements dealing 30 damage and stunning for 2 turns",
+        "description": "Extends shadow to bind opponent's movements dealing 30 damage and stunning for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 35,
         "damage": 30,
@@ -1299,7 +1293,7 @@
       },
       {
         "name": "Elite Training Techniques",
-        "description": "Uses superior teaching methods to enhance combat efficiency dealing 25 damage and buffing attack by 10 for 3 turns",
+        "description": "Uses superior teaching methods to enhance combat efficiency dealing 25 damage and buffing attack by 10 for 3 rounds",
         "jutsuType": "taijutsu",
         "chakraCost": 30,
         "damage": 25,
@@ -1339,7 +1333,7 @@
     ],
     "upgradedJutsu": {
       "name": "Demonic Illusion: Mirror Heaven and Earth Change",
-      "description": "Reverses opponent's genjutsu back onto them dealing 50 damage and stunning for 2 turns",
+      "description": "Reverses opponent's genjutsu back onto them dealing 50 damage and stunning for 2 rounds",
       "jutsuType": "genjutsu",
       "chakraCost": 50,
       "damage": 50,
@@ -1356,7 +1350,7 @@
     "jutsus": [
       {
         "name": "Mind Body Switch Technique",
-        "description": "Transfers consciousness to take control of opponent's body, stunning them for 2 turns",
+        "description": "Transfers consciousness to take control of opponent's body, stunning them for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 40,
         "damage": 0,
@@ -1377,7 +1371,7 @@
     ],
     "upgradedJutsu": {
       "name": "Mind Body Transmission Technique",
-      "description": "Advanced telepathic link that heals 35 HP and buffs damage by 15 for 3 turns",
+      "description": "Advanced telepathic link that heals 35 HP and buffs damage by 15 for 3 rounds",
       "jutsuType": "ninjutsu",
       "chakraCost": 50,
       "damage": 0,
@@ -1677,6 +1671,504 @@
       "jutsuType": "ninjutsu",
       "chakraCost": 55,
       "damage": 55
+    }
+  },
+  {
+    "name": "Tobi",
+    "jutsus": [
+      {
+        "name": "Kamui",
+        "description": "Warps space around the target, dealing 32 damage and stunning opponent",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 40,
+        "damage": 32,
+        "effect": {
+          "type": "stun",
+          "duration": 1,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Intangibility",
+        "description": "Phases through attacks, gaining a shield that blocks 50 damage for 2 rounds",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 30,
+        "effect": {
+          "type": "shield",
+          "value": 50,
+          "duration": 2,
+          "target": "self"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Kamui Shuriken",
+      "description": "Throws a shuriken infused with Kamui dimension, dealing 50 damage and stunning opponent",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 50,
+      "damage": 50,
+      "effect": {
+        "type": "stun",
+        "duration": 2,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "White Zetsu",
+    "jutsus": [
+      {
+        "name": "Plant Clone",
+        "description": "Creates plant-based clones to confuse opponent, dealing 20 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 25,
+        "damage": 20
+      },
+      {
+        "name": "Wood Release Technique",
+        "description": "Grows wooden vines to bind and damage opponent for 24 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 28,
+        "damage": 24,
+        "effect": {
+          "type": "stun",
+          "value": 10,
+          "duration": 2,
+          "target": "self"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Wood Release: Cutting Technique",
+      "description": "Unleashes a barrage of cutting wooden spikes dealing 45 damage with poison effect",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 45,
+      "damage": 30,
+      "effect": {
+        "type": "poison",
+        "value": 5,
+        "duration": 3,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Black Zetsu",
+    "jutsus": [
+      {
+        "name": "Shadow Possession",
+        "description": "Extends shadow to bind opponent, dealing 22 damage and stunning",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 28,
+        "damage": 22,
+        "effect": {
+          "type": "stun",
+          "duration": 1,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Chakra Absorption",
+        "description": "Absorbs opponent's chakra, draining 30 chakra from opponent",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 30,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 30,
+          "target": "opponent"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Perfect Absorption",
+      "description": "Completely absorbs opponent's chakra, dealing 30 damage and draining 40 chakra",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 50,
+      "damage": 30,
+      "effect": {
+        "type": "chakra_drain",
+        "value": 40,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Mahiru",
+    "jutsus": [
+      {
+        "name": "Shadow Clone Technique",
+        "description": "Creates 19-20 clones to overwhelm opponents with coordinated attacks dealing 28 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 30,
+        "damage": 28,
+        "effect": {
+          "type": "buff",
+          "value": 15,
+          "duration": 2,
+          "target": "self"
+        }
+      },
+      {
+        "name": "Earth Release Underground Ambush",
+        "description": "Hides underground and launches surprise attacks dealing 26 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 28,
+        "damage": 26
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Shadow Clone Slash Strike",
+      "description": "Combines Shadow Clones with high-speed kenjutsu for devastating sword strikes dealing 50 damage and boosting damage output",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 50,
+      "damage": 50,
+      "effect": {
+        "type": "buff",
+        "value": 20,
+        "duration": 2,
+        "target": "self"
+      }
+    }
+  },
+  {
+    "name": "Saiken",
+    "jutsus": [
+      {
+        "name": "Acidic Slime",
+        "description": "Sprays corrosive acid dealing 26 damage and poisoning opponent by dealing 4 damage across 3 rounds",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 32,
+        "damage": 26,
+        "effect": {
+          "type": "poison",
+          "value": 4,
+          "duration": 3,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Steam Vapor Cloud",
+        "description": "Creates a thick steam mist acting as a shield",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 28,
+        "effect": {
+          "type": "shield",
+          "duration": 2,
+          "target": "self"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Tailed Beast Bomb",
+      "description": "Unleashes devastating tailed beast energy dealing 55 damage with poisonous effects",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 55,
+      "damage": 55,
+      "effect": {
+        "type": "poison",
+        "value": 5,
+        "duration": 3,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Ittan",
+    "jutsus": [
+      {
+        "name": "Stone Defense",
+        "description": "Hardens body with stone creating a protective shield blocking 25 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 30,
+        "effect": {
+          "type": "shield",
+          "value": 25,
+          "duration": 2,
+          "target": "self"
+        }
+      },
+      {
+        "name": "Rock Projectile",
+        "description": "Launches sharp rock projectiles dealing 28 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 26,
+        "damage": 28
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Mountain Collapse",
+      "description": "Summons falling boulders dealing 48 damage and buffing defense",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 48,
+      "damage": 48,
+      "effect": {
+        "type": "shield",
+        "value": 20,
+        "duration": 2,
+        "target": "self"
+      }
+    }
+  },
+  {
+    "name": "Yahiko",
+    "jutsus": [
+      {
+        "name": "Paper Shuriken",
+        "description": "Throws sharpened paper shuriken dealing 24 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 24,
+        "damage": 24
+      },
+      {
+        "name": "Paper Clone",
+        "description": "Creates paper clones to distract opponent granting offensive boost",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 28,
+        "effect": {
+          "type": "buff",
+          "value": 15,
+          "duration": 2,
+          "target": "self"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Paper Binding Strike",
+      "description": "Binds opponent with paper wings while striking dealing 46 damage and stunning",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 50,
+      "damage": 46,
+      "effect": {
+        "type": "stun",
+        "duration": 1,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Izuna Uchiha",
+    "jutsus": [
+      {
+        "name": "Sharingan Strike",
+        "description": "Uses Sharingan to predict and counter opponent moves and creating shield that reflects 18 damage each attack for 2 rounds",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 32,
+        "damage": 28,
+        "effect": {
+          "type": "shield",
+          "value": 18,
+          "duration": 2,
+          "target": "self"
+        }
+      },
+      {
+        "name": "Flame Enhancement",
+        "description": "Empowers strikes with fire-enhanced chakra dealing 26 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 28,
+        "damage": 26
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Uchiha Flame Dragon",
+      "description": "Unleashes powerful fire dragon techniques dealing 52 damage",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 52,
+      "damage": 52
+    }
+  },
+  {
+    "name": "Jirōbō",
+    "jutsus": [
+      {
+        "name": "Earth-Style Wall",
+        "description": "Creates protective earth walls granting shield blocking 30 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 30,
+        "effect": {
+          "type": "shield",
+          "value": 30,
+          "duration": 2,
+          "target": "self"
+        }
+      },
+      {
+        "name": "Weighted Boulder",
+        "description": "Launches weighted stone projectiles dealing 25 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 26,
+        "damage": 25
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Earth Prison Technique",
+      "description": "Traps opponent in earth prison stunning them",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 50,
+      "effect": {
+        "type": "stun",
+        "duration": 3,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Kyūsuke",
+    "jutsus": [
+      {
+        "name": "Chain Strike",
+        "description": "Swings chained weapons dealing 24 damage and boosting attacks by 10 points for 1 round",
+        "jutsuType": "taijutsu",
+        "chakraCost": 24,
+        "damage": 24,
+        "effect": {
+          "type": "buff",
+          "value": 10,
+          "duration": 1,
+          "target": "self"
+        }
+      },
+      {
+        "name": "Rapid Chain Assault",
+        "description": "Quick consecutive chain attacks dealing 22 damage",
+        "jutsuType": "taijutsu",
+        "chakraCost": 22,
+        "damage": 22
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Spinning Chain Vortex",
+      "description": "Spins chains with tremendous force dealing 50 damage and buffing defense",
+      "jutsuType": "taijutsu",
+      "chakraCost": 50,
+      "damage": 50,
+      "effect": {
+        "type": "shield",
+        "value": 18,
+        "duration": 2,
+        "target": "self"
+      }
+    }
+  },
+  {
+    "name": "Tekka Uchiha",
+    "jutsus": [
+      {
+        "name": "Sharingan Genjutsu",
+        "description": "Uses Sharingan to cast genjutsu dealing 27 damage and stunning opponent for 2 rounds",
+        "jutsuType": "genjutsu",
+        "chakraCost": 30,
+        "damage": 27,
+        "effect": {
+          "type": "stun",
+          "duration": 2,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Fire Release: Phoenix Flower",
+        "description": "Shoots multiple fireballs dealing 24 damage and poisoning with burning effect",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 28,
+        "damage": 24,
+        "effect": {
+          "type": "poison",
+          "value": 4,
+          "duration": 2,
+          "target": "opponent"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Uchiha Fire Formation",
+      "description": "Creates devastating Uchiha fire technique dealing 50 damage with burning effect",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 52,
+      "damage": 50,
+      "effect": {
+        "type": "poison",
+        "value": 6,
+        "duration": 3,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Juzo Biwa",
+    "jutsus": [
+      {
+        "name": "Executioner's Blade Slash",
+        "description": "Wields massive Executioner's Blade dealing 30 damage and draining chakra",
+        "jutsuType": "taijutsu",
+        "chakraCost": 32,
+        "damage": 30,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 20,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Silent Killing Technique",
+        "description": "Uses mist assassination technique dealing 26 damage and buffing next attack",
+        "jutsuType": "taijutsu",
+        "chakraCost": 28,
+        "damage": 26,
+        "effect": {
+          "type": "buff",
+          "value": 14,
+          "duration": 2,
+          "target": "self"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Executioner's Beheading",
+      "description": "Delivers devastating cleaving strike with legendary blade dealing 54 damage and draining chakra",
+      "jutsuType": "taijutsu",
+      "chakraCost": 55,
+      "damage": 54,
+      "effect": {
+        "type": "chakra_drain",
+        "value": 30,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Fugaku Uchiha",
+    "jutsus": [
+      {
+        "name": "Sharingan Mastery",
+        "description": "Expert Sharingan control creating protective illusions granting shield",
+        "jutsuType": "genjutsu",
+        "chakraCost": 32,
+        "effect": {
+          "type": "shield",
+          "value": 28,
+          "duration": 2,
+          "target": "self"
+        }
+      },
+      {
+        "name": "Fire Release: Great Fireball",
+        "description": "Launches massive fireball technique dealing 32 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 35,
+        "damage": 32
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Mangekyo Sharingan",
+      "description": "Awakens Mangekyo Sharingan dealing 56 damage and stunning opponent with overwhelming power",
+      "jutsuType": "genjutsu",
+      "chakraCost": 58,
+      "damage": 56,
+      "effect": {
+        "type": "stun",
+        "duration": 2,
+        "target": "opponent"
+      }
     }
   }
 ]

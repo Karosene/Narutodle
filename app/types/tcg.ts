@@ -14,6 +14,7 @@ export interface CharacterFormData {
   name: string;
   health: number;
   maxChakra: number;
+  power: number;
   attackType: AttackType;
   resistances: Resistances;
   imageUrl?: string;
@@ -33,7 +34,7 @@ export interface CharacterCard {
   boosters: AttributeBoosterCard[];
 }
 
-export type BoosterType = 'weapon' | 'health' | 'chakra' | 'form_change';
+export type BoosterType = 'weapon' | 'health' | 'chakra' | 'power' | 'form_change';
 
 export interface AttributeBoosterCard {
   id: string;

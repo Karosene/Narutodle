@@ -20,23 +20,38 @@ export default function Characters() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClan, setSelectedClan] = useState<string>('all');
+  const [selectedAffiliation, setSelectedAffiliation] = useState<string>('all');
+  const [selectedNatureAffinity, setSelectedNatureAffinity] = useState<string>('all');
+  const [selectedRank, setSelectedRank] = useState<string>('all');
   const [selectedCharacter, setSelectedCharacter] = useState<{ card: CharacterCard; rawData: Character } | null>(null);
 
+  // Prevent background scrolling when modal is open
   useEffect(() => {
-    fetch('/characters.json')
-      .then(res => res.json())
-      .then((data: Character[]) => {
+    if (selectedCharacter) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedCharacter]);
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/attackTypes.json').then(res => res.json()),
+      fetch('/characters.json').then(res => res.json())
+    ])
+      .then(([attackTypesData, data]: [Record<string, 'taijutsu' | 'ninjutsu' | 'genjutsu'>, Character[]]) => {
         setAllCharacters(data);
         
         const cards: CharacterCard[] = data.map((char, index) => {
           const clanName = char.clan && char.clan !== 'None' ? char.clan : undefined;
           
-          let attackType: 'taijutsu' | 'ninjutsu' | 'genjutsu' = 'taijutsu';
-          if (char.natureAffinity && char.natureAffinity.length > 0) {
-            attackType = 'ninjutsu';
-          } else if (char.name.includes('Uchiha') || char.name.includes('Genjutsu')) {
-            attackType = 'genjutsu';
-          }
+          // Get attack type from attackTypes.json, default to taijutsu if not found
+          const attackType = attackTypesData[char.name] || 'taijutsu';
           
           return {
             id: `char-${index}`,
@@ -50,6 +65,7 @@ export default function Characters() {
                 name: 'Base Form',
                 health: 100,
                 maxChakra: 100,
+                power: 50,
                 attackType,
                 resistances: {
                   taijutsu: 'none',
@@ -73,15 +89,27 @@ export default function Characters() {
   }, []);
 
   // Filter characters based on search and filters
-  const filteredCards = displayCards.filter(card => {
+  const filteredCards = displayCards.filter((card, index) => {
+    const rawData = allCharacters[index];
     const matchesSearch = normalize(card.name).includes(normalize(searchTerm));
     const matchesClan = selectedClan === 'all' || card.clan === selectedClan;
     
-    return matchesSearch && matchesClan;
+    const matchesAffiliation = selectedAffiliation === 'all' || 
+      (rawData.affiliations && rawData.affiliations.some(a => a === selectedAffiliation));
+    
+    const matchesNatureAffinity = selectedNatureAffinity === 'all' || 
+      (rawData.natureAffinity && rawData.natureAffinity.some(n => n === selectedNatureAffinity));
+    
+    const matchesRank = selectedRank === 'all' || rawData.rank === selectedRank;
+    
+    return matchesSearch && matchesClan && matchesAffiliation && matchesNatureAffinity && matchesRank;
   });
 
-  // Get unique clans for filter
+  // Get unique values for filters
   const uniqueClans = Array.from(new Set(displayCards.map(card => card.clan).filter(Boolean))).sort();
+  const uniqueAffiliations = Array.from(new Set(allCharacters.flatMap(char => char.affiliations || []))).sort();
+  const uniqueNatureAffinities = Array.from(new Set(allCharacters.flatMap(char => char.natureAffinity || []))).sort();
+  const uniqueRanks = Array.from(new Set(allCharacters.map(char => char.rank).filter(Boolean))).sort();
 
   return (
     <div className="min-h-screen bg-linear-to-br from-orange-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
@@ -112,7 +140,7 @@ export default function Characters() {
                 </span>
               </div>
 
-              {/* Clan Filter */}
+              {/* Filters */}
               <div className="flex gap-4 justify-center flex-wrap">
                 <select
                   value={selectedClan}
@@ -122,6 +150,39 @@ export default function Characters() {
                   <option value="all">All Clans</option>
                   {uniqueClans.map(clan => (
                     <option key={clan} value={clan}>{clan}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedAffiliation}
+                  onChange={(e) => setSelectedAffiliation(e.target.value)}
+                  className="px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 focus:border-orange-500 focus:outline-none"
+                >
+                  <option value="all">All Affiliations</option>
+                  {uniqueAffiliations.map(affiliation => (
+                    <option key={affiliation} value={affiliation}>{affiliation}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedNatureAffinity}
+                  onChange={(e) => setSelectedNatureAffinity(e.target.value)}
+                  className="px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 focus:border-orange-500 focus:outline-none"
+                >
+                  <option value="all">All Nature Types</option>
+                  {uniqueNatureAffinities.map(nature => (
+                    <option key={nature} value={nature}>{nature}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedRank}
+                  onChange={(e) => setSelectedRank(e.target.value)}
+                  className="px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 focus:border-orange-500 focus:outline-none"
+                >
+                  <option value="all">All Ranks</option>
+                  {uniqueRanks.map(rank => (
+                    <option key={rank} value={rank}>{rank}</option>
                   ))}
                 </select>
               </div>
@@ -301,7 +362,7 @@ export default function Characters() {
                                 {jutsu.effect && (
                                   <div>
                                     <span className="text-slate-400">Effect: </span>
-                                    <span className="text-green-400 font-bold capitalize">{jutsu.effect.type}</span>
+                                    <span className="text-green-400 font-bold capitalize">{jutsu.effect.type.replace(/_/g, ' ')}</span>
                                   </div>
                                 )}
                               </div>
@@ -339,7 +400,7 @@ export default function Characters() {
                               {upgradedJutsu.effect && (
                                 <div>
                                   <span className="text-slate-400">Effect: </span>
-                                  <span className="text-green-400 font-bold capitalize">{upgradedJutsu.effect.type}</span>
+                                  <span className="text-green-400 font-bold capitalize">{upgradedJutsu.effect.type.replace(/_/g, ' ')}</span>
                                 </div>
                               )}
                             </div>

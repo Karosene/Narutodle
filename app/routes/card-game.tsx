@@ -51,6 +51,7 @@ export default function CardGame() {
                 name: 'Base Form',
                 health: 100,
                 maxChakra: 100,
+                power: 50,
                 attackType,
                 resistances: {
                   taijutsu: 'none',
@@ -245,7 +246,7 @@ export default function CardGame() {
                               {jutsu.effect && (
                                 <div>
                                   <span className="text-slate-400">Effect:</span>
-                                  <span className="text-green-400 font-semibold ml-1 capitalize">{jutsu.effect.type}</span>
+                                  <span className="text-green-400 font-semibold ml-1 capitalize">{jutsu.effect.type.replace(/_/g, ' ')}</span>
                                 </div>
                               )}
                             </div>
@@ -283,7 +284,7 @@ export default function CardGame() {
                             {upgradedJutsu.effect && (
                               <div>
                                 <span className="text-slate-400">Effect:</span>
-                                <span className="text-green-400 font-semibold ml-1 capitalize">{upgradedJutsu.effect.type}</span>
+                                <span className="text-green-400 font-semibold ml-1 capitalize">{upgradedJutsu.effect.type.replace(/_/g, ' ')}</span>
                               </div>
                             )}
                           </div>

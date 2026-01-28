@@ -21,6 +21,7 @@ interface Player {
 
 export default function PlayGame() {
   const [allCharacters, setAllCharacters] = useState<Character[]>([]);
+  const [attackTypes, setAttackTypes] = useState<Record<string, 'taijutsu' | 'ninjutsu' | 'genjutsu'>>({});
   const [gameStarted, setGameStarted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [players, setPlayers] = useState<[Player, Player]>([
@@ -33,14 +34,17 @@ export default function PlayGame() {
   const [currentBooster, setCurrentBooster] = useState<AttributeBoosterCard | null>(null);
 
   useEffect(() => {
-    fetch('/characters.json')
-      .then(res => res.json())
-      .then((data: Character[]) => {
-        setAllCharacters(data);
+    Promise.all([
+      fetch('/attackTypes.json').then(res => res.json()),
+      fetch('/characters.json').then(res => res.json())
+    ])
+      .then(([attackTypesData, charactersData]: [Record<string, 'taijutsu' | 'ninjutsu' | 'genjutsu'>, Character[]]) => {
+        setAttackTypes(attackTypesData);
+        setAllCharacters(charactersData);
         setLoading(false);
       })
       .catch(err => {
-        console.error('Failed to load characters:', err);
+        console.error('Failed to load data:', err);
         setLoading(false);
       });
   }, []);
@@ -48,12 +52,8 @@ export default function PlayGame() {
   const convertToCard = (char: Character, index: number): CharacterCard => {
     const clanName = char.clan && char.clan !== 'None' ? char.clan : undefined;
     
-    let attackType: 'taijutsu' | 'ninjutsu' | 'genjutsu' = 'taijutsu';
-    if (char.natureAffinity && char.natureAffinity.length > 0) {
-      attackType = 'ninjutsu';
-    } else if (char.name.includes('Uchiha') || char.name.includes('Genjutsu')) {
-      attackType = 'genjutsu';
-    }
+    // Get attack type from attackTypes.json, default to taijutsu if not found
+    const attackType = attackTypes[char.name] || 'taijutsu';
     
     return {
       id: `char-${index}`,
@@ -67,6 +67,7 @@ export default function PlayGame() {
           name: 'Base Form',
           health: 100,
           maxChakra: 100,
+          power: 50,
           attackType,
           resistances: {
             taijutsu: 'none',
@@ -90,12 +91,15 @@ export default function PlayGame() {
   };
 
   const startGame = () => {
-    if (allCharacters.length < 16) {
-      alert('Not enough characters loaded!');
+    // Filter characters to only include those in attackTypes.json (with complete jutsu data)
+    const validCharacters = allCharacters.filter(char => attackTypes[char.name]);
+    
+    if (validCharacters.length < 16) {
+      alert(`Not enough characters with complete jutsu data! Found ${validCharacters.length}, need 16.`);
       return;
     }
 
-    const shuffled = shuffleArray(allCharacters);
+    const shuffled = shuffleArray(validCharacters);
     const allCards = shuffled.slice(0, 16).map((char, index) => convertToCard(char, index));
 
     const player1Hand = allCards.slice(0, 8);
