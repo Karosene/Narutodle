@@ -668,42 +668,7 @@
       "damage": 58
     }
   },
- {
-    "name": "Neji Hyuga",
-    "jutsus": [
-      {
-        "name": "Eight Trigrams Sixty-Four Palms",
-        "description": "Precise strikes seal 64 tenketsu points dealing 38 damage",
-        "jutsuType": "taijutsu",
-        "chakraCost": 35,
-        "damage": 38,
-        "effect": {
-          "type": "chakra_drain",
-          "value": 18,
-          "target": "opponent"
-        }
-      },
-      {
-        "name": "Eight Trigrams Palms Revolving Heaven",
-        "description": "Defensive spin that deflects attacks ",
-        "jutsuType": "taijutsu",
-        "chakraCost": 30,
-        "effect": {
-          "type": "shield",
-          "duration": 2,
-          "target": "self"
-        }
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Eight Trigrams One Hundred Twenty-Eight Palms",
-      "description": "Double tenketsu strikes devastating enemy for 62 damage",
-      "jutsuType": "taijutsu",
-      "chakraCost": 55,
-      "damage": 62
-    }
-  },
-{
+  {
     "name": "Shikamaru Nara",
     "jutsus": [
       {
@@ -885,12 +850,12 @@
     "jutsus": [
       {
         "name": "Earth Spear",
-        "description": "Hardens skin to diamond and shields the character",
+        "description": "Hardens skin to diamond and reduces incoming damage to the character by 21 for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 25,
         "damage": 20,
         "effect": {
-          "type": "shield",
+          "type": "reducing_shield",
           "duration": 2,
           "target": "self"
         }
@@ -992,36 +957,6 @@
       "description": "Controls one hundred puppets simultaneously dealing 60 damage",
       "jutsuType": "ninjutsu",
       "chakraCost": 60,
-      "damage": 60
-    }
-  },
-  {
-    "name": "A (Fourth Raikage)",
-    "jutsus": [
-      {
-        "name": "Lightning Release Chakra Mode",
-        "description": "Lightning armor",
-        "jutsuType": "ninjutsu",
-        "chakraCost": 30,
-        "effect": {
-          "type": "shield",
-          "duration": 3,
-          "target": "self"
-        }
-      },
-      {
-        "name": "Lariat",
-        "description": "Devastating clothesline enhanced by lightning dealing 50 damage",
-        "jutsuType": "taijutsu",
-        "chakraCost": 35,
-        "damage": 50
-      }
-    ],
-    "upgradedJutsu": {
-      "name": "Lightning Oppression Horizontal Chop",
-      "description": "Maximum power guillotine drop technique dealing 60 damage",
-      "jutsuType": "taijutsu",
-      "chakraCost": 55,
       "damage": 60
     }
   },
@@ -1160,11 +1095,15 @@
     "jutsus": [
       {
         "name": "Hydrification Technique",
-        "description": "Liquefies body to become invulnerable to physical attacks",
+        "description": "Liquefies body to become invulnerable to physical attacks for 1 round",
         "jutsuType": "ninjutsu",
         "chakraCost": 40,
         "damage": 35,
-        "effect": "shield"
+        "effect": {
+          "type": "shield",
+          "duration": 1,
+          "target": "self"
+        }
       },
       {
         "name": "Water Gun Technique",
@@ -1686,12 +1625,12 @@
       },
       {
         "name": "Intangibility",
-        "description": "Phases through attacks, gaining a shield that blocks 50 damage for 2 rounds",
+        "description": "Phases through attacks, gaining a shield that reduces damage by 36 for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 30,
         "effect": {
-          "type": "shield",
-          "value": 50,
+          "type": "reducing_shield",
+          "value": 36,
           "duration": 2,
           "target": "self"
         }
@@ -1844,11 +1783,12 @@
       },
       {
         "name": "Steam Vapor Cloud",
-        "description": "Creates a thick steam mist acting as a shield",
+        "description": "Creates a thick steam mist reducing incoming damage by 14 for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 28,
         "effect": {
-          "type": "shield",
+          "type": "reducing_shield",
+          "value": 14,
           "duration": 2,
           "target": "self"
         }
@@ -1873,11 +1813,11 @@
     "jutsus": [
       {
         "name": "Stone Defense",
-        "description": "Hardens body with stone creating a protective shield blocking 25 damage",
+        "description": "Hardens body with stone creating a protective shield reducing damage by 25 for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 30,
         "effect": {
-          "type": "shield",
+          "type": "reducing_shield",
           "value": 25,
           "duration": 2,
           "target": "self"
@@ -1893,12 +1833,12 @@
     ],
     "upgradedJutsu": {
       "name": "Mountain Collapse",
-      "description": "Summons falling boulders dealing 48 damage and buffing defense",
+      "description": "Summons falling boulders dealing 48 damage and buffing defense by 20 for 2 rounds",
       "jutsuType": "ninjutsu",
       "chakraCost": 48,
       "damage": 48,
       "effect": {
-        "type": "shield",
+        "type": "reducing_shield",
         "value": 20,
         "duration": 2,
         "target": "self"
@@ -1951,7 +1891,7 @@
         "chakraCost": 32,
         "damage": 28,
         "effect": {
-          "type": "shield",
+          "type": "reducing_shield",
           "value": 18,
           "duration": 2,
           "target": "self"
@@ -1982,7 +1922,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 30,
         "effect": {
-          "type": "shield",
+          "type": "reducing_shield",
           "value": 30,
           "duration": 2,
           "target": "self"
@@ -2034,12 +1974,12 @@
     ],
     "upgradedJutsu": {
       "name": "Spinning Chain Vortex",
-      "description": "Spins chains with tremendous force dealing 50 damage and buffing defense",
+      "description": "Spins chains with tremendous force dealing 50 damage and buffing defense by 18 for 2 rounds",
       "jutsuType": "taijutsu",
       "chakraCost": 50,
       "damage": 50,
       "effect": {
-        "type": "shield",
+        "type": "reducing_shield",
         "value": 18,
         "duration": 2,
         "target": "self"
@@ -2090,7 +2030,7 @@
     }
   },
   {
-    "name": "Juzo Biwa",
+    "name": "Jūzō Biwa",
     "jutsus": [
       {
         "name": "Executioner's Blade Slash",
@@ -2136,12 +2076,11 @@
     "jutsus": [
       {
         "name": "Sharingan Mastery",
-        "description": "Expert Sharingan control creating protective illusions granting shield",
+        "description": "Expert Sharingan control creating protective illusions granting shield for 2 rounds",
         "jutsuType": "genjutsu",
         "chakraCost": 32,
         "effect": {
           "type": "shield",
-          "value": 28,
           "duration": 2,
           "target": "self"
         }
@@ -2245,7 +2184,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 28,
         "effect": {
-          "type": "shield",
+          "type": "reducing_shield",
           "value": 12,
           "duration": 3,
           "target": "self"
@@ -2290,7 +2229,6 @@
         "chakraCost": 25,
         "effect": {
           "type": "shield",
-          "value": 15,
           "duration": 2,
           "target": "self"
         }
@@ -2536,11 +2474,12 @@
       },
       {
         "name": "Water Release: Water Encampment Wall",
-        "description": "Creates protective water barrier shielding for 2 rounds",
+        "description": "Creates protective water shield that reduces damage by 20 for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 26,
         "effect": {
-          "type": "shield",
+          "type": "reducing_shield",
+          "value": 20,
           "duration": 2,
           "target": "self"
         }
@@ -2700,7 +2639,6 @@
       "damage": 46,
       "effect": {
         "type": "shield",
-        "value": 25,
         "duration": 2,
         "target": "self"
       }
@@ -2718,11 +2656,12 @@
       },
       {
         "name": "Sand Tsunami",
-        "description": "Creates massive wave of sand creating protective barrier for 2 rounds",
+        "description": "Creates massive wave of sand creating protective barrier that reduces damage by 20 for 2 rounds",
         "jutsuType": "ninjutsu",
         "chakraCost": 35,
         "effect": {
-          "type": "shield",
+          "type": "reducing_shield",
+          "value": 20,
           "duration": 2,
           "target": "self"
         }
@@ -2795,7 +2734,6 @@
         "chakraCost": 30,
         "effect": {
           "type": "shield",
-          "value": 16,
           "duration": 3,
           "target": "self"
         }
@@ -2803,7 +2741,7 @@
     ],
     "upgradedJutsu": {
       "name": "Earth Release: Golem Technique",
-      "description": "Creates giant rock golem dealing 52 damage and providing protection",
+      "description": "Creates giant rock golem dealing 52 damage and providing full protection",
       "jutsuType": "ninjutsu",
       "chakraCost": 50,
       "damage": 52,
@@ -2835,12 +2773,12 @@
     ],
     "upgradedJutsu": {
       "name": "Water Release: Great Water Arm",
-      "description": "Creates massive water arm dealing 42 damage and shielding self for 2 rounds",
+      "description": "Creates massive water arm dealing 42 damage and reducing damage taken by 15 for 2 rounds",
       "jutsuType": "ninjutsu",
       "chakraCost": 40,
       "damage": 42,
       "effect": {
-        "type": "shield",
+        "type": "reducing_shield",
         "value": 15,
         "duration": 2,
         "target": "self"
@@ -2976,7 +2914,6 @@
         "chakraCost": 26,
         "effect": {
           "type": "shield",
-          "value": 14,
           "duration": 2,
           "target": "self"
         }
@@ -3233,7 +3170,6 @@
       "damage": 41,
       "effect": {
         "type": "shield",
-        "value": 22,
         "duration": 2,
         "target": "self"
       }
@@ -3248,7 +3184,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 22,
         "effect": {
-          "type": "shield",
+          "type": "damage_suppress",
           "value": 13,
           "duration": 2,
           "target": "self"
@@ -3291,7 +3227,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 30,
         "effect": {
-          "type": "shield",
+          "type": "damage_suppress",
           "value": 17,
           "duration": 3,
           "target": "self"
@@ -3472,7 +3408,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 22,
         "effect": {
-          "type": "shield",
+          "type": "damage_suppress",
           "value": 14,
           "duration": 2,
           "target": "self"
@@ -3863,7 +3799,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 30,
         "effect": {
-          "type": "shield",
+          "type": "damage_suppress",
           "value": 17,
           "duration": 3,
           "target": "self"
@@ -4304,7 +4240,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 27,
         "effect": {
-          "type": "shield",
+          "type": "damage_suppress",
           "value": 14,
           "duration": 2,
           "target": "self"
@@ -4391,7 +4327,7 @@
       "chakraCost": 123,
       "damage": 75,
       "effect": {
-        "type": "shield",
+        "type": "damage_suppress",
         "value": 20,
         "duration": 3,
         "target": "self"
@@ -4505,7 +4441,7 @@
         "jutsuType": "ninjutsu",
         "chakraCost": 45,
         "effect": {
-          "type": "shield",
+          "type": "damage_suppress",
           "value": 32,
           "duration": 2,
           "target": "self"
@@ -4769,5 +4705,625 @@
         "target": "opponent"
       }
     }
+  },
+  {
+    "name": "Matsuri",
+    "jutsus": [
+      {
+        "name": "Jōhyō Strike",
+        "description": "Attacks with weighted rope weapon dealing 20 damage",
+        "jutsuType": "taijutsu",
+        "chakraCost": 16,
+        "damage": 20
+      },
+      {
+        "name": "Wind Release: Rotating Shuriken",
+        "description": "Launches wind-enhanced shuriken dealing 24 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 20,
+        "damage": 24
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Jōhyō: Binding Technique",
+      "description": "Expert rope weapon technique that binds and damages opponent dealing 38 damage and stunning for 1 round",
+      "jutsuType": "taijutsu",
+      "chakraCost": 42,
+      "damage": 38,
+      "effect": {
+        "type": "stun",
+        "duration": 1,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Kushina Uzumaki",
+    "jutsus": [
+      {
+        "name": "Adamantine Sealing Chains",
+        "description": "Manifests chakra chains that binds and suppresses opponent for 1 round draining 30 chakra",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 36,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 30,
+          "target": "opponent"
+        },
+        "secondaryEffect": {
+          "type": "stun",
+          "duration": 1,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Uzumaki Chakra Punch",
+        "description": "Powerful chakra-enhanced strike dealing 28 damage",
+        "jutsuType": "taijutsu",
+        "chakraCost": 24,
+        "damage": 28
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Adamantine Attacking Chains",
+      "description": "Advanced chakra chains that pierce and bind with overwhelming force dealing 50 damage and draining 40 chakra",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 83,
+      "damage": 50,
+      "effect": {
+        "type": "chakra_drain",
+        "value": 40,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Inabi Uchiha",
+    "jutsus": [
+      {
+        "name": "Fire Release: Phoenix Sage Fire",
+        "description": "Launches multiple small fireballs dealing 26 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 22,
+        "damage": 26
+      },
+      {
+        "name": "Sharingan Genjutsu",
+        "description": "Uses Sharingan to trap opponent in illusion draining 22 chakra",
+        "jutsuType": "genjutsu",
+        "chakraCost": 25,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 22,
+          "target": "opponent"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Fire Release: Great Fireball Technique",
+      "description": "Signature Uchiha fireball jutsu with immense destructive power dealing 48 damage",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 52,
+      "damage": 48
+    }
+  },
+  {
+    "name": "Neji Hyūga",
+    "jutsus": [
+      {
+        "description": "Precise chakra point strikes that damage and drain opponent's chakra dealing 32 damage and draining 25 chakra",
+        "jutsuType": "taijutsu",
+        "chakraCost": 50,
+        "damage": 32,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 25,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Eight Trigrams Palm Rotation",
+        "description": "Spinning defensive technique that creates protective chakra barrier that reduces damage by 35",
+        "jutsuType": "taijutsu",
+        "chakraCost": 28,
+        "effect": {
+          "type": "damage_suppress",
+          "value": 35,
+          "target": "self"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Eight Trigrams One Hundred Twenty-Eight Palms",
+      "description": "Ultimate Gentle Fist technique striking all 128 chakra points dealing 55 damage and draining 45 chakra",
+      "jutsuType": "taijutsu",
+      "chakraCost": 78,
+      "damage": 45,
+      "effect": {
+        "type": "chakra_drain",
+        "value": 40,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Giant Clam",
+    "jutsus": [
+      {
+        "name": "Mirage Technique",
+        "description": "Creates powerful illusions using mist to confuse opponent draining 20 chakra",
+        "jutsuType": "genjutsu",
+        "chakraCost": 24,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 20,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Water Gun Technique",
+        "description": "Fires high-pressure water bullets dealing 32 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 20,
+        "damage": 32
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Infinite Mirage",
+      "description": "Creates endless illusory copies in thick mist stunning and draining 46 chakra",
+      "jutsuType": "genjutsu",
+      "chakraCost": 41,
+      "effect": {
+        "type": "chakra_drain",
+        "value": 46,
+        "target": "opponent"
+      },
+      "secondaryEffect": {
+        "type": "stun",
+        "duration": 1,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Hiruzen Sarutobi",
+    "jutsus": [
+      {
+        "name": "Fire Release: Dragon Flame Jutsu",
+        "description": "Unleashes dragon-shaped flames dealing 34 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 30,
+        "damage": 34
+      },
+      {
+        "name": "Shadow Clone Technique",
+        "description": "Creates multiple shadow clones to attack dealing 28 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 26,
+        "damage": 28
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Summoning: Enma",
+      "description": "Summons the Monkey King who transforms into adamantine staff dealing 58 damage and shield that reduces incoming damage by 40",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 70,
+      "damage": 48,
+      "effect": {
+        "type": "damage_suppress",
+        "value": 30,
+        "target": "self"
+      }
+    }
+  },
+  {
+    "name": "Darui",
+    "jutsus": [
+      {
+        "name": "Storm Release: Laser Circus",
+        "description": "Fires multiple homing laser beams dealing 32 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 30,
+        "damage": 32
+      },
+      {
+        "name": "Black Lightning",
+        "description": "Enhanced black lightning attack dealing 35 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 32,
+        "damage": 35
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Storm Release: Gale Panther",
+      "description": "Creates massive panther-shaped storm that mauls opponent dealing 50 damage and stunning them for 2 rounds",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 64,
+      "damage": 50,
+      "effect": {
+        "type": "stun",
+        "duration": 2,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Kitsuchi",
+    "jutsus": [
+      {
+        "name": "Earth Release: Earth Flow Rampart",
+        "description": "Creates massive earth barrier shielding for 3 rounds",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 32,
+        "effect": {
+          "type": "shield",
+          "duration": 3,
+          "target": "self"
+        }
+      },
+      {
+        "name": "Earth Release: Rock Fist",
+        "description": "Encases fist in rock for powerful strike dealing 30 damage",
+        "jutsuType": "taijutsu",
+        "chakraCost": 34,
+        "damage": 36
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Earth Release: Mountain Jutsu",
+      "description": "Creates enormous rock formations to crush opponent dealing 56 damage",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 68,
+      "damage": 56
+    }
+  },
+  {
+    "name": "Ao",
+    "jutsus": [
+      {
+        "name": "Water Release: Water Whip",
+        "description": "Creates whip of water to strike opponent dealing 26 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 24,
+        "damage": 26
+      },
+      {
+        "name": "Byakugan Detection",
+        "description": "Uses stolen Byakugan to see opponents chakra points and drain 24 chakra",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 20,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 24,
+          "target": "opponent"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Water Release: Water Encampment Wall",
+      "description": "Creates massive defensive water barrier that reduces incoming damage by 26 damage for 2 rounds",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 53,
+      "effect": {
+        "type": "damage_suppress",
+        "value": 26,
+        "duration": 2,
+        "target": "self"
+      }
+    }
+  },
+  {
+    "name": "Gamabunta",
+    "jutsus": [
+      {
+        "name": "Water Release: Gunshot",
+        "description": "Fires massive water bullets from mouth dealing 36 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 32,
+        "damage": 36
+      },
+      {
+        "name": "Toad Sword Slash",
+        "description": "Slashes with giant katana dealing 40 damage",
+        "jutsuType": "taijutsu",
+        "chakraCost": 34,
+        "damage": 40
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Toad Oil Flame Bullet",
+      "description": "Combines oil and fire for devastating explosion dealing 48 damage and burning for 12 damage over 2 rounds",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 64,
+      "damage": 48,
+      "effect": {
+        "type": "burn",
+        "value": 12,
+        "duration": 2,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Mū",
+    "jutsus": [
+      {
+        "name": "Earth Release: Fist Rock Technique",
+        "description": "Expands fist size with rock armor dealing 32 damage",
+        "jutsuType": "taijutsu",
+        "chakraCost": 28,
+        "damage": 32
+      },
+      {
+        "name": "Dustless Bewildering Cover",
+        "description": "Becomes invisible to evade and drain opponent's chakra by 28",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 24,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 28,
+          "target": "opponent"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Dust Release: Detachment of the Primitive World",
+      "description": "Disintegrates matter at molecular level with devastating cube dealing 72 damage",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 64,
+      "damage": 72
+    }
+  },
+  {
+    "name": "Izumo Kamizuki",
+    "jutsus": [
+      {
+        "name": "Water Release: Syrup Capture Field",
+        "description": "Creates sticky syrup that traps opponent draining 22 chakra",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 28,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 22,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Mace Strike",
+        "description": "Powerful strike with mace weapon dealing 24 damage",
+        "jutsuType": "taijutsu",
+        "chakraCost": 20,
+        "damage": 24
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Water Release: Starch Syrup Binding",
+      "description": "Advanced syrup technique that immobilizes opponent draining 37 chakra and stunning them for 2 round",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 50,
+      "effect": {
+        "type": "stun",
+        "duration": 2,
+        "target": "opponent"
+      },
+      "secondaryEffect": {
+        "type": "chakra_drain",
+        "value": 37,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Raiga Kurosuki",
+    "jutsus": [
+      {
+        "name": "Lightning Release: Thunder Swords",
+        "description": "Channels lightning through twin swords dealing 34 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 30,
+        "damage": 34
+      },
+      {
+        "name": "Lightning Burial: Banquet of Lightning",
+        "description": "Summons lightning pillars from the ground dealing 36 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 32,
+        "damage": 36
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Lightning Release: Thunder Dragon Tornado",
+      "description": "Creates massive lightning dragon that devastates opponent dealing 42 damage",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 50,
+      "damage": 42,
+      "effect": {
+        "type": "stun",
+        "duration": 1,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Utakata",
+    "jutsus": [
+      {
+        "name": "Bubble Clone Technique",
+        "description": "Creates bubble clones to confuse and attack dealing 26 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 34,
+        "damage": 36
+      },
+      {
+        "name": "Soap Bubble Ninjutsu",
+        "description": "Launches explosive soap bubbles dealing 28 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 26,
+        "damage": 28
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Tailed Beast Ball",
+      "description": "Six-Tails jinchūriki unleashes massive chakra sphere dealing 70 damage",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 78,
+      "damage": 70
+    }
+  },
+  {
+    "name": "Rōshi",
+    "jutsus": [
+      {
+        "name": "Lava Release: Scorching Stream Rock Technique",
+        "description": "Spits molten lava rocks dealing 32 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 28,
+        "damage": 32
+      },
+      {
+        "name": "Lava Release Armor",
+        "description": "Coats body in protective lava reducing incoming damage to players cards by 36 and boosting power by 8 for 2 rounds",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 46,
+        "effect": {
+          "type": "damage_suppress",
+          "value": 36,
+          "target": "self"
+        },
+        "secondaryEffect": {
+          "type": "buff",
+          "value": 8,
+          "duration": 2,
+          "target": "self"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Lava Release: Monkey Rock Technique",
+      "description": "Four-Tails jinchūriki creates massive lava ape dealing 66 damage and burning opponent for 3 damage for 5 rounds",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 76,
+      "damage": 66,
+      "effect": {
+        "type": "burn",
+        "value": 3,
+        "duration": 5,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Hanabi Hyūga",
+    "jutsus": [
+      {
+        "name": "Gentle Fist",
+        "description": "Precise chakra point strikes dealing 30 damage and draining 23 chakra",
+        "jutsuType": "taijutsu",
+        "chakraCost": 49,
+        "damage": 30,
+        "effect": {
+          "type": "chakra_drain",
+          "value": 23,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Eight Trigrams Palm Rotation",
+        "description": "Defensive spinning technique deflecting all attacks for 2 rounds",
+        "jutsuType": "taijutsu",
+        "chakraCost": 26,
+        "effect": {
+          "type": "shield",
+          "duration": 2,
+          "target": "self"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Eight Trigrams Sixty-Four Palms",
+      "description": "Advanced Gentle Fist technique striking 64 chakra points dealing 37 damage and draining 20 chakra",
+      "jutsuType": "taijutsu",
+      "chakraCost": 51,
+      "damage": 37,
+      "effect": {
+        "type": "chakra_drain",
+        "value": 20,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "A (Fourth Raikage)",
+    "jutsus": [
+      {
+        "name": "Lariat",
+        "description": "Lightning-enhanced clothesline attack dealing 38 damage and stunning opponent for 1 round",
+        "jutsuType": "taijutsu",
+        "chakraCost": 38,
+        "damage": 34,
+        "effect": {
+          "type": "stun",
+          "duration": 1,
+          "target": "opponent"
+        }
+      },
+      {
+        "name": "Lightning Release Chakra Mode",
+        "description": "Activates lightning cloak enhancing speed and power boosting by 12 for 3 rounds",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 32,
+        "effect": {
+          "type": "buff",
+          "value": 12,
+          "duration": 3,
+          "target": "self"
+        }
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Lightning Oppression Horizontal Chop",
+      "description": "Maximum speed lightning-enhanced strike dealing 68 damage and stunning opponent for 2 rounds",
+      "jutsuType": "taijutsu",
+      "chakraCost": 65,
+      "damage": 48,
+      "effect": {
+        "type": "stun",
+        "duration": 2,
+        "target": "opponent"
+      }
+    }
+  },
+  {
+    "name": "Gamakichi",
+    "jutsus": [
+      {
+        "name": "Toad Oil Bullet",
+        "description": "Spits flammable toad oil dealing 24 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 22,
+        "damage": 24
+      },
+      {
+        "name": "Water Release: Water Gun",
+        "description": "Fires concentrated water bullets dealing 46 damage",
+        "jutsuType": "ninjutsu",
+        "chakraCost": 51,
+        "damage": 46
+      }
+    ],
+    "upgradedJutsu": {
+      "name": "Toad Flame Bomb",
+      "description": "Combines oil and fire for explosive attack dealing 54 damage and dealing burning opponent for 10 damage for 2 rounds",
+      "jutsuType": "ninjutsu",
+      "chakraCost": 62,
+      "damage": 54,
+      "effect": {
+        "type": "burn",
+        "value": 10,
+        "duration": 2,
+        "target": "opponent"
+      }
+    }
   }
 ]
+

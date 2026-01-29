@@ -7,10 +7,11 @@ export interface Jutsu {
   chakraCost: number;
   damage?: number;
   effect?: {
-    type: 'poison' | 'stun' | 'heal' | 'buff' | 'shield' | 'chakra_drain' | 'burn' | 'bleed';
+    type: 'poison' | 'stun' | 'heal' | 'buff' | 'damage_suppress' | 'shield' | 'chakra_drain' | 'burn' | 'bleed';
     value: number;
     duration?: number; // in turns
     target?: 'self' | 'opponent' | 'all-opponents' | 'all-allies';
+    invulnerable: 'genjutsu' | 'ninjutsu' | 'taijutsu' | 'all' | 'none'; 
   };
 }
 

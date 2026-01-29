@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { CharacterCardComponent } from '~/components/CharacterCard';
+import { GameRules } from '~/components/GameRules';
 import type { CharacterCard, AttributeBoosterCard } from '~/types/tcg';
 import { boosterDeck } from '~/data/boosters';
 
@@ -183,13 +184,18 @@ export default function PlayGame() {
           </div>
 
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 mb-6 border border-slate-200 dark:border-slate-800">
-            <div className="text-center mb-6">
-              <Link 
-                to="/characters"
-                className="inline-block text-blue-600 dark:text-blue-400 hover:underline font-semibold"
-              >
-                📖 View All Characters →
-              </Link>
+            <div className="text-center mb-6 space-y-3">
+              <div>
+                <Link 
+                  to="/characters"
+                  className="inline-block text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+                >
+                  📖 View All Characters →
+                </Link>
+              </div>
+              <div>
+                <GameRules />
+              </div>
             </div>
           </div>
 
@@ -282,11 +288,20 @@ export default function PlayGame() {
             <div className="text-center">
               <h3 className="text-3xl font-bold text-white mb-3">Game Info</h3>
               <p className="text-slate-300 text-base mb-4">Turn: {currentPlayer.name}</p>
-              <button
-                onClick={resetGame}
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition">
-                Reset Game
-              </button>
+              <div className="flex gap-2 justify-center">
+                <button
+                  onClick={resetGame}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition">
+                  Reset Game
+                </button>
+                <GameRules 
+                  triggerButton={
+                    <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition">
+                      📖 Rules
+                    </button>
+                  }
+                />
+              </div>
             </div>
           </div>
 
