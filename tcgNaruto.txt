@@ -9,8 +9,8 @@ NAPADY:
     2. animacie pri robeni tahu
 
 Poznamky:
-    1. Maximalny damage normalneho utoku: 20
-    2. Maximalny damage utoku s Attribute booster kartou: 50
+    1. Maximalny damage normalneho utoku: +-30
+    2. Maximalny damage utoku s Attribute booster kartou: +-50
     12. Ked postava zomrie tak zošedne
     13. 2 typy shieldov:
             = normalny shield - blokuje vsetken damage(trva iba 2 kola)

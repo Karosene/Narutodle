@@ -23,6 +23,7 @@ export default function Characters() {
   const [selectedAffiliation, setSelectedAffiliation] = useState<string>('all');
   const [selectedNatureAffinity, setSelectedNatureAffinity] = useState<string>('all');
   const [selectedRank, setSelectedRank] = useState<string>('all');
+  const [selectedJutsuType, setSelectedJutsuType] = useState<string>('all');
   const [selectedCharacter, setSelectedCharacter] = useState<{ card: CharacterCard; rawData: Character } | null>(null);
 
   // Prevent background scrolling when modal is open
@@ -102,7 +103,10 @@ export default function Characters() {
     
     const matchesRank = selectedRank === 'all' || rawData.rank === selectedRank;
     
-    return matchesSearch && matchesClan && matchesAffiliation && matchesNatureAffinity && matchesRank;
+    const matchesJutsuType = selectedJutsuType === 'all' || 
+      card.forms.default.attackType === selectedJutsuType;
+    
+    return matchesSearch && matchesClan && matchesAffiliation && matchesNatureAffinity && matchesRank && matchesJutsuType;
   });
 
   // Get unique values for filters
@@ -125,7 +129,7 @@ export default function Characters() {
 
           {/* Search and Filters */}
           {!loading && (
-            <div className="max-w-4xl mx-auto mb-8 space-y-4">
+            <div className="max-w-6xl mx-auto mb-8 space-y-4">
               {/* Search Bar */}
               <div className="relative">
                 <input
@@ -141,7 +145,7 @@ export default function Characters() {
               </div>
 
               {/* Filters */}
-              <div className="flex gap-4 justify-center flex-wrap">
+              <div className="flex gap-4 justify-center overflow-x-auto">
                 <select
                   value={selectedClan}
                   onChange={(e) => setSelectedClan(e.target.value)}
@@ -184,6 +188,17 @@ export default function Characters() {
                   {uniqueRanks.map(rank => (
                     <option key={rank} value={rank}>{rank}</option>
                   ))}
+                </select>
+
+                <select
+                  value={selectedJutsuType}
+                  onChange={(e) => setSelectedJutsuType(e.target.value)}
+                  className="px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 focus:border-orange-500 focus:outline-none"
+                >
+                  <option value="all">All Jutsu Types</option>
+                  <option value="ninjutsu">Ninjutsu</option>
+                  <option value="taijutsu">Taijutsu</option>
+                  <option value="genjutsu">Genjutsu</option>
                 </select>
               </div>
 
@@ -362,7 +377,7 @@ export default function Characters() {
                                 {jutsu.effect && (
                                   <div>
                                     <span className="text-slate-400">Effect: </span>
-                                    <span className="text-green-400 font-bold capitalize">{jutsu.effect.type.replace(/_/g, ' ')}</span>
+                                    <span className="text-green-400 font-bold capitalize">{jutsu.effect?.type?.replace(/_/g, ' ') || 'Unknown'}</span>
                                   </div>
                                 )}
                               </div>
@@ -400,7 +415,7 @@ export default function Characters() {
                               {upgradedJutsu.effect && (
                                 <div>
                                   <span className="text-slate-400">Effect: </span>
-                                  <span className="text-green-400 font-bold capitalize">{upgradedJutsu.effect.type.replace(/_/g, ' ')}</span>
+                                  <span className="text-green-400 font-bold capitalize">{upgradedJutsu.effect?.type?.replace(/_/g, ' ') || 'Unknown'}</span>
                                 </div>
                               )}
                             </div>

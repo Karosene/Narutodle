@@ -50,14 +50,16 @@ Jutsu system:
             - Je slabsie oproti Taijutsu
     - Su 2 typy efektov pre jutsu:
         = Jutsu pouzite na postavy hraca:
-            - Heal: Prida zivoty postave zvolenej hracom
-            - Shield: Dava postave nerozbitny stit na urcity pocet kol
-            - Buff: Zlepsuje utoky postavy na urcity pocet kol
-            - 
+            - Heal:                 Prida zivoty postave zvolenej hracom
+            - Buff:                 Zlepsuje utoky vsetkych postav hraca na urcity pocet kol
+            - Shields:
+                > Normal Shield:    Dava postave nerozbitny stit ktory blokuje vsetko poskodenie na urcity pocet kol
+                > Piercing Shield:  Dava postave stit ktory blokuje iba urcenu hodnotu poskodenia na urcity pocet kol
+
         = Jutsu pouzite na postavy protihraca:
-            - Poison: Ubera zivoty vybranej postave pocas niekolkych kol
-            - Stun: Zamrazuje vybranu postavu na urcity pocet kol
-            - Chakra Drain: Zoberie protihracovi dany pocet chakry
+            - Poison/Burn/ Bleed:   Ubera urceny pocet zivotov vybranej postave na urcity pocet kol
+            - Stun:                 Zamrazuje vybranu postavu na urcity pocet kol
+            - Chakra Drain:         Zoberie protihracovi dany pocet chakry
 
 Pasivne utoky:
     - Danzō Shimura     -> ked zomre tak sa moze revivnut, ale musi to byt v tom kole co zomrel

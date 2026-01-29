@@ -636,7 +636,7 @@
     "affiliations": ["Otogakure"],
     "team": "Sound Four",
     "clan": "None",
-    "rank": "Chūnin Exams",
+    "rank": "Chūnin",
     "firstAppearance": "Chūnin Exams"
   },
   {
@@ -2164,5 +2164,19 @@
     "clan": "None",
     "rank": "Kage",
     "firstAppearance": "Five Kage Summit"
+  },
+  {
+    "name": "Gamakichi",
+    "file": "/images/gamakichi.png",
+    "aliases": [""],
+    "gender": "Male",
+    "age": "Unknown",
+    "natureAffinity": ["Water Release"],
+    "height": "1690",
+    "affiliations": ["Mount Myōboku"],
+    "team": "None",
+    "clan": "None",
+    "rank": "None",
+    "firstAppearance": "Chūnin Exams"
   }
 ]
