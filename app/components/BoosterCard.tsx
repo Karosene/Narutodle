@@ -49,7 +49,6 @@ export function BoosterCardComponent({ booster, onClick, selected = false }: Boo
 
       {/* Description */}
       <p className="text-center text-white/90 mb-4 text-sm">
-        {booster.description}
       </p>
 
       {/* Effects */}
@@ -64,11 +63,7 @@ export function BoosterCardComponent({ booster, onClick, selected = false }: Boo
             +{booster.effect.chakraBoost} 💙
           </span>
         )}
-        {booster.effect.allowFormChange && (
-          <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-bold">
-            Form Change ⚡
-          </span>
-        )}
+        
       </div>
 
       {/* Decorative Elements */}

@@ -1,0 +1,9 @@
+game starts by coinflip that decides who gets the first move
+
+the move start by taking a booster card. then player chooses a character he wants to use jutsu with. 
+he uses jutsu by clicking on chosen character and a little box pops up with all 3 jutsus. 
+the upgraded jutsu will be disabled by default and only available through booster card "Jutsu Mastery"
+then he chooses a character on who the player want the jutsu to be used. 
+it can differ:
+    heal - can be used on character himself or other players cards
+    shield 0

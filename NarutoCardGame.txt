@@ -61,13 +61,15 @@ Jutsu system:
             - Stun:                 Zamrazuje vybranu postavu na urcity pocet kol
             - Chakra Drain:         Zoberie protihracovi dany pocet chakry
 
-Pasivne utoky:
-    - Danzō Shimura     -> ked zomre tak sa moze revivnut, ale musi to byt v tom kole co zomrel
-    - Naruto Uzumaki    -> ak má menej ako 20 HP a je v Sage Mode, automaticky prejde do Kurama Sage Mode, v ktorom majú jeho jutsu o 30 damage viac
-    - Tsunade Senju     -> pri pouziti jutsu je 25% sanca ze prida 10 zivotov kazdej postave hraca
-    - Minato Namikaze   -> pokial je pod utokom protihraca je 25% sanca ze sa mu mu vyhne pomocou Flying Raijin
-    - Hinata Hyūga      -> pri taijutsu útoku má 50 % šancu, že dostane iba polovicu damage
-    - Shino Aburame     -> pokial pouzije poison utok, je 25% sanca ze poison bude trva 1 kolo dlhsie
-    - Sasuke Uchiha     -> po použití jutsu Kirin má 20 % šancu aktivovať teleport cez Rinnegan a vyhnúť sa nasledujúcemu útoku protihráča
-    - Kaguya Otsutsuki  -> pokial je pod utokom protihraca 3-krat, jej regenerácia chakry sa zvýši z 10 na 20 bodov za kolo
-    - Madara Uchiha     -> 
+Pasivne ability:
+    - Tieto postavy maju tzv. pasivne utoky. Tie netreba nijako aktivovat, lebo sa aktivuju automaticky
+
+    List postav s pasivnymi abilitami:
+        = Danzō Shimura     -> ked zomre tak sa moze revivnut, ale musi to byt v tom kole co zomrel
+        = Tsunade Senju     -> pri pouziti jutsu je 25% sanca ze prida 10 zivotov kazdej postave hraca
+        = Minato Namikaze   -> pokial je pod utokom protihraca je 25% sanca ze sa mu mu vyhne pomocou Flying Raijin
+        = Hinata Hyūga      -> pri taijutsu útoku má 50 % šancu, že dostane iba polovicu damage
+        = Shino Aburame     -> pokial pouzije poison utok, je 25% sanca ze poison bude trva 1 kolo dlhsie
+        = Sasuke Uchiha     -> po použití jutsu Kirin má 20 % šancu aktivovať teleport cez Rinnegan a vyhnúť sa nasledujúcemu útoku protihráča
+        = Kaguya Otsutsuki  -> pokial je pod utokom protihraca 3-krat, jej regenerácia chakry sa zvýši z 10 na 20 bodov za kolo
+        = Madara Uchiha     -> 

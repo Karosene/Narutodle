@@ -1,9 +1,0 @@
-1. spravit funkcionalitu hry
-4. pridat php aby sa mohlo na LANke hrat oproti kamaratovi
-
-NAPADY:
-    2. animacie pri robeni tahu
-
-Poznamky:
-    12. Ked postava zomrie tak zošedne
- 

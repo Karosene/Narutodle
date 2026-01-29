@@ -36,7 +36,7 @@ export function GameRules({ triggerButton }: { triggerButton?: React.ReactNode }
               </button>
             </div>
 
-            <div className="p-6 space-y-6 text-slate-700 dark:text-slate-300">
+            <div className="p-6 space-y-6 text-slate-700 dark:text-slate-300 text-left">
               {/* Game Flow */}
               <section>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-3">🎮 Priebeh hry</h3>
@@ -160,16 +160,16 @@ export function GameRules({ triggerButton }: { triggerButton?: React.ReactNode }
               {/* Passive Abilities */}
               <section>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-3">🌟 Pasivne utoky</h3>
+                <p className="mb-4 text-slate-600 dark:text-slate-400">Tieto postavy majú tzv. pasívne útoky. Tie netreba nijako aktivovať, lebo sa aktivujú automaticky</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li><span className="font-semibold">Danzō Shimura</span> → ked zomre tak sa moze revivnut, ale musi to byt v tom kole co zomrel</li>
-                  <li><span className="font-semibold">Naruto Uzumaki</span> → ak má menej ako 20 HP a je v Sage Mode, automaticky prejde do Kurama Sage Mode, v ktorom majú jeho jutsu o 30 damage viac</li>
                   <li><span className="font-semibold">Tsunade Senju</span> → pri pouziti jutsu je 25% sanca ze prida 10 zivotov kazdej postave hraca</li>
                   <li><span className="font-semibold">Minato Namikaze</span> → pokial je pod utokom protihraca je 25% sanca ze sa mu mu vyhne pomocou Flying Raijin</li>
                   <li><span className="font-semibold">Hinata Hyūga</span> → pri taijutsu útoku má 50 % šancu, že dostane iba polovicu damage</li>
                   <li><span className="font-semibold">Shino Aburame</span> → pokial pouzije poison utok, je 25% sanca ze poison bude trva 1 kolo dlhsie</li>
                   <li><span className="font-semibold">Sasuke Uchiha</span> → po použití jutsu Kirin má 20 % šancu aktivovať teleport cez Rinnegan a vyhnúť sa nasledujúcemu útoku protihráča</li>
                   <li><span className="font-semibold">Kaguya Otsutsuki</span> → pokial je pod utokom protihraca 3-krat, jej regenerácia chakry sa zvýši z 10 na 20 bodov za kolo</li>
-                  <li><span className="font-semibold">Madara Uchiha</span> →</li>
+
                 </ul>
               </section>
             </div>

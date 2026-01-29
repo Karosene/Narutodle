@@ -136,7 +136,6 @@ export function CharacterCardComponent({
                 <span 
                   key={idx} 
                   className="text-[10px] px-1 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded-md font-semibold"
-                  title={booster.description}
                 >
                   ✨ {booster.name}
                 </span>

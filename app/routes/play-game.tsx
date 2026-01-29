@@ -184,18 +184,18 @@ export default function PlayGame() {
           </div>
 
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 mb-6 border border-slate-200 dark:border-slate-800">
-            <div className="text-center mb-6 space-y-3">
-              <div>
-                <Link 
-                  to="/characters"
-                  className="inline-block text-blue-600 dark:text-blue-400 hover:underline font-semibold"
-                >
-                  📖 View All Characters →
-                </Link>
-              </div>
-              <div>
-                <GameRules />
-              </div>
+            <div className="space-y-3">
+              <Link 
+                to="/characters"
+                className="block w-full bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105 shadow-md text-center"
+              >
+                📖 View All Characters
+              </Link>
+              <GameRules triggerButton={
+                <button className="w-full bg-linear-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105 shadow-md">
+                  📖 View Game Rules
+                </button>
+              } />
             </div>
           </div>
 
