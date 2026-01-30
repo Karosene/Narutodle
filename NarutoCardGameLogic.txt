@@ -1,9 +1,76 @@
-game starts by coinflip that decides who gets the first move
+Mechanics
+    Booster cards
+        - can be used by clicking on the card and choosing a character they would like to use the card on
+        - they are one-time use cards that can help a player
+        - player can hold only 5 booster cards at once
+        - if player doesnt have space for another booster card, the game will automatically
+        skip players move
 
-the move start by taking a booster card. then player chooses a character he wants to use jutsu with. 
-he uses jutsu by clicking on chosen character and a little box pops up with all 3 jutsus. 
-the upgraded jutsu will be disabled by default and only available through booster card "Jutsu Mastery"
-then he chooses a character on who the player want the jutsu to be used. 
-it can differ:
-    heal - can be used on character himself or other players cards
-    shield 0
+        Heal - heals a chosen character for 25 health points (chance 30%)
+        Chakra restore - restores 40 chakra to a chosen character (chance 20%)
+        Jutsu recovery - cancels cooldown on all jutsus of a chosen character (chance 20%)
+        Jutsu mastery - chosen character unlocks a special jutsu for 5 rounds (chance 15%)
+        Jutsu damage boost - increases damage on all jutsus of a chosen character by 20% (chance 5%)
+        Splash damage - next attack will deal damage to 3 chosen characters at once (chance 5%)
+        Double attack - allows a player to use jutsus at once, they can be 2 jutsus from 2 different character 
+                        but both jutsus are applied to the same character (chance 5%)
+
+    Charka system
+        - chakra replenishes 15 points per round, the maximum amount of chakra is 100 but
+          can be overflown by using Chakra Restore booster card
+        - chakra stop replenishing at 100
+
+    Jutsu system
+        - every jutsu has a 2 round cooldown
+        - 2 base jutsus that can be used anytime, 1 special jutsu that can be used only when
+          jutsu mastery card is active on that character
+        - character that are attacked by someone with a certain attack type attribute of jutsu will be
+          damaged less or more, depending on the users jutsu type attribute:
+            Attack type Ninjutsu deals 10% more damage to Attack type Taijutsu characters
+            Attack type Ninjutsu deals 10% less damage to Attack type Genjutsu characters
+
+            Attack type Taijutsu deals 10% more damage to Attack type Genjutsu characters
+            Attack type Taijutsu deals 10% more damage to Attack type Ninjutsu characters
+
+            Attack type Genjutsu deals 10% more damage to Attack type Ninjutsu characters
+            Attack type Genjutsu deals 10% more damage to Attack type Taijutsu characters
+
+        - Jutsu effects
+            - some effects will be used automatically like when chosen like: shield, damage supress or buff,
+              but som jutsus need a character to be chosen heal(itself or team), posion/burn/bleed, stun, chakra drain
+            heal - heals a chosen character for a cetain amount
+            buff - increases characters attack power for a certain amount of rounds
+            shield - when active, it cancels all of opponents attacks
+            damage suppress - when active, it decreases power of opponents attacks
+
+            poison/burn/bleed - damages a character across multiple rounds
+            stun - disables the use of a character for centain amount of rounds
+            chakra drain - deletes a certain amount of chakra from enemy character
+
+Pasive abilities
+    these characters have a passive ability that will be used automatically
+
+    list of characters with passive abilities (these characters will have 2 tabs in the signature
+    jutsus section, the tabs will be on top, one tab will say jutsus and the other will say passive ability
+    where the passive ability will be described. also make a new json file for passive abilities)
+        = tsunade - 20% chance she heals all of the players cards after using a jutsu
+        = minato - 25% chance he can dodge taijutsu or ninjutsu attack using flying Raijin
+        = hinata - 50% chance she can dodge a taijutsu attack using byakugan
+        = neji - 50% chance he can dodge a taijutsu attack using byakugan
+        = shino - 20% chance his poison attack lasts 1 round longer after using poison type jutsu
+        = sasuke - 20% change after using Kirin that he will dodge the next attack using Rinnegan
+        = Kaguya - 10% chance her attack will hit all alive enemy characters after using a jutsu
+        = naruto - 20% chance he will use Talk No Jutsu damaging the character for 20 damage after being under attack
+        = hagoromo - 20% chance after using Creation of All Things he will do 20 damage more
+
+Gameplay
+    1. a coin is tossed to choose which player goes first
+    2. players get 8 random cards from database, 1 of the characters has to be a character with passive ability
+    3. players enter the game and first thing they do is take the booster card
+    4. once theyve taken the card they can use it right away on likely character or save it for later
+    5. next they use jutsu by clicking on any character, their jutsus will pop up in a box
+       with all 3 jutsu stacked bellow each other and player can choose what jutsu they want to use.
+       then player chooses own/enemy character the jutsu will be used on, it depends on the type of jutsu
+    6. once the player has used jutsu, its player 2s turn
+
+    game ends when one of the players have no cards 

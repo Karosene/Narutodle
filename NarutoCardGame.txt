@@ -20,14 +20,13 @@ Booster karty:
     - Maximalny pocet booster kariet je 5
     - Vsetky booster karty su jednorazove a hned po pouziti sa smažú
     - Typy booster kariet:
-        = Heal: Prida vybranej postave 15 health pointov (sanca 25%)
-        = Chakra Restore: Doplni vybranej postave 20 chakry (sanca 20%)
+        = Heal: Prida vybranej postave 25 health pointov (sanca 25%)
+        = Chakra Restore: Doplni vybranej postave 40 chakry (sanca 20%)
         = Jutsu Mastery: Vybrana postava unlockne na 5 kol specialne Jutsu (sanca 15%)
         = Jutsu Damage Boost: Zvysi damage vybranej postave o 20% (sanca 10%)
         = Splash Damage: Umoznuje zautocit 1 utokom na 3 vybranych charakterov (sanca 10%)
         = Jutsu recovery: Zrusi cooldown vybraneho jutsu (sanca 10%)
         = Double Attack: Umoznuje hracovi pouzit 2 jutsu za 1 kolo (sanca 5%)
-        = Shield Pierce: Umoznuje zautocit na vybranu kartu protihraca aj ked ma aktivny shield (sanca 5%)
 
 Chakra system:
     - Na pouzitie nejakeho jutsu potrebuje hrac dany pocet chakry
@@ -57,7 +56,7 @@ Jutsu system:
                 > Piercing Shield:  Dava postave stit ktory blokuje iba urcenu hodnotu poskodenia na urcity pocet kol
 
         = Jutsu pouzite na postavy protihraca:
-            - Poison/Burn/ Bleed:   Ubera urceny pocet zivotov vybranej postave na urcity pocet kol
+            - Poison/Burn/Bleed:    Ubera urceny pocet zivotov vybranej postave na urcity pocet kol
             - Stun:                 Zamrazuje vybranu postavu na urcity pocet kol
             - Chakra Drain:         Zoberie protihracovi dany pocet chakry
 

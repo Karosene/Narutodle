@@ -5,13 +5,15 @@ interface CharacterCardProps {
   onClick?: () => void;
   selected?: boolean;
   showDetails?: boolean;
+  isSelectable?: boolean;
 }
 
 export function CharacterCardComponent({ 
   card, 
   onClick, 
   selected = false,
-  showDetails = true 
+  showDetails = true,
+  isSelectable = false
 }: CharacterCardProps) {
   const formData = card.forms[card.currentForm];
   if (!formData) return null;
@@ -35,9 +37,11 @@ export function CharacterCardComponent({
         relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer h-full flex flex-col
         ${selected 
           ? 'border-orange-500 shadow-2xl shadow-orange-500/50 scale-105 ring-4 ring-orange-300 dark:ring-orange-700' 
-          : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600'
+          : isSelectable
+            ? 'border-slate-300 dark:border-slate-700 hover:border-green-500 hover:shadow-2xl hover:shadow-green-500/60 hover:ring-4 hover:ring-green-500 hover:scale-105'
+            : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600'
         }
-        ${card.currentHealth === 0 ? 'opacity-50 grayscale' : 'hover:shadow-xl'}
+        ${card.currentHealth === 0 ? 'opacity-50 grayscale' : !isSelectable ? 'hover:shadow-xl' : ''}
         bg-linear-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900
       `}
     >
@@ -149,6 +153,30 @@ export function CharacterCardComponent({
       {card.currentHealth === 0 && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <span className="text-2xl font-bold text-white drop-shadow-lg">DEFEATED</span>
+        </div>
+      )}
+
+      {/* Shield Overlay - Simple icon with duration */}
+      {card.shieldRoundsLeft && card.shieldRoundsLeft > 0 && (
+        <div className="absolute top-2 left-2 flex flex-col items-center pointer-events-none">
+          <div className="relative">
+            <span className="text-5xl drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">🛡️</span>
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-bold text-cyan-400 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]">
+              {card.shieldRoundsLeft}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Damage Suppress Overlay - Shield icon with damage reduction number */}
+      {card.damageSuppressActive && card.damageSuppressAmount && (
+        <div className="absolute top-2 left-2 flex flex-col items-center pointer-events-none">
+          <div className="relative">
+            <span className="text-5xl drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">🛡️</span>
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-bold text-white drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]">
+              -{card.damageSuppressAmount}
+            </span>
+          </div>
         </div>
       )}
     </div>

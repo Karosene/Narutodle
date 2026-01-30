@@ -1362,7 +1362,7 @@
         "effect": {
           "type": "poison",
           "value": 8,
-          "duration": 3,
+          "duration": 2,
           "target": "opponent"
         }
       }
@@ -4322,10 +4322,10 @@
     ],
     "upgradedJutsu": {
       "name": "Creation of All Things",
-      "description": "Uses ultimate power dealing 75 damage and creating protective barrier that reduces damage by 20 for 3 rounds",
+      "description": "Uses ultimate power dealing 55 damage and creating protective barrier that reduces damage by 20 for 3 rounds",
       "jutsuType": "ninjutsu",
-      "chakraCost": 123,
-      "damage": 75,
+      "chakraCost": 103,
+      "damage": 55,
       "effect": {
         "type": "damage_suppress",
         "value": 20,
