@@ -142,11 +142,21 @@ export default function PlayGame() {
     // Separate characters by type
     const charactersWithPassive = validCharacters.filter(char => passiveAbilities[char.name]);
     
-    // Find healers - characters with heal jutsu
+    // Find healers - characters with heal jutsu BUT WITHOUT passive abilities
     const healers = validCharacters.filter(char => {
       const charJutsu = jutsuData[char.name];
       if (!charJutsu) return false;
-      return charJutsu.jutsus.some(jutsu => jutsu.effect?.type === 'heal');
+      const hasHealJutsu = charJutsu.jutsus.some(jutsu => jutsu.effect?.type === 'heal');
+      const hasPassive = passiveAbilities[char.name];
+      return hasHealJutsu && !hasPassive; // Must have heal jutsu but NO passive ability
+    });
+    
+    // Normal characters - no passive ability AND no heal jutsu
+    const normalChars = validCharacters.filter(char => {
+      const charJutsu = jutsuData[char.name];
+      const hasPassive = passiveAbilities[char.name];
+      const hasHealJutsu = charJutsu?.jutsus.some(jutsu => jutsu.effect?.type === 'heal');
+      return !hasPassive && !hasHealJutsu;
     });
     
     if (charactersWithPassive.length < 2) {
@@ -155,35 +165,55 @@ export default function PlayGame() {
     }
     
     if (healers.length < 4) {
-      alert('Not enough healer characters!');
+      alert(`Not enough healer characters without passive abilities! Found ${healers.length}, need 4.`);
+      return;
+    }
+    
+    if (normalChars.length < 12) {
+      alert(`Not enough normal characters! Found ${normalChars.length}, need 12.`);
       return;
     }
 
+    // Shuffle and select
     const shuffledPassive = shuffleArray(charactersWithPassive);
+    const shuffledHealers = shuffleArray(healers);
+    const shuffledNormal = shuffleArray(normalChars);
     
-    // Select passive characters first
-    const selectedPassive1 = shuffledPassive[0];
-    const selectedPassive2 = shuffledPassive[1];
+    // Build player hands: 1 passive + 2 healers + 6 normal = 9 cards each
+    const player1Chars = [
+      shuffledPassive[0],      // 1 passive
+      shuffledHealers[0],      // healer 1
+      shuffledHealers[1],      // healer 2
+      ...shuffledNormal.slice(0, 6)  // 6 normal
+    ];
     
-    // Filter healers to exclude the already selected passive characters
-    const availableHealers = healers.filter(h => h.name !== selectedPassive1.name && h.name !== selectedPassive2.name);
-    const shuffledHealers = shuffleArray(availableHealers);
+    const player2Chars = [
+      shuffledPassive[1],      // 1 passive
+      shuffledHealers[2],      // healer 1
+      shuffledHealers[3],      // healer 2
+      ...shuffledNormal.slice(6, 12)  // 6 normal
+    ];
     
-    // Get normal characters (excluding the selected passive and healers)
-    const usedCharNames = new Set([
-      selectedPassive1.name,
-      selectedPassive2.name,
-      shuffledHealers[0].name,
-      shuffledHealers[1].name,
-      shuffledHealers[2].name,
-      shuffledHealers[3].name
-    ]);
-    const normalCharacters = validCharacters.filter(char => !usedCharNames.has(char.name));
-    const shuffledNormal = shuffleArray(normalCharacters);
+    // Validation
+    if (player1Chars.length !== 9) {
+      alert(`Error: Player 1 has ${player1Chars.length} cards instead of 9!`);
+      return;
+    }
     
-    // Ensure each player gets 1 passive + 2 healers + 6 normal characters
-    const player1Chars = [selectedPassive1, shuffledHealers[0], shuffledHealers[1], ...shuffledNormal.slice(0, 6)];
-    const player2Chars = [selectedPassive2, shuffledHealers[2], shuffledHealers[3], ...shuffledNormal.slice(6, 12)];
+    if (player2Chars.length !== 9) {
+      alert(`Error: Player 2 has ${player2Chars.length} cards instead of 9!`);
+      return;
+    }
+    
+    if (player1Chars.some(c => !c)) {
+      alert('Error: Player 1 has undefined characters!');
+      return;
+    }
+    
+    if (player2Chars.some(c => !c)) {
+      alert('Error: Player 2 has undefined characters!');
+      return;
+    }
     
     const player1Hand = player1Chars.map((char, index) => convertToCard(char, index));
     const player2Hand = player2Chars.map((char, index) => convertToCard(char, index + 9));
@@ -268,6 +298,7 @@ export default function PlayGame() {
         // Unlock special jutsu for specified rounds
         if (booster.effect.unlockSpecialJutsu && booster.effect.duration) {
           targetCard.jutsuMasteryRoundsLeft = booster.effect.duration;
+          targetCard.boosters.push(booster);
         }
         break;
         
@@ -275,6 +306,7 @@ export default function PlayGame() {
         // Activate damage boost
         if (booster.effect.damageBoostPercent) {
           targetCard.damageBoostActive = true;
+          targetCard.boosters.push(booster);
         }
         break;
         
@@ -404,26 +436,26 @@ export default function PlayGame() {
       player.hand.forEach(card => {
         if (!card.statusEffects) card.statusEffects = [];
         
-        // Process each status effect (poison/burn/bleed damage applies every turn)
-        card.statusEffects = card.statusEffects.filter(effect => {
-          switch (effect.type) {
-            case 'poison':
-            case 'burn':
-            case 'bleed':
-              // Apply damage
-              card.currentHealth = Math.max(0, card.currentHealth - (effect.value || 0));
-              break;
-          }
-          
-          // Only decrement duration on player's own turn
-          if (playerIndex === currentPlayerIndex) {
+        // Process status effects only on affected player's own turn
+        if (playerIndex === currentPlayerIndex) {
+          card.statusEffects = card.statusEffects.filter(effect => {
+            switch (effect.type) {
+              case 'poison':
+              case 'burn':
+              case 'bleed':
+                // Apply damage on affected player's turn
+                card.currentHealth = Math.max(0, card.currentHealth - (effect.value || 0));
+                break;
+            }
+            
+            // Decrement duration
             effect.duration--;
-          }
-          return effect.duration > 0;
-        });
+            return effect.duration > 0;
+          });
+        }
         
-        // Only decrement buff/shield/stun/mastery rounds for the OTHER player (when their turn is about to start)
-        if (playerIndex !== currentPlayerIndex) {
+        // Decrement buffs/shields/stuns/mastery only on the card owner's turn
+        if (playerIndex === currentPlayerIndex) {
           // Decrement buff rounds
           if (card.buffRoundsLeft && card.buffRoundsLeft > 0) {
             card.buffRoundsLeft--;
@@ -435,6 +467,9 @@ export default function PlayGame() {
           // Decrement jutsu mastery rounds
           if (card.jutsuMasteryRoundsLeft && card.jutsuMasteryRoundsLeft > 0) {
             card.jutsuMasteryRoundsLeft--;
+            if (card.jutsuMasteryRoundsLeft === 0) {
+              card.boosters = card.boosters?.filter(b => b.type !== 'jutsu_mastery') || [];
+            }
           }
           
           // Decrement stun rounds
@@ -446,8 +481,8 @@ export default function PlayGame() {
           if (card.shieldRoundsLeft && card.shieldRoundsLeft > 0) {
             card.shieldRoundsLeft--;
           }
-        } else {
-          // For current player's cards, decrement their double attack rounds (expires on their own turn)
+          
+          // Decrement double attack rounds (expires on their own turn)
           if (card.doubleAttackRoundsLeft && card.doubleAttackRoundsLeft > 0) {
             card.doubleAttackRoundsLeft--;
             if (card.doubleAttackRoundsLeft === 0) {
@@ -769,6 +804,9 @@ export default function PlayGame() {
         // Apply damage boost if active
         if (caster.damageBoostActive) {
           finalDamage = Math.floor(finalDamage * 1.5);
+          // Deactivate damage boost after use
+          caster.damageBoostActive = false;
+          caster.boosters = caster.boosters?.filter(b => b.type !== 'damage_boost') || [];
         }
         
         // Apply shield reduction
@@ -904,6 +942,9 @@ export default function PlayGame() {
         // Apply damage boost if active
         if (caster.damageBoostActive) {
           damage = Math.floor(damage * 1.2);
+          // Deactivate damage boost after use
+          caster.damageBoostActive = false;
+          caster.boosters = caster.boosters?.filter(b => b.type !== 'damage_boost') || [];
         }
         
         // Apply buff if active
@@ -1187,7 +1228,7 @@ export default function PlayGame() {
             <div className="grid grid-cols-3 gap-3">
               {/* Passive ability card Box */}
               {players[0].hand.filter(card => card.passiveAbility).slice(0, 1).length > 0 && (
-                <div className="border-2 border-blue-600 rounded-lg p-2 relative">
+                <div className="border-2 border-blue-600 rounded-lg p-3 relative">
                   <div className="absolute -top-3 left-2">
                     <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-blue-600 text-white rounded-md">
                       Passive ability cards
@@ -1216,45 +1257,21 @@ export default function PlayGame() {
                       const isSplashTarget = splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index);
                       
                       return (
-                        <div key={index} className="flex flex-col gap-1">
-                          <div 
-                            className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                            onClick={() => handleCharacterClick(0, index)}
-                          >
-                            <CharacterCardComponent 
-                              card={card}
-                              onClick={() => {}}
-                              isSelectable={
-                                (selectingTarget && currentPlayerIndex === 0) || 
-                                (selectingJutsuTarget && isValidTarget) ||
-                                (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
-                              }
-                              isHealer={isHealer(card)}
-                            />
-                          </div>
-                          {/* Active Effect Indicators */}
-                          <div className="flex flex-wrap gap-1">
-                            {card.jutsuMasteryRoundsLeft && card.jutsuMasteryRoundsLeft > 0 && (
-                              <div className="bg-purple-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                Mastery ({card.jutsuMasteryRoundsLeft})
-                              </div>
-                            )}
-                            {card.damageBoostActive && (
-                              <div className="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                +Damage
-                              </div>
-                            )}
-                            {card.splashDamageActive && (
-                              <div className="bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                Splash
-                              </div>
-                            )}
-                            {card.doubleAttackRoundsLeft && card.doubleAttackRoundsLeft > 0 && (
-                              <div className="bg-yellow-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                x2 Attack ({card.doubleAttackRoundsLeft})
-                              </div>
-                            )}
-                          </div>
+                        <div 
+                          key={index}
+                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
+                          onClick={() => handleCharacterClick(0, index)}
+                        >
+                          <CharacterCardComponent 
+                            card={card}
+                            onClick={() => {}}
+                            isSelectable={
+                              (selectingTarget && currentPlayerIndex === 0) || 
+                              (selectingJutsuTarget && isValidTarget) ||
+                              (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
+                            }
+                            isHealer={isHealer(card)}
+                          />
                         </div>
                       );
                     })}
@@ -1264,7 +1281,7 @@ export default function PlayGame() {
               
               {/* Healers Box */}
               {players[0].hand.filter(card => isHealer(card) && !card.passiveAbility).length > 0 && (
-                <div className="col-span-2 border-2 border-green-600 rounded-lg p-2 relative">
+                <div className="col-span-2 border-2 border-green-600 rounded-lg p-3 relative">
                   <div className="absolute -top-3 left-2">
                     <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-green-600 text-white rounded-md">
                       Healers
@@ -1293,45 +1310,21 @@ export default function PlayGame() {
                       const isSplashTarget = splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index);
                       
                       return (
-                        <div key={index} className="flex flex-col gap-1">
-                          <div 
-                            className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                            onClick={() => handleCharacterClick(0, index)}
-                          >
-                            <CharacterCardComponent 
-                              card={card}
-                              onClick={() => {}}
-                              isSelectable={
-                                (selectingTarget && currentPlayerIndex === 0) || 
-                                (selectingJutsuTarget && isValidTarget) ||
-                                (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
-                              }
-                              isHealer={isHealer(card)}
-                            />
-                          </div>
-                          {/* Active Effect Indicators */}
-                          <div className="flex flex-wrap gap-1">
-                            {card.jutsuMasteryRoundsLeft && card.jutsuMasteryRoundsLeft > 0 && (
-                              <div className="bg-purple-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                Mastery ({card.jutsuMasteryRoundsLeft})
-                              </div>
-                            )}
-                            {card.damageBoostActive && (
-                              <div className="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                +Damage
-                              </div>
-                            )}
-                            {card.splashDamageActive && (
-                              <div className="bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                Splash
-                              </div>
-                            )}
-                            {card.doubleAttackRoundsLeft && card.doubleAttackRoundsLeft > 0 && (
-                              <div className="bg-yellow-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                x2 Attack ({card.doubleAttackRoundsLeft})
-                              </div>
-                            )}
-                          </div>
+                        <div 
+                          key={index}
+                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
+                          onClick={() => handleCharacterClick(0, index)}
+                        >
+                          <CharacterCardComponent 
+                            card={card}
+                            onClick={() => {}}
+                            isSelectable={
+                              (selectingTarget && currentPlayerIndex === 0) || 
+                              (selectingJutsuTarget && isValidTarget) ||
+                              (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
+                            }
+                            isHealer={isHealer(card)}
+                          />
                         </div>
                       );
                     })}
@@ -1367,45 +1360,21 @@ export default function PlayGame() {
                 const isSplashTarget = splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index);
                 
                 return (
-                  <div key={index} className="flex flex-col gap-1">
-                    <div 
-                      className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                      onClick={() => handleCharacterClick(0, index)}
-                    >
-                      <CharacterCardComponent 
-                        card={card}
-                        onClick={() => {}}
-                        isSelectable={
-                          (selectingTarget && currentPlayerIndex === 0) || 
-                          (selectingJutsuTarget && isValidTarget) ||
-                          (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
-                        }
-                        isHealer={isHealer(card)}
-                      />
-                    </div>
-                    {/* Active Effect Indicators */}
-                    <div className="flex flex-wrap gap-1">
-                      {card.jutsuMasteryRoundsLeft && card.jutsuMasteryRoundsLeft > 0 && (
-                        <div className="bg-purple-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          Mastery ({card.jutsuMasteryRoundsLeft})
-                        </div>
-                      )}
-                      {card.damageBoostActive && (
-                        <div className="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          +Damage
-                        </div>
-                      )}
-                      {card.splashDamageActive && (
-                        <div className="bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          Splash
-                        </div>
-                      )}
-                      {card.doubleAttackRoundsLeft && card.doubleAttackRoundsLeft > 0 && (
-                        <div className="bg-yellow-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          x2 Attack ({card.doubleAttackRoundsLeft})
-                        </div>
-                      )}
-                    </div>
+                  <div 
+                    key={index}
+                    className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
+                    onClick={() => handleCharacterClick(0, index)}
+                  >
+                    <CharacterCardComponent 
+                      card={card}
+                      onClick={() => {}}
+                      isSelectable={
+                        (selectingTarget && currentPlayerIndex === 0) || 
+                        (selectingJutsuTarget && isValidTarget) ||
+                        (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
+                      }
+                      isHealer={isHealer(card)}
+                    />
                   </div>
                 );
               })}
@@ -1542,7 +1511,7 @@ export default function PlayGame() {
             <div className="grid grid-cols-3 gap-3">
               {/* Healers Box */}
               {players[1].hand.filter(card => isHealer(card) && !card.passiveAbility).length > 0 && (
-                <div className="col-span-2 border-2 border-green-600 rounded-lg p-2 relative">
+                <div className="col-span-2 border-2 border-green-600 rounded-lg p-3 relative">
                   <div className="absolute -top-3 left-2">
                     <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-green-600 text-white rounded-md">
                       Healers
@@ -1571,45 +1540,21 @@ export default function PlayGame() {
                       const isSplashTarget = splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index);
                       
                       return (
-                        <div key={index} className="flex flex-col gap-1">
-                          <div 
-                            className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                            onClick={() => handleCharacterClick(1, index)}
-                          >
-                            <CharacterCardComponent 
-                              card={card}
-                              onClick={() => {}}
-                              isSelectable={
-                                (selectingTarget && currentPlayerIndex === 1) || 
-                                (selectingJutsuTarget && isValidTarget) ||
-                                (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
-                              }
-                              isHealer={isHealer(card)}
-                            />
-                          </div>
-                          {/* Active Effect Indicators */}
-                          <div className="flex flex-wrap gap-1">
-                            {card.jutsuMasteryRoundsLeft && card.jutsuMasteryRoundsLeft > 0 && (
-                              <div className="bg-purple-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                Mastery ({card.jutsuMasteryRoundsLeft})
-                              </div>
-                            )}
-                            {card.damageBoostActive && (
-                              <div className="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                +Damage
-                              </div>
-                            )}
-                            {card.splashDamageActive && (
-                              <div className="bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                Splash
-                              </div>
-                            )}
-                            {card.doubleAttackRoundsLeft && card.doubleAttackRoundsLeft > 0 && (
-                              <div className="bg-yellow-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                x2 Attack ({card.doubleAttackRoundsLeft})
-                              </div>
-                            )}
-                          </div>
+                        <div 
+                          key={index}
+                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
+                          onClick={() => handleCharacterClick(1, index)}
+                        >
+                          <CharacterCardComponent 
+                            card={card}
+                            onClick={() => {}}
+                            isSelectable={
+                              (selectingTarget && currentPlayerIndex === 1) || 
+                              (selectingJutsuTarget && isValidTarget) ||
+                              (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
+                            }
+                            isHealer={isHealer(card)}
+                          />
                         </div>
                       );
                     })}
@@ -1619,7 +1564,7 @@ export default function PlayGame() {
               
               {/* Passive ability card Box */}
               {players[1].hand.filter(card => card.passiveAbility).slice(0, 1).length > 0 && (
-                <div className="border-2 border-blue-600 rounded-lg p-2 relative">
+                <div className="border-2 border-blue-600 rounded-lg p-3 relative">
                   <div className="absolute -top-3 left-2">
                     <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-blue-600 text-white rounded-md">
                       Passive ability cards
@@ -1648,45 +1593,21 @@ export default function PlayGame() {
                       const isSplashTarget = splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index);
                       
                       return (
-                        <div key={index} className="flex flex-col gap-1">
-                          <div 
-                            className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                            onClick={() => handleCharacterClick(1, index)}
-                          >
-                            <CharacterCardComponent 
-                              card={card}
-                              onClick={() => {}}
-                              isSelectable={
-                                (selectingTarget && currentPlayerIndex === 1) || 
-                                (selectingJutsuTarget && isValidTarget) ||
-                                (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
-                              }
-                              isHealer={isHealer(card)}
-                            />
-                          </div>
-                          {/* Active Effect Indicators */}
-                          <div className="flex flex-wrap gap-1">
-                            {card.jutsuMasteryRoundsLeft && card.jutsuMasteryRoundsLeft > 0 && (
-                              <div className="bg-purple-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                Mastery ({card.jutsuMasteryRoundsLeft})
-                              </div>
-                            )}
-                            {card.damageBoostActive && (
-                              <div className="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                +Damage
-                              </div>
-                            )}
-                            {card.splashDamageActive && (
-                              <div className="bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                Splash
-                              </div>
-                            )}
-                            {card.doubleAttackRoundsLeft && card.doubleAttackRoundsLeft > 0 && (
-                              <div className="bg-yellow-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded">
-                                x2 Attack ({card.doubleAttackRoundsLeft})
-                              </div>
-                            )}
-                          </div>
+                        <div 
+                          key={index}
+                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
+                          onClick={() => handleCharacterClick(1, index)}
+                        >
+                          <CharacterCardComponent 
+                            card={card}
+                            onClick={() => {}}
+                            isSelectable={
+                              (selectingTarget && currentPlayerIndex === 1) || 
+                              (selectingJutsuTarget && isValidTarget) ||
+                              (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
+                            }
+                            isHealer={isHealer(card)}
+                          />
                         </div>
                       );
                     })}
@@ -1722,45 +1643,21 @@ export default function PlayGame() {
                 const isSplashTarget = splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index);
                 
                 return (
-                  <div key={index} className="flex flex-col gap-1">
-                    <div 
-                      className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                      onClick={() => handleCharacterClick(1, index)}
-                    >
-                      <CharacterCardComponent 
-                        card={card}
-                        onClick={() => {}}
-                        isSelectable={
-                          (selectingTarget && currentPlayerIndex === 1) || 
-                          (selectingJutsuTarget && isValidTarget) ||
-                          (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
-                        }
-                        isHealer={isHealer(card)}
-                      />
-                    </div>
-                    {/* Active Effect Indicators */}
-                    <div className="flex flex-wrap gap-1">
-                      {card.jutsuMasteryRoundsLeft && card.jutsuMasteryRoundsLeft > 0 && (
-                        <div className="bg-purple-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          Mastery ({card.jutsuMasteryRoundsLeft})
-                        </div>
-                      )}
-                      {card.damageBoostActive && (
-                        <div className="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          +Damage
-                        </div>
-                      )}
-                      {card.splashDamageActive && (
-                        <div className="bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          Splash
-                        </div>
-                      )}
-                      {card.doubleAttackRoundsLeft && card.doubleAttackRoundsLeft > 0 && (
-                        <div className="bg-yellow-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          x2 Attack ({card.doubleAttackRoundsLeft})
-                        </div>
-                      )}
-                    </div>
+                  <div 
+                    key={index}
+                    className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
+                    onClick={() => handleCharacterClick(1, index)}
+                  >
+                    <CharacterCardComponent 
+                      card={card}
+                      onClick={() => {}}
+                      isSelectable={
+                        (selectingTarget && currentPlayerIndex === 1) || 
+                        (selectingJutsuTarget && isValidTarget) ||
+                        (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
+                      }
+                      isHealer={isHealer(card)}
+                    />
                   </div>
                 );
               })}

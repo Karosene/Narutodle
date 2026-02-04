@@ -1560,7 +1560,7 @@
       },
       {
         "name": "Poison Mist Hell: Hundred Continuous Firing",
-        "description": "Karasu blankets the area in smokescreen while Kuroari fires poisoned needles at blinded opponents.",
+        "description": "Karasu blankets the area in smokescreen while Kuroari fires poisoned needles at blinded opponents dealing 3 damage for 3 rounds.",
         "jutsuType": "ninjutsu",
         "chakraCost": 45,
         "damage": 40,

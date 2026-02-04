@@ -6,14 +6,13 @@ Mechanics
         - if player doesnt have space for another booster card, the game will automatically
         skip players move
 
-        Heal - heals a chosen character for 25 health points (chance 30%)
-        Chakra restore - restores 40 chakra to a chosen character (chance 25%)
+        Heal - heals a chosen character for 25 health points (chance 35%)
+        Chakra restore - restores 40 chakra to a chosen character (chance 20%)
         Jutsu recovery - cancels cooldown on all jutsus of a chosen character (chance 15%)
-        Jutsu mastery - chosen character unlocks a special jutsu for 3 rounds (chance 15%)
-        Jutsu damage boost - increases damage on all jutsus of a chosen character by 20% for 3 rounds(chance 5%)
+        Jutsu damage boost - increases damage on all jutsus of a chosen character by 20% for 3 rounds(chance 10%)
+        Jutsu mastery - chosen character unlocks a special jutsu for 3 rounds (chance 10%)
+        Double attack - allows a player to use 2 jutsus per round for 1 round(chance 5%)
         Splash damage - next attack will deal damage to 3 chosen characters at once for 1 round(chance 5%)
-        Double attack - allows a player to use jutsus at once, they can be 2 jutsus from 2 different character 
-                        but both jutsus are applied to the same character for 1 round(chance 5%)
 
     Charka system
         - chakra replenishes by 3 points per round when 7-8 characters are alive, by 5 when 5-6 chracters are alive,
