@@ -767,6 +767,9 @@ export default function PlayGame() {
     caster.boosters = caster.boosters?.filter(b => b.type !== 'splash_damage') || [];
     
     // Apply jutsu to each selected target
+    const shouldApplyDamageBoost = caster.damageBoostActive;
+    const damageBoostMultiplier = shouldApplyDamageBoost ? 1.5 : 1;
+
     splashTargets.forEach(target => {
       const targetCard = newPlayers[target.playerIndex].hand[target.cardIndex];
       
@@ -802,11 +805,8 @@ export default function PlayGame() {
         }
         
         // Apply damage boost if active
-        if (caster.damageBoostActive) {
-          finalDamage = Math.floor(finalDamage * 1.5);
-          // Deactivate damage boost after use
-          caster.damageBoostActive = false;
-          caster.boosters = caster.boosters?.filter(b => b.type !== 'damage_boost') || [];
+        if (shouldApplyDamageBoost) {
+          finalDamage = Math.floor(finalDamage * damageBoostMultiplier);
         }
         
         // Apply shield reduction
@@ -841,6 +841,12 @@ export default function PlayGame() {
       }
     });
     
+    // Deactivate damage boost after use (applies to all splash targets)
+    if (shouldApplyDamageBoost) {
+      caster.damageBoostActive = false;
+      caster.boosters = caster.boosters?.filter(b => b.type !== 'damage_boost') || [];
+    }
+
     // Update jutsus used this turn
     setJutsusUsedThisTurn(prev => prev + 1);
     
