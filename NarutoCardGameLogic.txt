@@ -7,17 +7,17 @@ Mechanics
         skip players move
 
         Heal - heals a chosen character for 25 health points (chance 30%)
-        Chakra restore - restores 40 chakra to a chosen character (chance 20%)
-        Jutsu recovery - cancels cooldown on all jutsus of a chosen character (chance 20%)
-        Jutsu mastery - chosen character unlocks a special jutsu for 5 rounds (chance 15%)
-        Jutsu damage boost - increases damage on all jutsus of a chosen character by 20% (chance 5%)
-        Splash damage - next attack will deal damage to 3 chosen characters at once (chance 5%)
+        Chakra restore - restores 40 chakra to a chosen character (chance 25%)
+        Jutsu recovery - cancels cooldown on all jutsus of a chosen character (chance 15%)
+        Jutsu mastery - chosen character unlocks a special jutsu for 3 rounds (chance 15%)
+        Jutsu damage boost - increases damage on all jutsus of a chosen character by 20% for 3 rounds(chance 5%)
+        Splash damage - next attack will deal damage to 3 chosen characters at once for 1 round(chance 5%)
         Double attack - allows a player to use jutsus at once, they can be 2 jutsus from 2 different character 
-                        but both jutsus are applied to the same character (chance 5%)
+                        but both jutsus are applied to the same character for 1 round(chance 5%)
 
     Charka system
-        - chakra replenishes 15 points per round, the maximum amount of chakra is 100 but
-          can be overflown by using Chakra Restore booster card
+        - chakra replenishes by 3 points per round when 7-8 characters are alive, by 5 when 5-6 chracters are alive,
+          by 10 when 3-4 characters are alive, by 15 when 2 characters are alive and by 30 when 1 character is alive
         - chakra stop replenishing at 100
 
     Jutsu system
@@ -68,6 +68,7 @@ Gameplay
     2. players get 8 random cards from database, 1 of the characters has to be a character with passive ability
     3. players enter the game and first thing they do is take the booster card
     4. once theyve taken the card they can use it right away on likely character or save it for later
+        - player can skip turn by clicking on skip turn button
     5. next they use jutsu by clicking on any character, their jutsus will pop up in a box
        with all 3 jutsu stacked bellow each other and player can choose what jutsu they want to use.
        then player chooses own/enemy character the jutsu will be used on, it depends on the type of jutsu

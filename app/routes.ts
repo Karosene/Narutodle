@@ -8,6 +8,7 @@ export default [
 	route("characters", "routes/characters.tsx"),
 	route("play-game", "routes/play-game.tsx"),
 	route("card-game", "routes/card-game.tsx"),
+	route("rules", "routes/rules.tsx"),
 	route("robots.txt", "routes/robots.txt.ts"),
 	route("sitemap.xml", "routes/sitemap.xml.ts"),
 ] satisfies RouteConfig;

@@ -77,6 +77,7 @@ export interface CharacterCard {
   boosters: AttributeBoosterCard[];
   jutsuMasteryRoundsLeft?: number;
   damageBoostActive?: boolean;
+  splashDamageActive?: boolean;
   jutsuCooldowns?: Record<string, number>;
   statusEffects?: StatusEffect[];
   buffRoundsLeft?: number;
@@ -85,6 +86,7 @@ export interface CharacterCard {
   damageSuppressActive?: boolean;
   damageSuppressAmount?: number;
   stunRoundsLeft?: number;
+  doubleAttackRoundsLeft?: number;
   passiveAbility?: PassiveAbility;
   dodgeNextAttack?: boolean;
 }

@@ -15,8 +15,8 @@ const generateBoosterCards = (): AttributeBoosterCard[] => {
     });
   }
   
-  // Chakra Restore (20% - 20 cards)
-  for (let i = 1; i <= 20; i++) {
+  // Chakra Restore (25% - 25 cards)
+  for (let i = 1; i <= 25; i++) {
     cards.push({
       id: `chakra-restore-${i}`,
       name: 'Chakra Restore',
@@ -26,8 +26,8 @@ const generateBoosterCards = (): AttributeBoosterCard[] => {
     });
   }
   
-  // Jutsu Recovery (20% - 20 cards)
-  for (let i = 1; i <= 20; i++) {
+  // Jutsu Recovery (15% - 15 cards)
+  for (let i = 1; i <= 15; i++) {
     cards.push({
       id: `jutsu-recovery-${i}`,
       name: 'Jutsu Recovery',
@@ -43,8 +43,8 @@ const generateBoosterCards = (): AttributeBoosterCard[] => {
       id: `jutsu-mastery-${i}`,
       name: 'Jutsu Mastery',
       type: 'jutsu_mastery',
-      effect: { unlockSpecialJutsu: true, duration: 5 },
-      description: 'Chosen character unlocks a special jutsu for 5 rounds'
+      effect: { unlockSpecialJutsu: true, duration: 3 },
+      description: 'Chosen character unlocks a special jutsu for 3 rounds'
     });
   }
   
@@ -55,7 +55,7 @@ const generateBoosterCards = (): AttributeBoosterCard[] => {
       name: 'Jutsu Damage Boost',
       type: 'damage_boost',
       effect: { damageBoostPercent: 20 },
-      description: 'Increases damage on all jutsus of a chosen character by 20%'
+      description: 'Increases damage on all jutsus of a chosen character by 20% for 3 rounds'
     });
   }
   
@@ -66,7 +66,7 @@ const generateBoosterCards = (): AttributeBoosterCard[] => {
       name: 'Splash Damage',
       type: 'splash_damage',
       effect: { multiTarget: 3 },
-      description: 'Next attack will deal damage to 3 chosen characters at once'
+      description: 'Next attack will deal damage to 3 chosen characters at once for 1 round'
     });
   }
   
@@ -77,7 +77,7 @@ const generateBoosterCards = (): AttributeBoosterCard[] => {
       name: 'Double Attack',
       type: 'double_attack',
       effect: { extraAttack: true },
-      description: 'Allows a player to use 2 jutsus at once from different characters on the same target'
+      description: 'Allows a player to use 2 jutsus at once from different characters on the same target for 1 round'
     });
   }
   

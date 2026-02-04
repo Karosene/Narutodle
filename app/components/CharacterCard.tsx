@@ -6,6 +6,7 @@ interface CharacterCardProps {
   selected?: boolean;
   showDetails?: boolean;
   isSelectable?: boolean;
+  isHealer?: boolean;
 }
 
 export function CharacterCardComponent({ 
@@ -13,7 +14,8 @@ export function CharacterCardComponent({
   onClick, 
   selected = false,
   showDetails = true,
-  isSelectable = false
+  isSelectable = false,
+  isHealer = false
 }: CharacterCardProps) {
   const formData = card.forms[card.currentForm];
   if (!formData) return null;
@@ -38,7 +40,7 @@ export function CharacterCardComponent({
         ${selected 
           ? 'border-orange-500 shadow-2xl shadow-orange-500/50 scale-105 ring-4 ring-orange-300 dark:ring-orange-700' 
           : isSelectable
-            ? 'border-slate-300 dark:border-slate-700 hover:border-green-500 hover:shadow-2xl hover:shadow-green-500/60 hover:ring-4 hover:ring-green-500 hover:scale-105'
+            ? 'border-slate-300 dark:border-slate-700 hover:border-cyan-400 hover:shadow-2xl hover:shadow-cyan-400/60 hover:ring-2 hover:ring-cyan-400'
             : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600'
         }
         ${card.currentHealth === 0 ? 'opacity-50 grayscale' : !isSelectable ? 'hover:shadow-xl' : ''}
@@ -175,6 +177,31 @@ export function CharacterCardComponent({
             <span className="text-5xl drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">🛡️</span>
             <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-bold text-white drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]">
               -{card.damageSuppressAmount}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Stun Overlay - Blue overlay with countdown */}
+      {card.stunRoundsLeft && card.stunRoundsLeft > 0 && (
+        <div className="absolute inset-0 bg-blue-500/40 rounded-xl pointer-events-none flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-6xl mb-2">⚡</div>
+            <div className="bg-blue-600 rounded-full w-12 h-12 flex items-center justify-center mx-auto">
+              <span className="text-2xl font-bold text-white">{card.stunRoundsLeft}</span>
+            </div>
+            <p className="text-white font-bold text-sm mt-2 drop-shadow-lg">STUNNED</p>
+          </div>
+        </div>
+      )}
+
+      {/* Buff Indicator - Green upward arrow with rounds left */}
+      {card.buffRoundsLeft && card.buffRoundsLeft > 0 && (
+        <div className="absolute top-2 left-2 flex flex-col items-center pointer-events-none z-20">
+          <div className="relative bg-green-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg border-2 border-white">
+            <span className="text-2xl text-white drop-shadow-lg">↑</span>
+            <span className="absolute -bottom-1 -right-1 bg-yellow-400 text-black text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">
+              {card.buffRoundsLeft}
             </span>
           </div>
         </div>
