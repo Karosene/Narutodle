@@ -643,6 +643,12 @@ export default function PlayGame() {
       
       const card = players[playerIndex].hand[cardIndex];
       
+      // Check if character is defeated
+      if (card.currentHealth === 0) {
+        alert(`${card.name} is defeated and cannot use jutsus!`);
+        return;
+      }
+      
       // Check if character is stunned
       if (card.stunRoundsLeft && card.stunRoundsLeft > 0) {
         alert(`${card.name} is stunned and cannot use jutsus for ${card.stunRoundsLeft} more round(s)!`);
@@ -1705,6 +1711,25 @@ export default function PlayGame() {
         </div>
       )}
 
+      {/* Normal Jutsu Target Selection UI */}
+      {selectingJutsuTarget && !isSelectingSplashTargets && selectedJutsu && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-4 rounded-lg shadow-xl z-50 border-2 border-cyan-400">
+          <p className="text-lg font-bold mb-2">🎯 {selectedJutsu.name}</p>
+          <p className="text-sm mb-3">Select a target for this jutsu</p>
+          <button
+            onClick={() => {
+              setSelectingJutsuTarget(false);
+              setSelectedJutsu(null);
+              setSelectedCharacter(null);
+              setShowJutsuSelector(false);
+            }}
+            className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-semibold transition"
+          >
+            Cancel Jutsu
+          </button>
+        </div>
+      )}
+
       {/* Jutsu Selector Modal */}
       {showJutsuSelector && selectedCharacter && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={() => setShowJutsuSelector(false)}>
@@ -1795,54 +1820,58 @@ export default function PlayGame() {
                   );
                 })}
                 
-                {/* Special Jutsu (only if mastery active) */}
-                {players[selectedCharacter.playerIndex].hand[selectedCharacter.cardIndex].jutsuMasteryRoundsLeft && 
-                 players[selectedCharacter.playerIndex].hand[selectedCharacter.cardIndex].jutsuMasteryRoundsLeft! > 0 && (
-                  <div>
-                    <div className="text-xs text-yellow-400 font-semibold mb-2">
-                      ⚡ Special Jutsu Unlocked ({players[selectedCharacter.playerIndex].hand[selectedCharacter.cardIndex].jutsuMasteryRoundsLeft} rounds left)
+                {/* Upgraded Jutsu (always shown, but disabled if mastery not active) */}
+                {(() => {
+                  const jutsu = jutsuData[players[selectedCharacter.playerIndex].hand[selectedCharacter.cardIndex].name].upgradedJutsu;
+                  const card = players[selectedCharacter.playerIndex].hand[selectedCharacter.cardIndex];
+                  const hasMastery = card.jutsuMasteryRoundsLeft && card.jutsuMasteryRoundsLeft > 0;
+                  const onCooldown = card.jutsuCooldowns && card.jutsuCooldowns[jutsu.name] > 0;
+                  const notEnoughChakra = card.currentChakra < jutsu.chakraCost;
+                  const isDisabled = !hasMastery || onCooldown || notEnoughChakra;
+                  
+                  return (
+                    <div>
+                      {hasMastery && (
+                        <div className="text-xs text-yellow-400 font-semibold mb-2">
+                          ⚡ Special Jutsu Unlocked ({card.jutsuMasteryRoundsLeft} rounds left)
+                        </div>
+                      )}
+                      <button
+                        onClick={() => !isDisabled && handleJutsuSelect(jutsu)}
+                        disabled={isDisabled}
+                        className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                          isDisabled
+                            ? 'border-gray-600 bg-gray-800/30 opacity-40 cursor-not-allowed'
+                            : 'border-yellow-500 bg-yellow-900 hover:bg-yellow-800 cursor-pointer'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-bold text-white">{jutsu.name}</h4>
+                          <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                            jutsu.jutsuType === 'ninjutsu' ? 'bg-blue-600' :
+                            jutsu.jutsuType === 'taijutsu' ? 'bg-red-600' : 'bg-purple-600'
+                          } text-white`}>
+                            {jutsu.jutsuType}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300 mb-2">{jutsu.description}</p>
+                        <div className="flex gap-2 text-xs">
+                          <span className="text-blue-400">Chakra: {jutsu.chakraCost}</span>
+                          {jutsu.damage && <span className="text-red-400">Damage: {jutsu.damage}</span>}
+                        </div>
+                        {!hasMastery && (
+                          <p className="text-xs text-red-400 mt-1">⚡ Requires Jutsu Mastery booster!</p>
+                        )}
+                        {hasMastery && onCooldown && (
+                          <p className="text-xs text-yellow-400 mt-1">Cooldown: {card.jutsuCooldowns![jutsu.name]} rounds</p>
+                        )}
+                        {hasMastery && notEnoughChakra && (
+                          <p className="text-xs text-red-400 mt-1">Not enough chakra!</p>
+                        )}
+                      </button>
                     </div>
-                    {(() => {
-                      const jutsu = jutsuData[players[selectedCharacter.playerIndex].hand[selectedCharacter.cardIndex].name].upgradedJutsu;
-                      const card = players[selectedCharacter.playerIndex].hand[selectedCharacter.cardIndex];
-                      const onCooldown = card.jutsuCooldowns && card.jutsuCooldowns[jutsu.name] > 0;
-                      const notEnoughChakra = card.currentChakra < jutsu.chakraCost;
-                      
-                      return (
-                        <button
-                          onClick={() => !onCooldown && !notEnoughChakra && handleJutsuSelect(jutsu)}
-                          disabled={onCooldown || notEnoughChakra}
-                          className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                            onCooldown || notEnoughChakra
-                              ? 'border-gray-600 bg-gray-800 opacity-50 cursor-not-allowed'
-                              : 'border-yellow-500 bg-yellow-900 hover:bg-yellow-800 cursor-pointer'
-                          }`}
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className="font-bold text-white">{jutsu.name}</h4>
-                            <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                              jutsu.jutsuType === 'ninjutsu' ? 'bg-blue-600' :
-                              jutsu.jutsuType === 'taijutsu' ? 'bg-red-600' : 'bg-purple-600'
-                            } text-white`}>
-                              {jutsu.jutsuType}
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-300 mb-2">{jutsu.description}</p>
-                          <div className="flex gap-2 text-xs">
-                            <span className="text-blue-400">Chakra: {jutsu.chakraCost}</span>
-                            {jutsu.damage && <span className="text-red-400">Damage: {jutsu.damage}</span>}
-                          </div>
-                          {onCooldown && (
-                            <p className="text-xs text-yellow-400 mt-1">Cooldown: {card.jutsuCooldowns![jutsu.name]} rounds</p>
-                          )}
-                          {notEnoughChakra && (
-                            <p className="text-xs text-red-400 mt-1">Not enough chakra!</p>
-                          )}
-                        </button>
-                      );
-                    })()}
-                  </div>
-                )}
+                  );
+                })()}
               </div>
               )
             )}
@@ -1851,6 +1880,11 @@ export default function PlayGame() {
               onClick={() => {
                 setShowJutsuSelector(false);
                 setShowPassiveTab(false);
+                setSelectedCharacter(null);
+                setSelectedJutsu(null);
+                setSelectingJutsuTarget(false);
+                setIsSelectingSplashTargets(false);
+                setSplashTargets([]);
               }}
               className="mt-4 w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition"
             >

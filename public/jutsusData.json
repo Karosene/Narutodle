@@ -1750,9 +1750,9 @@
     ],
     "upgradedJutsu": {
       "name": "Shadow Clone Slash Strike",
-      "description": "Combines Shadow Clones with high-speed kenjutsu for devastating sword strikes dealing 50 damage and boosting damage output",
+      "description": "Combines Shadow Clones with high-speed kenjutsu for devastating sword strikes dealing 50 damage and boosting damage by 20 for 2 rounds",
       "jutsuType": "ninjutsu",
-      "chakraCost": 50,
+      "chakraCost": 70,
       "damage": 50,
       "effect": {
         "type": "buff",
@@ -4021,6 +4021,11 @@
           "value": 12,
           "duration": 2,
           "target": "opponent"
+        },
+        "secondaryEffect": {
+          "type": "stun",
+          "duration": 2,
+          "target": "opponent"
         }
       }
     ],
@@ -4161,9 +4166,10 @@
       },
       {
         "name": "Magnet Release: Iron Poison Binding",
-        "description": "Uses magnetism to restrain opponents and poison them using needles for 19 damage for 2 rounds",
+        "description": "Uses magnetism to restrain opponents dealing 21 damage and poisoning them using needles for 19 damage for 2 rounds",
         "jutsuType": "ninjutsu",
-        "chakraCost": 26,
+        "chakraCost": 50,
+        "damage": 21,
         "effect": {
           "type": "poison",
           "value": 19,
