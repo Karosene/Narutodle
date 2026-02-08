@@ -53,6 +53,7 @@ export default function PlayGame() {
   const [isSelectingSplashTargets, setIsSelectingSplashTargets] = useState(false);
   const [healedCard, setHealedCard] = useState<{playerIndex: 0 | 1, cardIndex: number} | null>(null);
   const [showRulesModal, setShowRulesModal] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -296,6 +297,10 @@ export default function PlayGame() {
   };
 
   const resetGame = () => {
+    setShowResetConfirm(true);
+  };
+
+  const confirmResetGame = () => {
     setGameStarted(false);
     setPlayers([
       { name: 'Player 1', hand: [] },
@@ -307,6 +312,7 @@ export default function PlayGame() {
     setBoosterHands([[], []]);
     setSelectedBooster(null);
     setSelectingTarget(false);
+    setShowResetConfirm(false);
   };
 
   const applyBoosterToCharacter = (characterIndex: number) => {
@@ -2298,6 +2304,33 @@ export default function PlayGame() {
                   <p className="text-lg">Reduce all 9 of your opponent's character cards to 0 health to achieve victory.</p>
                 </div>
               </section>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setShowResetConfirm(false)}>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-8 border-2 border-red-500" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center mb-6">
+              <div className="text-6xl mb-4">⚠️</div>
+              <h2 className="text-2xl font-bold text-white mb-3">Reset Game?</h2>
+              <p className="text-slate-300 text-lg">Do you really want to reset the game? All progress will be lost.</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                className="flex-1 px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmResetGame}
+                className="flex-1 px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition"
+              >
+                Confirm
+              </button>
             </div>
           </div>
         </div>

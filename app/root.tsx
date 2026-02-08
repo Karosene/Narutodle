@@ -51,6 +51,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 import { Analytics } from "@vercel/analytics/react";
 
 const navLinks = [
+  { to: "/characters", label: "Character Cards" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
   { to: "/privacy", label: "Privacy" },
@@ -58,7 +59,6 @@ const navLinks = [
 
 const gameLinks = [
   { to: "/", label: "Narutodle (Guess the Character)", icon: "🔮" },
-  { to: "/characters", label: "Character Cards Gallery", icon: "🎴" },
   { to: "/play-game", label: "Play Card Game", icon: "⚔️" },
 ];
 
@@ -203,7 +203,7 @@ export default function App() {
         <Outlet />
       </main>
 
-      <footer className="mt-6 border-t border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90">
+      <footer className="border-t border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-700 dark:text-slate-300">
             <div className="font-semibold text-slate-900 dark:text-slate-100">Narutodle</div>

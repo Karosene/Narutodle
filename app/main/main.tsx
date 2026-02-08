@@ -416,20 +416,27 @@ export default function Site() {
 
 
   return (
-    <main className="flex items-start justify-center min-h-screen p-8 mt-0 sm:mt-6 lg:mt-12 overflow-x-hidden overflow-y-auto md:overflow-visible">
-      <div className="w-full max-w-6xl space-y-6">
+    <main className="flex items-start justify-center min-h-screen px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden overflow-y-auto md:overflow-visible bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+
+      <div className="w-full max-w-6xl space-y-6 relative z-10 mt-10">
         <h1 className="text-5xl sm:text-6xl font-extrabold mb-2 text-center">Narutodle</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-10 text-center">Character guessing from Naruto and Naruto Shippuden</p>
+        <p className="text-sm text-slate-300 mb-10 text-center">Character guessing from Naruto and Naruto Shippuden</p>
 
         <div className="w-1/2 mx-auto mb-6 flex justify-center">
-          <div className="bg-white/5 dark:bg-white/3 rounded-lg px-4 py-3 shadow-sm border border-white/10 dark:border-white/5">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-lg px-4 py-3 shadow-lg border border-slate-700/50">
             <span className="text-lg text-white font-semibold">
               Guesses: {guesses.length}
             </span>
           </div>
         </div>
 
-        <div className="bg-linear-to-br from-white/10 via-white/5 to-white/3 dark:from-white/8 dark:via-white/4 dark:to-white/2 rounded-2xl p-6 shadow-lg border border-white/10 dark:border-white/5 w-full md:w-1/2 mx-auto">
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-slate-700/50 w-full md:w-1/2 mx-auto relative z-20">
           {guesses.length > 0 && !revealed && !showAttributes ? (
             <button
               type="button"
@@ -494,7 +501,7 @@ export default function Site() {
               />
 
               {showSuggestions && suggestions.length > 0 ? (
-                <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 top-full mt-2 z-50 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-xl max-h-96 overflow-auto border border-white/20 dark:border-gray-700/50">
+                <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-xl max-h-96 overflow-auto border border-white/20 dark:border-gray-700/50">
                   {suggestions.map((s, i) => (
                     <div
                       id={`suggestion-${i}`}
@@ -651,7 +658,7 @@ export default function Site() {
         </div>
 
         {guesses.length > 0 && (
-          <div className="bg-white/5 dark:bg-white/3 rounded-xl p-6 shadow-sm w-full overflow-x-auto">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-700/50 w-full overflow-x-auto">
             {/* Desktop view - horizontal grid */}
             <div className="hidden md:block">
               <div className="grid grid-cols-11 gap-2 items-center mb-3">
