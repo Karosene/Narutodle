@@ -76,7 +76,7 @@ export default function App() {
       <header className="sticky top-0 z-50 border-b border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur supports-backdrop-filter:bg-white/70 dark:supports-backdrop-filter:bg-slate-900/70">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
           <NavLink to="/" className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition">
-            <img src="/images/logo.png" alt="Narutodle Logo" className="w-12 h-12 select-none" />
+            <img src="/images/logo.png" alt="Narutodle Logo" className="w-12 h-9 select-none" />
             <span className="tracking-tight">Narutodle</span>
           </NavLink>
           <button

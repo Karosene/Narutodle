@@ -442,6 +442,15 @@ export default function PlayGame() {
   };
 
   const endTurn = () => {
+    // Clear any in-progress jutsu selection when skipping/ending turn
+    setSelectingJutsuTarget(false);
+    setSelectedJutsu(null);
+    setSelectedCharacter(null);
+    setShowJutsuSelector(false);
+    setIsSelectingSplashTargets(false);
+    setSplashTargets([]);
+    setShowPassiveTab(false);
+
     // Regenerate chakra for all characters
     regenerateChakra();
     
@@ -1629,6 +1638,60 @@ export default function PlayGame() {
                   className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg transition text-center">
                   📖 Rules
                 </button>
+                {isSelectingSplashTargets && (
+                  <>
+                    <hr className="border-slate-600 my-3" />
+                    <div className="bg-purple-600 text-white px-4 py-3 rounded-lg shadow border-2 border-yellow-400">
+                      <p className="text-sm font-bold mb-1">💥 Splash Damage Active!</p>
+                      <p className="text-xs mb-2">Select up to 3 enemy targets ({splashTargets.length}/3 selected)</p>
+                      <div className="flex flex-col gap-2">
+                        <button
+                          onClick={executeSplashDamageJutsu}
+                          disabled={splashTargets.length === 0}
+                          className={`w-full px-3 py-2 rounded-lg font-semibold transition ${
+                            splashTargets.length === 0
+                              ? 'bg-gray-500 cursor-not-allowed'
+                              : 'bg-green-500 hover:bg-green-600'
+                          }`}
+                        >
+                          Confirm ({splashTargets.length} targets)
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsSelectingSplashTargets(false);
+                            setSplashTargets([]);
+                            setSelectingJutsuTarget(false);
+                            setSelectedJutsu(null);
+                            setShowJutsuSelector(true);
+                          }}
+                          className="w-full px-3 py-2 bg-red-500 hover:bg-red-900 rounded-lg font-semibold transition"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+                {selectingJutsuTarget && !isSelectingSplashTargets && selectedJutsu && (
+                  <>
+                    <hr className="border-slate-600 my-3" />
+                    <div className="bg-blue-600 text-white px-4 py-3 rounded-lg shadow border-2 border-cyan-400">
+                      <p className="text-sm font-bold mb-1">🎯 {selectedJutsu.name}</p>
+                      <p className="text-xs mb-2">Select a target for this jutsu</p>
+                      <button
+                        onClick={() => {
+                          setSelectingJutsuTarget(false);
+                          setSelectedJutsu(null);
+                          setSelectedCharacter(null);
+                          setShowJutsuSelector(false);
+                        }}
+                        className="w-full px-3 py-2 bg-red-500 hover:bg-red-900 rounded-lg font-semibold transition"
+                      >
+                        Cancel Jutsu
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -1837,58 +1900,6 @@ export default function PlayGame() {
           </div>
         </div>
       </div>
-
-      {/* Splash Damage Target Selection UI */}
-      {isSelectingSplashTargets && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white px-6 py-4 rounded-lg shadow-xl z-50 border-2 border-yellow-400">
-          <p className="text-lg font-bold mb-2">💥 Splash Damage Active!</p>
-          <p className="text-sm mb-3">Select up to 3 enemy targets ({splashTargets.length}/3 selected)</p>
-          <div className="flex gap-2">
-            <button
-              onClick={executeSplashDamageJutsu}
-              disabled={splashTargets.length === 0}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                splashTargets.length === 0
-                  ? 'bg-gray-500 cursor-not-allowed'
-                  : 'bg-green-500 hover:bg-green-600'
-              }`}
-            >
-              Confirm ({splashTargets.length} targets)
-            </button>
-            <button
-              onClick={() => {
-                setIsSelectingSplashTargets(false);
-                setSplashTargets([]);
-                setSelectingJutsuTarget(false);
-                setSelectedJutsu(null);
-                setShowJutsuSelector(true);
-              }}
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-semibold transition"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Normal Jutsu Target Selection UI */}
-      {selectingJutsuTarget && !isSelectingSplashTargets && selectedJutsu && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-4 rounded-lg shadow-xl z-50 border-2 border-cyan-400">
-          <p className="text-lg font-bold mb-2">🎯 {selectedJutsu.name}</p>
-          <p className="text-sm mb-3">Select a target for this jutsu</p>
-          <button
-            onClick={() => {
-              setSelectingJutsuTarget(false);
-              setSelectedJutsu(null);
-              setSelectedCharacter(null);
-              setShowJutsuSelector(false);
-            }}
-            className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-semibold transition"
-          >
-            Cancel Jutsu
-          </button>
-        </div>
-      )}
 
       {/* Jutsu Selector Modal */}
       {showJutsuSelector && selectedCharacter && (
