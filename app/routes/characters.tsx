@@ -145,7 +145,7 @@ export default function Characters() {
               </div>
 
               {/* Filters */}
-              <div className="flex gap-4 justify-center overflow-x-auto">
+              <div className="grid grid-cols-2 md:flex gap-4 md:justify-center">
                 <select
                   value={selectedClan}
                   onChange={(e) => setSelectedClan(e.target.value)}
@@ -217,7 +217,7 @@ export default function Characters() {
           </div>
         ) : (
           /* Cards Grid */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredCards.map((card) => {
               const rawData = allCharacters.find(c => c.name === card.name);
               return (
