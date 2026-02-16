@@ -204,12 +204,6 @@ export default function OnlineGamePlay() {
             console.log('Setting gameStarted to:', state.game_started);
             setGameStarted(state.game_started);
           }
-          if (typeof state.show_number_guess === 'boolean') setShowNumberGuess(state.show_number_guess);
-          if (state.target_number !== undefined) setTargetNumber(state.target_number);
-          if (state.player1_guess !== undefined) setPlayer1Guess(state.player1_guess);
-          if (state.player2_guess !== undefined) setPlayer2Guess(state.player2_guess);
-          if (state.guessing_player_index !== undefined) setGuessingPlayerIndex(state.guessing_player_index);
-          if (typeof state.guess_timer === 'number') setGuessTimer(state.guess_timer);
           if (typeof state.jutsus_used_this_turn === 'number') setJutsusUsedThisTurn(state.jutsus_used_this_turn || 0);
           if (state.newly_drawn_card) setNewlyDrawnCard(state.newly_drawn_card);
           
@@ -254,12 +248,6 @@ export default function OnlineGamePlay() {
         pending_players: updates.pendingPlayers !== undefined ? updates.pendingPlayers : pendingPlayers,
         booster_hands: updates.boosterHands || boosterHands,
         game_started: updates.gameStarted !== undefined ? updates.gameStarted : gameStarted,
-        show_number_guess: updates.showNumberGuess !== undefined ? updates.showNumberGuess : showNumberGuess,
-        target_number: updates.targetNumber || targetNumber,
-        player1_guess: updates.player1Guess || player1Guess,
-        player2_guess: updates.player2Guess || player2Guess,
-        guessing_player_index: updates.guessingPlayerIndex !== undefined ? updates.guessingPlayerIndex : guessingPlayerIndex,
-        guess_timer: updates.guessTimer !== undefined ? updates.guessTimer : guessTimer,
         jutsus_used_this_turn: updates.jutsusUsedThisTurn !== undefined ? updates.jutsusUsedThisTurn : jutsusUsedThisTurn,
         selected_character: updates.selectedCharacter !== undefined ? updates.selectedCharacter : selectedCharacter,
         selected_jutsu: updates.selectedJutsu !== undefined ? updates.selectedJutsu : selectedJutsu,
@@ -415,7 +403,6 @@ export default function OnlineGamePlay() {
     await saveCurrentState({
       players: newPlayers,
       gameStarted: true,
-      showNumberGuess: false,
       boosterHands: newHands,
       newlyDrawnCard: {playerIndex: startingPlayer, cardIndex: 0}
     });
