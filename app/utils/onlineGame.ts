@@ -23,6 +23,7 @@ export interface GameState {
   id?: string;
   session_id: string;
   players: any; // JSONB
+  pending_players?: any; // JSONB - players waiting for game to start
   booster_hands: any; // JSONB
   booster_deck?: any;
   jutsu_cooldowns?: any;

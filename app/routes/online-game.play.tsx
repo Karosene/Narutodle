@@ -143,6 +143,7 @@ export default function OnlineGamePlay() {
           // Restore game state from database
           const state = stateResult.state;
           if (state.players) setPlayers(state.players);
+          if (state.pending_players) setPendingPlayers(state.pending_players);
           if (state.booster_hands) setBoosterHands(state.booster_hands);
           if (typeof state.game_started === 'boolean') setGameStarted(state.game_started);
           if (typeof state.show_number_guess === 'boolean') setShowNumberGuess(state.show_number_guess);
@@ -181,17 +182,26 @@ export default function OnlineGamePlay() {
 
   // Polling for state updates every 3 seconds
   useEffect(() => {
-    if (!sessionId || !gameStarted || loading) return;
+    if (!sessionId || loading) return;
 
     const pollGameState = async () => {
       try {
         const stateResult = await loadGameState(sessionId);
         if (stateResult.success && stateResult.state) {
           const state = stateResult.state;
-          setPlayers(state.players);
-          setBoosterHands(state.booster_hands);
-          setGameStarted(state.game_started);
-          setJutsusUsedThisTurn(state.jutsus_used_this_turn || 0);
+          
+          // Update all state variables
+          if (state.players) setPlayers(state.players);
+          if (state.pending_players) setPendingPlayers(state.pending_players);
+          if (state.booster_hands) setBoosterHands(state.booster_hands);
+          if (typeof state.game_started === 'boolean') setGameStarted(state.game_started);
+          if (typeof state.show_number_guess === 'boolean') setShowNumberGuess(state.show_number_guess);
+          if (state.target_number !== undefined) setTargetNumber(state.target_number);
+          if (state.player1_guess !== undefined) setPlayer1Guess(state.player1_guess);
+          if (state.player2_guess !== undefined) setPlayer2Guess(state.player2_guess);
+          if (state.guessing_player_index !== undefined) setGuessingPlayerIndex(state.guessing_player_index);
+          if (typeof state.guess_timer === 'number') setGuessTimer(state.guess_timer);
+          if (typeof state.jutsus_used_this_turn === 'number') setJutsusUsedThisTurn(state.jutsus_used_this_turn || 0);
           
           // Update session data for current player index
           const sessionResult = await getGameSession(sessionId);
@@ -215,7 +225,7 @@ export default function OnlineGamePlay() {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [sessionId, gameStarted, loading]);
+  }, [sessionId, loading]);
 
   // Timer countdown for number guessing
   useEffect(() => {
@@ -247,6 +257,7 @@ export default function OnlineGamePlay() {
       await saveGameState({
         session_id: sessionId,
         players: updates.players || players,
+        pending_players: updates.pendingPlayers !== undefined ? updates.pendingPlayers : pendingPlayers,
         booster_hands: updates.boosterHands || boosterHands,
         game_started: updates.gameStarted !== undefined ? updates.gameStarted : gameStarted,
         show_number_guess: updates.showNumberGuess !== undefined ? updates.showNumberGuess : showNumberGuess,
@@ -393,6 +404,7 @@ export default function OnlineGamePlay() {
     
     // Save state
     await saveCurrentState({
+      pendingPlayers: newPendingPlayers,
       showNumberGuess: true,
       targetNumber: randomNum,
       player1Guess: '',
