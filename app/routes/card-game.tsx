@@ -86,7 +86,7 @@ export default function CardGame() {
           <div className="flex-1 flex gap-5">
             <div className="flex-1 bg-slate-800 rounded-lg p-5">
               <h2 className="text-xl font-bold text-white mb-4">Player 1 Hand</h2>
-      attackTypes        <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-2 gap-5">
                 {displayCards.slice(0, 8).map((card, index) => (
                   <div key={card.id} className="transform transition-transform hover:scale-105">
                     <CharacterCardComponent
@@ -101,7 +101,7 @@ export default function CardGame() {
             <div className="flex-1 flex flex-col gap-5">
               <div className="bg-slate-800 rounded-lg p-5">
                 <div className="text-center">
-                  <h3 className=" text-9xl font-bold text-white">Game Info</h3>
+                  <h3 className="text-2xl font-bold text-white">Game Info</h3>
                   <p className="text-slate-400 text-sm">Turn 1 - Player 1's Turn</p>
                 </div>
               </div>

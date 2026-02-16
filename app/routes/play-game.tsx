@@ -1282,14 +1282,24 @@ export default function PlayGame() {
           </div>
           
           {/* Main Action Button */}
-          <div className="mb-8 flex justify-center">
+          <div className="mb-8 flex flex-col items-center gap-4">
             <button 
               onClick={startGame}
               className="group relative px-12 py-6 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white font-bold text-2xl rounded-2xl transition-all transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-orange-500/50 border-4 border-white/20"
             >
-              <span className="relative z-10">⚔️ Start Battle</span>
+              <span className="relative z-10">⚔️ Start Local Battle (2 Players)</span>
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-600 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity"></div>
             </button>
+            
+            <div className="text-center">
+              <p className="text-slate-400 mb-2">Or play online with a friend</p>
+              <Link
+                to="/online-game"
+                className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xl rounded-xl transition-all transform hover:scale-105 shadow-lg border-2 border-white/20"
+              >
+                🌐 Play Online Multiplayer
+              </Link>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
