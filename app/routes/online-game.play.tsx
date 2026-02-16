@@ -227,28 +227,6 @@ export default function OnlineGamePlay() {
     };
   }, [sessionId, loading]);
 
-  // Timer countdown for number guessing
-  useEffect(() => {
-    if (!showNumberGuess || guessingPlayerIndex === null) return;
-
-    if (guessTimer <= 0) {
-      // Auto-submit when timer runs out
-      handleGuessSubmit();
-      return;
-    }
-
-    const timerInterval = setInterval(() => {
-      setGuessTimer(prev => {
-        const newTimer = prev - 1;
-        // Save timer to database
-        saveCurrentState({ guessTimer: newTimer });
-        return newTimer;
-      });
-    }, 1000);
-
-    return () => clearInterval(timerInterval);
-  }, [showNumberGuess, guessingPlayerIndex, guessTimer]);
-
   // Helper function to save current state
   const saveCurrentState = async (updates: any = {}) => {
     if (!sessionId) return;
@@ -387,134 +365,46 @@ export default function OnlineGamePlay() {
     const player1Hand = player1Chars.map((char, index) => convertToCard(char, index));
     const player2Hand = player2Chars.map((char, index) => convertToCard(char, index + 9));
 
-    const newPendingPlayers: [Player, Player] = [
+    const newPlayers: [Player, Player] = [
       { name: 'Player 1', hand: player1Hand },
       { name: 'Player 2', hand: player2Hand }
     ];
-    setPendingPlayers(newPendingPlayers);
     
-    const randomNum = Math.floor(Math.random() * 51);
-    setTargetNumber(randomNum);
-    setShowNumberGuess(true);
-    setPlayer1Guess('');
-    setPlayer2Guess('');
-    setGuessingPlayerIndex(0); // Player 1 goes first
-    setGuessTimer(10); // 10 second timer
-    setGameResult('');
+    // Host (Player 1) always goes first
+    const startingPlayer = 0;
     
-    // Save state
-    await saveCurrentState({
-      pendingPlayers: newPendingPlayers,
-      showNumberGuess: true,
-      targetNumber: randomNum,
-      player1Guess: '',
-      player2Guess: '',
-      guessingPlayerIndex: 0,
-      guessTimer: 10
-    });
-  };
-
-  const handleGuessSubmit = async () => {
-    // Player 1's turn to guess
-    if (guessingPlayerIndex === 0) {
-      let guess1 = parseInt(player1Guess);
-      
-      // If timer ran out or invalid input, default to middle value (25)
-      if (isNaN(guess1) || guess1 < 0 || guess1 > 50) {
-        guess1 = 25;
-        setPlayer1Guess('25');
-      }
-      
-      // Move to Player 2's turn
-      setGuessingPlayerIndex(1);
-      setGuessTimer(10); // Reset timer for Player 2
-      
-      await saveCurrentState({
-        player1Guess: guess1.toString(),
-        guessingPlayerIndex: 1,
-        guessTimer: 10
+    // Set game state
+    setPlayers(newPlayers);
+    setCurrentPlayerIndex(startingPlayer);
+    setGameStarted(true);
+    
+    // Update session with current player
+    if (sessionId) {
+      await updateGameSession(sessionId, {
+        current_player_index: startingPlayer
       });
-      
-      return;
     }
     
-    // Player 2's turn to guess
-    if (guessingPlayerIndex === 1) {
-      const guess1 = parseInt(player1Guess);
-      let guess2 = parseInt(player2Guess);
-      
-      // If timer ran out or invalid input, default to middle value (25)
-      if (isNaN(guess2) || guess2 < 0 || guess2 > 50) {
-        guess2 = 25;
-        setPlayer2Guess('25');
-      }
-      
-      const distance1 = Math.abs(targetNumber - guess1);
-      const distance2 = Math.abs(targetNumber - guess2);
-      
-      // Handle tie
-      if (distance1 === distance2) {
-        const newRandomNum = Math.floor(Math.random() * 51);
-        setTargetNumber(newRandomNum);
-        setPlayer1Guess('');
-        setPlayer2Guess('');
-        setGuessingPlayerIndex(0); // Start over with Player 1
-        setGuessTimer(10);
-        setGameResult(`🔁 Tie! Both were ${distance1} away. New number generated - guess again!`);
-        
-        await saveCurrentState({
-          targetNumber: newRandomNum,
-          player1Guess: '',
-          player2Guess: '',
-          guessingPlayerIndex: 0,
-          guessTimer: 10
-        });
-        
-        return;
-      }
-      
-      // Determine winner
-      const winner: 0 | 1 = distance1 < distance2 ? 0 : 1;
-      const winnerName = winner === 0 ? 'Player 1' : 'Player 2';
-      
-      setGameResult(`🎯 The number was ${targetNumber}! ${winnerName} was closer (${winner === 0 ? distance1 : distance2} away) and goes first!`);
-      
-      setTimeout(async () => {
-        if (pendingPlayers) {
-          setPlayers(pendingPlayers);
-          setCurrentPlayerIndex(winner);
-          setGameStarted(true);
-          setShowNumberGuess(false);
-          
-          // Update session with current player
-          if (sessionId) {
-            await updateGameSession(sessionId, {
-              current_player_index: winner
-            });
-          }
-          
-          setTimeout(async () => {
-            const randomIndex = Math.floor(Math.random() * boosterDeck.length);
-            const booster = boosterDeck[randomIndex];
-            
-            const newHands: [AttributeBoosterCard[], AttributeBoosterCard[]] = [[], []];
-            newHands[winner] = [booster];
-            setBoosterHands(newHands);
-            setNewlyDrawnCard({playerIndex: winner, cardIndex: 0});
-            
-            await saveCurrentState({
-              players: pendingPlayers,
-              gameStarted: true,
-              showNumberGuess: false,
-              boosterHands: newHands,
-              newlyDrawnCard: {playerIndex: winner, cardIndex: 0}
-            });
-            
-            setTimeout(() => setNewlyDrawnCard(null), 1500);
-          }, 500);
-        }
-      }, 3000);
-    }
+    // Give starting player a random booster card
+    const randomIndex = Math.floor(Math.random() * boosterDeck.length);
+    const booster = boosterDeck[randomIndex];
+    
+    const newHands: [AttributeBoosterCard[], AttributeBoosterCard[]] = [[], []];
+    newHands[startingPlayer] = [booster];
+    setBoosterHands(newHands);
+    setNewlyDrawnCard({playerIndex: startingPlayer, cardIndex: 0});
+    
+    // Save state to database
+    await saveCurrentState({
+      players: newPlayers,
+      gameStarted: true,
+      showNumberGuess: false,
+      boosterHands: newHands,
+      newlyDrawnCard: {playerIndex: startingPlayer, cardIndex: 0}
+    });
+    
+    // Clear the newly drawn card animation after delay
+    setTimeout(() => setNewlyDrawnCard(null), 1500);
   };
 
   const resetGame = () => {
@@ -1414,115 +1304,6 @@ export default function OnlineGamePlay() {
           >
             ← Back to Online Games
           </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Number guessing screen
-  if (showNumberGuess) {
-    const isMyGuessTurn = (isHost && guessingPlayerIndex === 0) || (!isHost && guessingPlayerIndex === 1);
-    const currentGuesserName = guessingPlayerIndex === 0 ? 'Player 1' : guessingPlayerIndex === 1 ? 'Player 2' : '';
-    
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-500">
-          <div className="text-center mb-8">
-            <div className="text-7xl mb-4">🎲</div>
-            <h2 className="text-4xl font-bold text-white mb-2">Number Guessing Game</h2>
-            <p className="text-slate-300 text-lg">Guess a number between 0 and 50</p>
-            <p className="text-purple-400 font-semibold mt-2">Closest guess goes first!</p>
-            <p className="text-yellow-400 text-sm mt-4">
-              You are: {isHost ? 'Player 1 (Host)' : 'Player 2 (Guest)'}
-            </p>
-          </div>
-
-          {/* Timer Display */}
-          {!gameResult && guessingPlayerIndex !== null && (
-            <div className="mb-6 text-center">
-              <div className={`inline-block px-8 py-4 rounded-2xl border-4 ${guessTimer <= 3 ? 'bg-red-600/30 border-red-500 animate-pulse' : 'bg-blue-600/30 border-blue-500'}`}>
-                <p className="text-white text-lg font-semibold mb-2">Time Remaining</p>
-                <p className={`text-7xl font-black ${guessTimer <= 3 ? 'text-red-300' : 'text-white'}`}>{guessTimer}</p>
-              </div>
-              <p className="text-slate-300 text-xl font-semibold mt-4">
-                {currentGuesserName}'s turn to guess
-              </p>
-            </div>
-          )}
-          
-          {/* Result Display */}
-          {gameResult && (
-            <div className="mb-6 p-8 bg-gradient-to-br from-purple-600/30 to-blue-600/30 border-4 border-purple-500/50 rounded-2xl shadow-2xl">
-              <p className="text-white text-center text-lg font-semibold">{gameResult}</p>
-            </div>
-          )}
-          
-          {/* Input Section */}
-          {!gameResult && (
-            <div className="mb-6">
-              {isMyGuessTurn ? (
-                <div className="bg-gradient-to-br from-green-600/20 to-blue-600/20 p-8 rounded-2xl border-4 border-green-500/50">
-                  <h3 className="text-2xl font-bold text-green-400 mb-4 text-center">Your Turn! 🎯</h3>
-                  <input
-                    type="number"
-                    min="0"
-                    max="50"
-                    value={isHost ? player1Guess : player2Guess}
-                    onChange={(e) => {
-                      if (isHost) {
-                        setPlayer1Guess(e.target.value);
-                        saveCurrentState({ player1Guess: e.target.value });
-                      } else {
-                        setPlayer2Guess(e.target.value);
-                        saveCurrentState({ player2Guess: e.target.value });
-                      }
-                    }}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleGuessSubmit();
-                      }
-                    }}
-                    className="w-full px-6 py-4 bg-slate-800 border-4 border-green-500 rounded-xl text-white text-center text-3xl font-bold focus:outline-none focus:border-green-400 mb-4"
-                    placeholder="Enter your guess"
-                    autoFocus
-                  />
-                  <button
-                    onClick={handleGuessSubmit}
-                    className="w-full px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 text-white font-bold text-xl rounded-xl transition-all transform hover:scale-105 shadow-lg"
-                  >
-                    Submit Guess ✓
-                  </button>
-                  <p className="text-slate-300 text-sm text-center mt-3">
-                    Press Enter or click Submit. Timer auto-submits at 0.
-                  </p>
-                </div>
-              ) : (
-                <div className="bg-gradient-to-br from-slate-700/30 to-slate-800/30 p-8 rounded-2xl border-4 border-slate-600/50">
-                  <div className="text-center">
-                    <div className="text-6xl mb-4 animate-pulse">⏳</div>
-                    <h3 className="text-2xl font-bold text-slate-300 mb-2">Waiting for opponent...</h3>
-                    <p className="text-slate-400">
-                      {currentGuesserName} is making their guess
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Guesses Display - Show after both have guessed */}
-          {player1Guess && player2Guess && !gameResult && (
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <div className="bg-orange-600/20 p-4 rounded-lg border-2 border-orange-500/50">
-                <p className="text-orange-400 font-semibold text-center">Player 1</p>
-                <p className="text-white text-2xl font-bold text-center">{player1Guess}</p>
-              </div>
-              <div className="bg-cyan-600/20 p-4 rounded-lg border-2 border-cyan-500/50">
-                <p className="text-cyan-400 font-semibold text-center">Player 2</p>
-                <p className="text-white text-2xl font-bold text-center">{player2Guess}</p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );
