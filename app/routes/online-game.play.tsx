@@ -190,11 +190,20 @@ export default function OnlineGamePlay() {
         if (stateResult.success && stateResult.state) {
           const state = stateResult.state;
           
+          console.log('Polling received state:', { 
+            game_started: state.game_started, 
+            has_players: !!state.players,
+            players_length: state.players?.length
+          });
+          
           // Update all state variables
           if (state.players) setPlayers(state.players);
           if (state.pending_players) setPendingPlayers(state.pending_players);
           if (state.booster_hands) setBoosterHands(state.booster_hands);
-          if (typeof state.game_started === 'boolean') setGameStarted(state.game_started);
+          if (typeof state.game_started === 'boolean') {
+            console.log('Setting gameStarted to:', state.game_started);
+            setGameStarted(state.game_started);
+          }
           if (typeof state.show_number_guess === 'boolean') setShowNumberGuess(state.show_number_guess);
           if (state.target_number !== undefined) setTargetNumber(state.target_number);
           if (state.player1_guess !== undefined) setPlayer1Guess(state.player1_guess);
@@ -202,6 +211,7 @@ export default function OnlineGamePlay() {
           if (state.guessing_player_index !== undefined) setGuessingPlayerIndex(state.guessing_player_index);
           if (typeof state.guess_timer === 'number') setGuessTimer(state.guess_timer);
           if (typeof state.jutsus_used_this_turn === 'number') setJutsusUsedThisTurn(state.jutsus_used_this_turn || 0);
+          if (state.newly_drawn_card) setNewlyDrawnCard(state.newly_drawn_card);
           
           // Update session data for current player index
           const sessionResult = await getGameSession(sessionId);
@@ -217,7 +227,8 @@ export default function OnlineGamePlay() {
       }
     };
 
-    // Poll every 3 seconds
+    // Poll immediately, then every 3 seconds
+    pollGameState();
     pollingIntervalRef.current = setInterval(pollGameState, 3000);
 
     return () => {
@@ -226,6 +237,11 @@ export default function OnlineGamePlay() {
       }
     };
   }, [sessionId, loading]);
+
+  // Debug: Log when gameStarted changes
+  useEffect(() => {
+    console.log('gameStarted changed to:', gameStarted);
+  }, [gameStarted]);
 
   // Helper function to save current state
   const saveCurrentState = async (updates: any = {}) => {
@@ -395,6 +411,7 @@ export default function OnlineGamePlay() {
     setNewlyDrawnCard({playerIndex: startingPlayer, cardIndex: 0});
     
     // Save state to database
+    console.log('Saving game state with gameStarted: true');
     await saveCurrentState({
       players: newPlayers,
       gameStarted: true,
@@ -402,6 +419,7 @@ export default function OnlineGamePlay() {
       boosterHands: newHands,
       newlyDrawnCard: {playerIndex: startingPlayer, cardIndex: 0}
     });
+    console.log('Game state saved successfully');
     
     // Clear the newly drawn card animation after delay
     setTimeout(() => setNewlyDrawnCard(null), 1500);
