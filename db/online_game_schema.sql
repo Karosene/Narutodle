@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS online_game_state (
   session_id UUID REFERENCES online_game_sessions(id) ON DELETE CASCADE,
   -- Full game state
   players JSONB NOT NULL, -- [Player, Player] with hands
+  pending_players JSONB, -- Players waiting for game to start
   booster_hands JSONB NOT NULL, -- [[booster], [booster]]
   booster_deck JSONB, -- Remaining boosters
   jutsu_cooldowns JSONB, -- Cooldown tracking
@@ -35,6 +36,8 @@ CREATE TABLE IF NOT EXISTS online_game_state (
   target_number INTEGER,
   player1_guess VARCHAR(10),
   player2_guess VARCHAR(10),
+  guessing_player_index INTEGER, -- 0 or 1 or null
+  guess_timer INTEGER, -- Timer for number guessing
   -- Turn tracking
   jutsus_used_this_turn INTEGER DEFAULT 0,
   -- UI state for syncing
