@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { CharacterCardComponent } from '~/components/CharacterCard';
 import type { CharacterCard, AttributeBoosterCard, CharacterJutsuData, Jutsu, StatusEffect, PassiveAbility } from '~/types/tcg';
 import { boosterDeck } from '~/data/boosters';
-import { getCurrentUser } from '../utils/auth';
+import { getCurrentUser, getUserProfile, type Profile } from '../utils/auth';
 import { getGameSession, loadGameState, saveGameState, updateGameSession, type OnlineGameSession } from '../utils/onlineGame';
 
 interface Character {
@@ -22,6 +22,364 @@ interface Player {
   hand: CharacterCard[];
 }
 
+function LevelBadge({ level, xp, size = 40 }: { level: number | null; xp?: number | null; size?: number }) {
+  const stroke = Math.max(4, Math.round(size * 0.1));
+  const radius = (size - stroke) / 2.3;
+  const circumference = 2 * Math.PI * radius;
+  const xpValue = xp ?? 0;
+  const levelFromXp = (value: number) => {
+    if (value <= 0) return 1;
+    const scaled = (2 * value) / 5;
+    return Math.max(1, Math.floor((1 + Math.sqrt(1 + 4 * scaled)) / 2));
+  };
+  const xpForLevel = (lvl: number) => (5 * (lvl - 1) * lvl) / 2;
+  const currentLevel = level ?? levelFromXp(xpValue);
+  const currentThreshold = xpForLevel(currentLevel);
+  const nextThreshold = xpForLevel(currentLevel + 1);
+  const progress = nextThreshold > currentThreshold
+    ? Math.min(1, Math.max(0, (xpValue - currentThreshold) / (nextThreshold - currentThreshold)))
+    : 0;
+  const dash = `${(progress * circumference).toFixed(2)} ${circumference.toFixed(2)}`;
+  const currentXpProgress = xpValue - currentThreshold;
+  const xpNeeded = nextThreshold - currentThreshold;
+
+  return (
+    <div style={{ width: size, height: size }} title={`${currentXpProgress}/${xpNeeded}XP`}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={size/2} cy={size/2} r={radius} stroke="#374151" strokeWidth={stroke} fill="none" />
+        <circle cx={size/2} cy={size/2} r={radius} stroke="#7c3aed" strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={dash} transform={`rotate(-90 ${size/2} ${size/2})`} />
+      </svg>
+      <div style={{ position: 'relative', top: -size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="text-white font-semibold mt-0.5" style={{ fontSize: size * 0.35, lineHeight: 1, textAlign: 'center' }}>{level ?? '-'}</div>
+      </div>
+    </div>
+  );
+}
+
+interface PlayerHeaderProps {
+  username: string;
+  profilePicture?: string;
+  level?: number;
+  xp?: number;
+  wins?: number;
+  losses?: number;
+  isLeftSide: boolean;
+}
+
+function PlayerHeader({ username, profilePicture, level = 1, xp = 0, wins = 0, losses = 0, isLeftSide }: PlayerHeaderProps) {
+  if (isLeftSide) {
+    // Player 1 layout: Avatar → Username → Level → W/L
+    return (
+      <div className="bg-slate-800 rounded-lg px-4 py-3 flex items-center justify-between h-fit">
+        <div className="flex items-center gap-3">
+          {profilePicture ? (
+            <img 
+              src={profilePicture} 
+              alt={username}
+              className="w-12 h-12 rounded-full object-cover border-2 border-slate-600"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-lg">
+              {username.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <span className="text-white font-bold text-xl">
+            {username}
+          </span>
+          <LevelBadge level={level} xp={xp} size={56} />
+        </div>
+        <div className="text-lg font-bold">
+          <span className="text-green-400">{wins}W</span>
+          <span className="text-slate-400"> / </span>
+          <span className="text-red-400">{losses}L</span>
+        </div>
+      </div>
+    );
+  } else {
+    // Player 2 layout: W/L → Level → Username → Avatar
+    return (
+      <div className="bg-slate-800 rounded-lg px-4 py-3 flex items-center justify-between h-fit">
+        <div className="text-lg font-bold">
+          <span className="text-green-400">{wins}W</span>
+          <span className="text-slate-400"> / </span>
+          <span className="text-red-400">{losses}L</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <LevelBadge level={level} xp={xp} size={56} />
+          <span className="text-white font-bold text-xl">
+            {username}
+          </span>
+          {profilePicture ? (
+            <img 
+              src={profilePicture} 
+              alt={username}
+              className="w-12 h-12 rounded-full object-cover border-2 border-slate-600"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-lg">
+              {username.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+}
+
+interface PlayerCardsSectionProps {
+  playerIndex: 0 | 1;
+  players: [Player, Player];
+  currentPlayerIndex: 0 | 1;
+  selectingTarget: boolean;
+  selectingJutsuTarget: boolean;
+  selectedJutsu: Jutsu | null;
+  splashTargets: Array<{playerIndex: 0 | 1, cardIndex: number}>;
+  isHealer: (card: CharacterCard) => boolean;
+  handleCharacterClick: (playerIndex: 0 | 1, cardIndex: number) => void;
+  isMyTurn: () => boolean;
+}
+
+function PlayerCardsSection({ 
+  playerIndex, 
+  players, 
+  currentPlayerIndex,
+  selectingTarget,
+  selectingJutsuTarget,
+  selectedJutsu,
+  splashTargets,
+  isHealer,
+  handleCharacterClick,
+  isMyTurn
+}: PlayerCardsSectionProps) {
+  const player = players[playerIndex];
+  
+  return (
+    <div className="bg-slate-800 rounded-lg px-3 pt-3 pb-0 h-fit flex-1 flex flex-col w-full max-w-2xl">
+      <div className="grid grid-cols-3 gap-3">
+        {/* Passive ability card Box */}
+        {player.hand.filter(card => card.passiveAbility).slice(0, 1).length > 0 && (
+          <div className="border-2 border-blue-600 rounded-lg p-3 relative">
+            <div className="absolute -top-3 left-2">
+              <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-blue-600 text-white rounded-md">
+                Passive ability cards
+              </span>
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              {player.hand.filter(card => card.passiveAbility).slice(0, 1).map((card) => {
+                const index = player.hand.indexOf(card);
+                let isValidTarget = false;
+                if (selectingJutsuTarget && selectedJutsu) {
+                  if (selectedJutsu.damage) {
+                    isValidTarget = (currentPlayerIndex !== playerIndex);
+                  }
+                  else if (selectedJutsu.effect) {
+                    const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
+                      selectedJutsu.effect.target === 'self' || 
+                      selectedJutsu.effect.target === 'ally' || 
+                      selectedJutsu.effect.target === 'all_allies';
+                    const isOpponent = selectedJutsu.effect.target === 'opponent' || 
+                      selectedJutsu.effect.target === 'all_opponents';
+                    
+                    if (isHealOrAlly && currentPlayerIndex === playerIndex) isValidTarget = true;
+                    if (isOpponent && currentPlayerIndex !== playerIndex) isValidTarget = true;
+                  }
+                }
+                const isSplashTarget = splashTargets.some(t => t.playerIndex === playerIndex && t.cardIndex === index);
+                
+                return (
+                  <div 
+                    key={index}
+                    className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
+                    onClick={() => handleCharacterClick(playerIndex, index)}
+                  >
+                    <CharacterCardComponent 
+                      card={card}
+                      onClick={() => {}}
+                      isSelectable={
+                        (selectingTarget && currentPlayerIndex === playerIndex && isMyTurn()) || 
+                        (selectingJutsuTarget && isValidTarget && isMyTurn()) ||
+                        (currentPlayerIndex === playerIndex && !selectingTarget && !selectingJutsuTarget && isMyTurn())
+                      }
+                      isHealer={isHealer(card)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        
+        {/* Healers Box */}
+        {player.hand.filter(card => isHealer(card) && !card.passiveAbility).length > 0 && (
+          <div className="col-span-2 border-2 border-green-600 rounded-lg p-3 relative">
+            <div className="absolute -top-3 left-2">
+              <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-green-600 text-white rounded-md">
+                Healers
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {player.hand.filter(card => isHealer(card) && !card.passiveAbility).map((card) => {
+                const index = player.hand.indexOf(card);
+                let isValidTarget = false;
+                if (selectingJutsuTarget && selectedJutsu) {
+                  if (selectedJutsu.damage) {
+                    isValidTarget = (currentPlayerIndex !== playerIndex);
+                  }
+                  else if (selectedJutsu.effect) {
+                    const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
+                      selectedJutsu.effect.target === 'self' || 
+                      selectedJutsu.effect.target === 'ally' || 
+                      selectedJutsu.effect.target === 'all_allies';
+                    const isOpponent = selectedJutsu.effect.target === 'opponent' || 
+                      selectedJutsu.effect.target === 'all_opponents';
+                    
+                    if (isHealOrAlly && currentPlayerIndex === playerIndex) isValidTarget = true;
+                    if (isOpponent && currentPlayerIndex !== playerIndex) isValidTarget = true;
+                  }
+                }
+                const isSplashTarget = splashTargets.some(t => t.playerIndex === playerIndex && t.cardIndex === index);
+                
+                return (
+                  <div 
+                    key={index}
+                    className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
+                    onClick={() => handleCharacterClick(playerIndex, index)}
+                  >
+                    <CharacterCardComponent 
+                      card={card}
+                      onClick={() => {}}
+                      isSelectable={
+                        (selectingTarget && currentPlayerIndex === playerIndex && isMyTurn()) || 
+                        (selectingJutsuTarget && isValidTarget && isMyTurn()) ||
+                        (currentPlayerIndex === playerIndex && !selectingTarget && !selectingJutsuTarget && isMyTurn())
+                      }
+                      isHealer={isHealer(card)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        
+        {/* Normal cards */}
+        {player.hand.filter(card => !card.passiveAbility && !isHealer(card)).map((card) => {
+          const index = player.hand.indexOf(card);
+          let isValidTarget = false;
+          if (selectingJutsuTarget && selectedJutsu) {
+            if (selectedJutsu.damage) {
+              isValidTarget = (currentPlayerIndex !== playerIndex);
+            }
+            else if (selectedJutsu.effect) {
+              const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
+                selectedJutsu.effect.target === 'self' || 
+                selectedJutsu.effect.target === 'ally' || 
+                selectedJutsu.effect.target === 'all_allies';
+              const isOpponent = selectedJutsu.effect.target === 'opponent' || 
+                selectedJutsu.effect.target === 'all_opponents';
+              
+              if (isHealOrAlly && currentPlayerIndex === playerIndex) isValidTarget = true;
+              if (isOpponent && currentPlayerIndex !== playerIndex) isValidTarget = true;
+            }
+          }
+          
+          const isSplashTarget = splashTargets.some(t => t.playerIndex === playerIndex && t.cardIndex === index);
+          
+          return (
+            <div 
+              key={index}
+              className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
+              onClick={() => handleCharacterClick(playerIndex, index)}
+            >
+              <CharacterCardComponent 
+                card={card}
+                onClick={() => {}}
+                isSelectable={
+                  (selectingTarget && currentPlayerIndex === playerIndex && isMyTurn()) || 
+                  (selectingJutsuTarget && isValidTarget && isMyTurn()) ||
+                  (currentPlayerIndex === playerIndex && !selectingTarget && !selectingJutsuTarget && isMyTurn())
+                }
+                isHealer={isHealer(card)}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface BoosterHandSectionProps {
+  playerIndex: 0 | 1;
+  boosterHands: [AttributeBoosterCard[], AttributeBoosterCard[]];
+  currentPlayerIndex: 0 | 1;
+  selectingTarget: boolean;
+  selectedBooster: {booster: AttributeBoosterCard, index: number} | null;
+  newlyDrawnCard: {playerIndex: 0 | 1, cardIndex: number} | null;
+  handleBoosterClick: (booster: AttributeBoosterCard, index: number) => void;
+  setSelectedBooster: (val: {booster: AttributeBoosterCard, index: number} | null) => void;
+  setSelectingTarget: (val: boolean) => void;
+  isMyTurn: () => boolean;
+}
+
+function BoosterHandSection({
+  playerIndex,
+  boosterHands,
+  currentPlayerIndex,
+  selectingTarget,
+  selectedBooster,
+  newlyDrawnCard,
+  handleBoosterClick,
+  setSelectedBooster,
+  setSelectingTarget,
+  isMyTurn
+}: BoosterHandSectionProps) {
+  const hand = boosterHands[playerIndex];
+  
+  return (
+    <div className="bg-slate-800 rounded-lg p-3 w-56 h-fit flex flex-col">
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="text-lg font-bold text-white">Booster Hand ({hand.length}/5)</h4>
+      </div>
+      <hr className="border-slate-600 mb-3" />
+      <div className="space-y-2">
+        {hand.map((booster, index) => (
+          <button
+            key={index}
+            onClick={() => handleBoosterClick(booster, index)}
+            disabled={currentPlayerIndex !== playerIndex || selectingTarget || !isMyTurn()}
+            className={`border-2 rounded-lg p-3 w-full text-left transition-all h-20 ${
+              currentPlayerIndex === playerIndex && !selectingTarget && isMyTurn()
+                ? 'border-purple-500 hover:bg-purple-900 cursor-pointer'
+                : 'border-slate-600 opacity-50 cursor-not-allowed'
+            } ${
+              selectedBooster?.index === index && selectedBooster?.booster === booster ? 'bg-purple-800' : ''
+            } ${
+              newlyDrawnCard?.playerIndex === playerIndex && newlyDrawnCard?.cardIndex === index
+                ? 'animate-pulse ring-4 ring-yellow-400 shadow-xl shadow-yellow-400/50'
+                : ''
+            }`}
+          >
+            <h5 className="text-sm font-bold text-white mb-1">{booster.name}</h5>
+            <p className="text-xs text-slate-300 line-clamp-2">{booster.description}</p>
+          </button>
+        ))}
+      </div>
+      {selectingTarget && selectedBooster && currentPlayerIndex === playerIndex && (
+        <button
+          onClick={() => {
+            setSelectedBooster(null);
+            setSelectingTarget(false);
+          }}
+          className="mt-2 w-full px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition"
+        >
+          Cancel
+        </button>
+      )}  
+    </div>
+  );
+}
+
 export default function OnlineGamePlay() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -33,6 +391,8 @@ export default function OnlineGamePlay() {
   const [isHost, setIsHost] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [player1Profile, setPlayer1Profile] = useState<Profile | null>(null);
+  const [player2Profile, setPlayer2Profile] = useState<Profile | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentPlayerIndexRef = useRef<0 | 1>(0);
   
@@ -101,6 +461,15 @@ export default function OnlineGamePlay() {
         return;
       }
       setSession(sessionResult.session);
+
+      // Load player profiles
+      const hostProfile = await getUserProfile(sessionResult.session.host_user_id);
+      setPlayer1Profile(hostProfile);
+      
+      if (sessionResult.session.guest_user_id) {
+        const guestProfile = await getUserProfile(sessionResult.session.guest_user_id);
+        setPlayer2Profile(guestProfile);
+      }
 
       // Check if user is part of this game
       const userIsHost = sessionResult.session.host_user_id === currentUser.id;
@@ -270,6 +639,17 @@ export default function OnlineGamePlay() {
   useEffect(() => {
     console.log('gameStarted changed to:', gameStarted);
   }, [gameStarted]);
+
+  // Fetch guest profile when they join
+  useEffect(() => {
+    const fetchGuestProfile = async () => {
+      if (session?.guest_user_id && !player2Profile) {
+        const guestProfile = await getUserProfile(session.guest_user_id);
+        setPlayer2Profile(guestProfile);
+      }
+    };
+    fetchGuestProfile();
+  }, [session?.guest_user_id, player2Profile]);
 
   // Helper function to save current state
   const saveCurrentState = async (updates: any = {}) => {
@@ -1396,209 +1776,54 @@ export default function OnlineGamePlay() {
 
   return (
     <div className="min-h-screen bg-slate-900 p-4">
-      <div className="h-[calc(100vh-2rem)] flex gap-3 justify-center items-start">
+      <div className="h-[calc(100vh-2rem)] flex gap-1 justify-center items-start">
         {/* Player 1 Section - Left Side */}
-        <div className="flex gap-3 h-full">
-          {/* Player 1 Cards */}
-          <div className="bg-slate-800 rounded-lg p-3 h-auto flex-1 flex flex-col max-w-xl">
-            <div className="grid grid-cols-3 gap-3">
-              {/* Passive ability card Box */}
-              {players[0].hand.filter(card => card.passiveAbility).slice(0, 1).length > 0 && (
-                <div className="border-2 border-blue-600 rounded-lg p-3 relative">
-                  <div className="absolute -top-3 left-2">
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-blue-600 text-white rounded-md">
-                      Passive ability cards
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-3">
-                    {players[0].hand.filter(card => card.passiveAbility).slice(0, 1).map((card) => {
-                      const index = players[0].hand.indexOf(card);
-                      let isValidTarget = false;
-                      if (selectingJutsuTarget && selectedJutsu) {
-                        if (selectedJutsu.damage) {
-                          isValidTarget = (currentPlayerIndex === 1);
-                        }
-                        else if (selectedJutsu.effect) {
-                          const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                            selectedJutsu.effect.target === 'self' || 
-                            selectedJutsu.effect.target === 'ally' || 
-                            selectedJutsu.effect.target === 'all_allies';
-                          const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                            selectedJutsu.effect.target === 'all_opponents';
-                          
-                          if (isHealOrAlly && currentPlayerIndex === 0) isValidTarget = true;
-                          if (isOpponent && currentPlayerIndex === 1) isValidTarget = true;
-                        }
-                      }
-                      const isSplashTarget = splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index);
-                      
-                      return (
-                        <div 
-                          key={index}
-                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                          onClick={() => handleCharacterClick(0, index)}
-                        >
-                          <CharacterCardComponent 
-                            card={card}
-                            onClick={() => {}}
-                            isSelectable={
-                              (selectingTarget && currentPlayerIndex === 0 && isMyTurn()) || 
-                              (selectingJutsuTarget && isValidTarget && isMyTurn()) ||
-                              (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget && isMyTurn())
-                            }
-                            isHealer={isHealer(card)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              
-              {/* Healers Box */}
-              {players[0].hand.filter(card => isHealer(card) && !card.passiveAbility).length > 0 && (
-                <div className="col-span-2 border-2 border-green-600 rounded-lg p-3 relative">
-                  <div className="absolute -top-3 left-2">
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-green-600 text-white rounded-md">
-                      Healers
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {players[0].hand.filter(card => isHealer(card) && !card.passiveAbility).map((card) => {
-                      const index = players[0].hand.indexOf(card);
-                      let isValidTarget = false;
-                      if (selectingJutsuTarget && selectedJutsu) {
-                        if (selectedJutsu.damage) {
-                          isValidTarget = (currentPlayerIndex === 1);
-                        }
-                        else if (selectedJutsu.effect) {
-                          const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                            selectedJutsu.effect.target === 'self' || 
-                            selectedJutsu.effect.target === 'ally' || 
-                            selectedJutsu.effect.target === 'all_allies';
-                          const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                            selectedJutsu.effect.target === 'all_opponents';
-                          
-                          if (isHealOrAlly && currentPlayerIndex === 0) isValidTarget = true;
-                          if (isOpponent && currentPlayerIndex === 1) isValidTarget = true;
-                        }
-                      }
-                      const isSplashTarget = splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index);
-                      
-                      return (
-                        <div 
-                          key={index}
-                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                          onClick={() => handleCharacterClick(0, index)}
-                        >
-                          <CharacterCardComponent 
-                            card={card}
-                            onClick={() => {}}
-                            isSelectable={
-                              (selectingTarget && currentPlayerIndex === 0 && isMyTurn()) || 
-                              (selectingJutsuTarget && isValidTarget && isMyTurn()) ||
-                              (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget && isMyTurn())
-                            }
-                            isHealer={isHealer(card)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              
-              {/* Normal cards */}
-              {players[0].hand.filter(card => !card.passiveAbility && !isHealer(card)).map((card) => {
-                const index = players[0].hand.indexOf(card);
-                let isValidTarget = false;
-                if (selectingJutsuTarget && selectedJutsu) {
-                  if (selectedJutsu.damage) {
-                    isValidTarget = (currentPlayerIndex === 1);
-                  }
-                  else if (selectedJutsu.effect) {
-                    const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                      selectedJutsu.effect.target === 'self' || 
-                      selectedJutsu.effect.target === 'ally' || 
-                      selectedJutsu.effect.target === 'all_allies';
-                    const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                      selectedJutsu.effect.target === 'all_opponents';
-                    
-                    if (isHealOrAlly && currentPlayerIndex === 0) isValidTarget = true;
-                    if (isOpponent && currentPlayerIndex === 1) isValidTarget = true;
-                  }
-                }
-                
-                const isSplashTarget = splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index);
-                
-                return (
-                  <div 
-                    key={index}
-                    className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                    onClick={() => handleCharacterClick(0, index)}
-                  >
-                    <CharacterCardComponent 
-                      card={card}
-                      onClick={() => {}}
-                      isSelectable={
-                        (selectingTarget && currentPlayerIndex === 0 && isMyTurn()) || 
-                        (selectingJutsuTarget && isValidTarget && isMyTurn()) ||
-                        (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget && isMyTurn())
-                      }
-                      isHealer={isHealer(card)}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+        <div className="flex flex-col gap-1 h-full">
+          {/* Player 1 Profile Header */}
+          <PlayerHeader 
+            username={player1Profile?.display_name || session?.host_user_id || 'Player 1'}
+            profilePicture={player1Profile?.profile_picture}
+            level={player1Profile?.level}
+            xp={player1Profile?.xp}
+            wins={player1Profile?.cardgame_games_won}
+            losses={player1Profile?.cardgame_games_lost}
+            isLeftSide={true}
+          />
           
-          {/* Player 1 Booster Hand */}
-          <div className="bg-slate-800 rounded-lg p-3 w-56 h-fit flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-lg font-bold text-white">Booster Hand ({boosterHands[0].length}/5)</h4>
-            </div>
-            <hr className="border-slate-600 mb-3" />
-            <div className="space-y-2">
-              {boosterHands[0].map((booster, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleBoosterClick(booster, index)}
-                  disabled={currentPlayerIndex !== 0 || selectingTarget || !isMyTurn()}
-                  className={`border-2 rounded-lg p-2 w-full text-left transition-all h-16 ${
-                    currentPlayerIndex === 0 && !selectingTarget && isMyTurn()
-                      ? 'border-purple-500 hover:bg-purple-900 cursor-pointer'
-                      : 'border-slate-600 opacity-50 cursor-not-allowed'
-                  } ${
-                    selectedBooster?.index === index && selectedBooster?.booster === booster ? 'bg-purple-800' : ''
-                  } ${
-                    newlyDrawnCard?.playerIndex === 0 && newlyDrawnCard?.cardIndex === index
-                      ? 'animate-pulse ring-4 ring-yellow-400 shadow-xl shadow-yellow-400/50'
-                      : ''
-                  }`}
-                >
-                  <h5 className="text-xs font-bold text-white mb-1">{booster.name}</h5>
-                  <p className="text-[9px] text-slate-300 line-clamp-2">{booster.description}</p>
-                </button>
-              ))}
-            </div>
-            {selectingTarget && selectedBooster && currentPlayerIndex === 0 && (
-              <button
-                onClick={() => {
-                  setSelectedBooster(null);
-                  setSelectingTarget(false);
-                }}
-                className="mt-2 w-full px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition"
-              >
-                Cancel
-              </button>
-            )}
+          <div className="flex gap-1 h-full">
+            {/* Player 1 Cards */}
+            <PlayerCardsSection 
+              playerIndex={0}
+              players={players}
+              currentPlayerIndex={currentPlayerIndex}
+              selectingTarget={selectingTarget}
+              selectingJutsuTarget={selectingJutsuTarget}
+              selectedJutsu={selectedJutsu}
+              splashTargets={splashTargets}
+              isHealer={isHealer}
+              handleCharacterClick={handleCharacterClick}
+              isMyTurn={isMyTurn}
+            />
+            
+            {/* Player 1 Booster Hand */}
+            <BoosterHandSection 
+              playerIndex={0}
+              boosterHands={boosterHands}
+              currentPlayerIndex={currentPlayerIndex}
+              selectingTarget={selectingTarget}
+              selectedBooster={selectedBooster}
+              newlyDrawnCard={newlyDrawnCard}
+              handleBoosterClick={handleBoosterClick}
+              setSelectedBooster={setSelectedBooster}
+              setSelectingTarget={setSelectingTarget}
+              isMyTurn={isMyTurn}
+            />
           </div>
         </div>
 
         {/* Middle Section - Game Info */}
-        <div className="flex-1 flex flex-col gap-3 h-full">
-          <div className="bg-slate-800 rounded-lg p-5 w-56 mx-auto">
+        <div className="flex-1 flex flex-col gap-1 h-full">
+          <div className="bg-slate-800 rounded-lg p-5 w-56 mx-auto h-fit">
             <div className="text-center">
               <h3 className="text-3xl font-bold text-white mb-3">Game Info</h3>
               
@@ -1705,201 +1930,46 @@ export default function OnlineGamePlay() {
         </div>
 
         {/* Player 2 Section - Right Side */}
-        <div className="flex gap-3 h-full">
-          {/* Player 2 Booster Hand */}
-          <div className="bg-slate-800 rounded-lg p-3 w-56 h-fit flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-lg font-bold text-white">Booster Hand ({boosterHands[1].length}/5)</h4>
-            </div>
-            <hr className="border-slate-600 mb-3" />
-            <div className="space-y-2">
-              {boosterHands[1].map((booster, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleBoosterClick(booster, index)}
-                  disabled={currentPlayerIndex !== 1 || selectingTarget || !isMyTurn()}
-                  className={`border-2 rounded-lg p-2 w-full text-left transition-all h-16 ${
-                    currentPlayerIndex === 1 && !selectingTarget && isMyTurn()
-                      ? 'border-purple-500 hover:bg-purple-900 cursor-pointer'
-                      : 'border-slate-600 opacity-50 cursor-not-allowed'
-                  } ${
-                    selectedBooster?.index === index && selectedBooster?.booster === booster ? 'bg-purple-800' : ''
-                  } ${
-                    newlyDrawnCard?.playerIndex === 1 && newlyDrawnCard?.cardIndex === index
-                      ? 'animate-pulse ring-4 ring-yellow-400 shadow-xl shadow-yellow-400/50'
-                      : ''
-                  }`}
-                >
-                  <h5 className="text-xs font-bold text-white mb-1">{booster.name}</h5>
-                  <p className="text-[9px] text-slate-300 line-clamp-2">{booster.description}</p>
-                </button>
-              ))}
-            </div>
-            {selectingTarget && selectedBooster && currentPlayerIndex === 1 && (
-              <button
-                onClick={() => {
-                  setSelectedBooster(null);
-                  setSelectingTarget(false);
-                }}
-                className="mt-2 w-full px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
+        <div className="flex flex-col gap-1 h-full">
+          {/* Player 2 Profile Header */}
+          <PlayerHeader 
+            username={player2Profile?.display_name || session?.guest_user_id || 'Player 2'}
+            profilePicture={player2Profile?.profile_picture}
+            level={player2Profile?.level}
+            xp={player2Profile?.xp}
+            wins={player2Profile?.cardgame_games_won}
+            losses={player2Profile?.cardgame_games_lost}
+            isLeftSide={false}
+          />
           
-          {/* Player 2 Cards */}
-          <div className="bg-slate-800 rounded-lg p-3 h-auto flex-1 flex flex-col max-w-xl">
-            <div className="grid grid-cols-3 gap-3">
-              {/* Healers Box */}
-              {players[1].hand.filter(card => isHealer(card) && !card.passiveAbility).length > 0 && (
-                <div className="col-span-2 border-2 border-green-600 rounded-lg p-3 relative">
-                  <div className="absolute -top-3 left-2">
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-green-600 text-white rounded-md">
-                      Healers
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {players[1].hand.filter(card => isHealer(card) && !card.passiveAbility).map((card) => {
-                      const index = players[1].hand.indexOf(card);
-                      let isValidTarget = false;
-                      if (selectingJutsuTarget && selectedJutsu) {
-                        if (selectedJutsu.damage) {
-                          isValidTarget = (currentPlayerIndex === 0);
-                        }
-                        else if (selectedJutsu.effect) {
-                          const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                            selectedJutsu.effect.target === 'self' || 
-                            selectedJutsu.effect.target === 'ally' || 
-                            selectedJutsu.effect.target === 'all_allies';
-                          const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                            selectedJutsu.effect.target === 'all_opponents';
-                          
-                          if (isHealOrAlly && currentPlayerIndex === 1) isValidTarget = true;
-                          if (isOpponent && currentPlayerIndex === 0) isValidTarget = true;
-                        }
-                      }
-                      const isSplashTarget = splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index);
-                      
-                      return (
-                        <div 
-                          key={index}
-                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                          onClick={() => handleCharacterClick(1, index)}
-                        >
-                          <CharacterCardComponent 
-                            card={card}
-                            onClick={() => {}}
-                            isSelectable={
-                              (selectingTarget && currentPlayerIndex === 1 && isMyTurn()) || 
-                              (selectingJutsuTarget && isValidTarget && isMyTurn()) ||
-                              (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget && isMyTurn())
-                            }
-                            isHealer={isHealer(card)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              
-              {/* Passive ability card Box */}
-              {players[1].hand.filter(card => card.passiveAbility).slice(0, 1).length > 0 && (
-                <div className="border-2 border-blue-600 rounded-lg p-3 relative">
-                  <div className="absolute -top-3 left-2">
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-blue-600 text-white rounded-md">
-                      Passive ability cards
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-3">
-                    {players[1].hand.filter(card => card.passiveAbility).slice(0, 1).map((card) => {
-                      const index = players[1].hand.indexOf(card);
-                      let isValidTarget = false;
-                      if (selectingJutsuTarget && selectedJutsu) {
-                        if (selectedJutsu.damage) {
-                          isValidTarget = (currentPlayerIndex === 0);
-                        }
-                        else if (selectedJutsu.effect) {
-                          const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                            selectedJutsu.effect.target === 'self' || 
-                            selectedJutsu.effect.target === 'ally' || 
-                            selectedJutsu.effect.target === 'all_allies';
-                          const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                            selectedJutsu.effect.target === 'all_opponents';
-                          
-                          if (isHealOrAlly && currentPlayerIndex === 1) isValidTarget = true;
-                          if (isOpponent && currentPlayerIndex === 0) isValidTarget = true;
-                        }
-                      }
-                      const isSplashTarget = splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index);
-                      
-                      return (
-                        <div 
-                          key={index}
-                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                          onClick={() => handleCharacterClick(1, index)}
-                        >
-                          <CharacterCardComponent 
-                            card={card}
-                            onClick={() => {}}
-                            isSelectable={
-                              (selectingTarget && currentPlayerIndex === 1 && isMyTurn()) || 
-                              (selectingJutsuTarget && isValidTarget && isMyTurn()) ||
-                              (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget && isMyTurn())
-                            }
-                            isHealer={isHealer(card)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              
-              {/* Normal cards */}
-              {players[1].hand.filter(card => !card.passiveAbility && !isHealer(card)).map((card) => {
-                const index = players[1].hand.indexOf(card);
-                let isValidTarget = false;
-                if (selectingJutsuTarget && selectedJutsu) {
-                  if (selectedJutsu.damage) {
-                    isValidTarget = (currentPlayerIndex === 0);
-                  }
-                  else if (selectedJutsu.effect) {
-                    const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                      selectedJutsu.effect.target === 'self' || 
-                      selectedJutsu.effect.target === 'ally' || 
-                      selectedJutsu.effect.target === 'all_allies';
-                    const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                      selectedJutsu.effect.target === 'all_opponents';
-                    
-                    if (isHealOrAlly && currentPlayerIndex === 1) isValidTarget = true;
-                    if (isOpponent && currentPlayerIndex === 0) isValidTarget = true;
-                  }
-                }
-                
-                const isSplashTarget = splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index);
-                
-                return (
-                  <div 
-                    key={index}
-                    className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                    onClick={() => handleCharacterClick(1, index)}
-                  >
-                    <CharacterCardComponent 
-                      card={card}
-                      onClick={() => {}}
-                      isSelectable={
-                        (selectingTarget && currentPlayerIndex === 1 && isMyTurn()) || 
-                        (selectingJutsuTarget && isValidTarget && isMyTurn()) ||
-                        (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget && isMyTurn())
-                      }
-                      isHealer={isHealer(card)}
-                    />
-                  </div>
-                );
-              })}
-            </div>
+          <div className="flex gap-1 h-full">
+            {/* Player 2 Booster Hand */}
+            <BoosterHandSection 
+              playerIndex={1}
+              boosterHands={boosterHands}
+              currentPlayerIndex={currentPlayerIndex}
+              selectingTarget={selectingTarget}
+              selectedBooster={selectedBooster}
+              newlyDrawnCard={newlyDrawnCard}
+              handleBoosterClick={handleBoosterClick}
+              setSelectedBooster={setSelectedBooster}
+              setSelectingTarget={setSelectingTarget}
+              isMyTurn={isMyTurn}
+            />
+            
+            {/* Player 2 Cards */}
+            <PlayerCardsSection 
+              playerIndex={1}
+              players={players}
+              currentPlayerIndex={currentPlayerIndex}
+              selectingTarget={selectingTarget}
+              selectingJutsuTarget={selectingJutsuTarget}
+              selectedJutsu={selectedJutsu}
+              splashTargets={splashTargets}
+              isHealer={isHealer}
+              handleCharacterClick={handleCharacterClick}
+              isMyTurn={isMyTurn}
+            />
           </div>
         </div>
       </div>
