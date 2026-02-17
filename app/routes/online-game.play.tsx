@@ -204,8 +204,23 @@ export default function OnlineGamePlay() {
             console.log('Setting gameStarted to:', state.game_started);
             setGameStarted(state.game_started);
           }
+          if (typeof state.show_number_guess === 'boolean') setShowNumberGuess(state.show_number_guess);
+          if (state.target_number !== undefined) setTargetNumber(state.target_number);
+          if (state.player1_guess !== undefined) setPlayer1Guess(state.player1_guess);
+          if (state.player2_guess !== undefined) setPlayer2Guess(state.player2_guess);
+          if (state.guessing_player_index !== undefined) setGuessingPlayerIndex(state.guessing_player_index);
+          if (typeof state.guess_timer === 'number') setGuessTimer(state.guess_timer);
           if (typeof state.jutsus_used_this_turn === 'number') setJutsusUsedThisTurn(state.jutsus_used_this_turn || 0);
           if (state.newly_drawn_card) setNewlyDrawnCard(state.newly_drawn_card);
+          if (state.selected_character !== undefined) setSelectedCharacter(state.selected_character);
+          if (state.selected_jutsu !== undefined) setSelectedJutsu(state.selected_jutsu);
+          if (state.selected_booster !== undefined) setSelectedBooster(state.selected_booster);
+          if (typeof state.selecting_target === 'boolean') setSelectingTarget(state.selecting_target);
+          if (typeof state.selecting_jutsu_target === 'boolean') setSelectingJutsuTarget(state.selecting_jutsu_target);
+          if (typeof state.is_selecting_splash_targets === 'boolean') setIsSelectingSplashTargets(state.is_selecting_splash_targets);
+          if (state.splash_targets) setSplashTargets(state.splash_targets);
+          if (state.double_attack_character !== undefined) setDoubleAttackCharacter(state.double_attack_character);
+          if (state.healed_card !== undefined) setHealedCard(state.healed_card);
           
           // Update session data for current player index
           const sessionResult = await getGameSession(sessionId);
@@ -248,6 +263,12 @@ export default function OnlineGamePlay() {
         pending_players: updates.pendingPlayers !== undefined ? updates.pendingPlayers : pendingPlayers,
         booster_hands: updates.boosterHands || boosterHands,
         game_started: updates.gameStarted !== undefined ? updates.gameStarted : gameStarted,
+        show_number_guess: updates.showNumberGuess !== undefined ? updates.showNumberGuess : showNumberGuess,
+        target_number: updates.targetNumber !== undefined ? updates.targetNumber : targetNumber,
+        player1_guess: updates.player1Guess !== undefined ? updates.player1Guess : player1Guess,
+        player2_guess: updates.player2Guess !== undefined ? updates.player2Guess : player2Guess,
+        guessing_player_index: updates.guessingPlayerIndex !== undefined ? updates.guessingPlayerIndex : guessingPlayerIndex,
+        guess_timer: updates.guessTimer !== undefined ? updates.guessTimer : guessTimer,
         jutsus_used_this_turn: updates.jutsusUsedThisTurn !== undefined ? updates.jutsusUsedThisTurn : jutsusUsedThisTurn,
         selected_character: updates.selectedCharacter !== undefined ? updates.selectedCharacter : selectedCharacter,
         selected_jutsu: updates.selectedJutsu !== undefined ? updates.selectedJutsu : selectedJutsu,
@@ -257,7 +278,8 @@ export default function OnlineGamePlay() {
         is_selecting_splash_targets: updates.isSelectingSplashTargets !== undefined ? updates.isSelectingSplashTargets : isSelectingSplashTargets,
         splash_targets: updates.splashTargets || splashTargets,
         newly_drawn_card: updates.newlyDrawnCard !== undefined ? updates.newlyDrawnCard : newlyDrawnCard,
-        double_attack_character: updates.doubleAttackCharacter !== undefined ? updates.doubleAttackCharacter : doubleAttackCharacter
+        double_attack_character: updates.doubleAttackCharacter !== undefined ? updates.doubleAttackCharacter : doubleAttackCharacter,
+        healed_card: updates.healedCard !== undefined ? updates.healedCard : healedCard
       });
     } catch (err) {
       console.error('Failed to save game state:', err);
