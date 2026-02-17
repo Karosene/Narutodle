@@ -196,7 +196,7 @@ export default function OnlineGamePlay() {
             players_length: state.players?.length
           });
           
-          // Update all state variables
+          // Update all state variables (except UI selection states which are player-specific)
           if (state.players) setPlayers(state.players);
           if (state.pending_players) setPendingPlayers(state.pending_players);
           if (state.booster_hands) setBoosterHands(state.booster_hands);
@@ -212,22 +212,32 @@ export default function OnlineGamePlay() {
           if (typeof state.guess_timer === 'number') setGuessTimer(state.guess_timer);
           if (typeof state.jutsus_used_this_turn === 'number') setJutsusUsedThisTurn(state.jutsus_used_this_turn || 0);
           if (state.newly_drawn_card) setNewlyDrawnCard(state.newly_drawn_card);
-          if (state.selected_character !== undefined) setSelectedCharacter(state.selected_character);
-          if (state.selected_jutsu !== undefined) setSelectedJutsu(state.selected_jutsu);
-          if (state.selected_booster !== undefined) setSelectedBooster(state.selected_booster);
-          if (typeof state.selecting_target === 'boolean') setSelectingTarget(state.selecting_target);
-          if (typeof state.selecting_jutsu_target === 'boolean') setSelectingJutsuTarget(state.selecting_jutsu_target);
-          if (typeof state.is_selecting_splash_targets === 'boolean') setIsSelectingSplashTargets(state.is_selecting_splash_targets);
-          if (state.splash_targets) setSplashTargets(state.splash_targets);
           if (state.double_attack_character !== undefined) setDoubleAttackCharacter(state.double_attack_character);
           if (state.healed_card !== undefined) setHealedCard(state.healed_card);
+          
+          // DO NOT sync UI selection states (selectedCharacter, selectedJutsu, etc.)
+          // These are player-specific and should not persist across turns
           
           // Update session data for current player index
           const sessionResult = await getGameSession(sessionId);
           if (sessionResult.success && sessionResult.session) {
             setSession(sessionResult.session);
             if (sessionResult.session.current_player_index !== undefined) {
-              setCurrentPlayerIndex(sessionResult.session.current_player_index as 0 | 1);
+              const newPlayerIndex = sessionResult.session.current_player_index as 0 | 1;
+              
+              // If turn changed, clear any local selection states
+              if (newPlayerIndex !== currentPlayerIndex) {
+                setSelectedCharacter(null);
+                setSelectedJutsu(null);
+                setSelectedBooster(null);
+                setSelectingTarget(false);
+                setSelectingJutsuTarget(false);
+                setIsSelectingSplashTargets(false);
+                setSplashTargets([]);
+                setShowJutsuSelector(false);
+              }
+              
+              setCurrentPlayerIndex(newPlayerIndex);
             }
           }
         }
@@ -270,13 +280,14 @@ export default function OnlineGamePlay() {
         guessing_player_index: updates.guessingPlayerIndex !== undefined ? updates.guessingPlayerIndex : guessingPlayerIndex,
         guess_timer: updates.guessTimer !== undefined ? updates.guessTimer : guessTimer,
         jutsus_used_this_turn: updates.jutsusUsedThisTurn !== undefined ? updates.jutsusUsedThisTurn : jutsusUsedThisTurn,
-        selected_character: updates.selectedCharacter !== undefined ? updates.selectedCharacter : selectedCharacter,
-        selected_jutsu: updates.selectedJutsu !== undefined ? updates.selectedJutsu : selectedJutsu,
-        selected_booster: updates.selectedBooster !== undefined ? updates.selectedBooster : selectedBooster,
-        selecting_target: updates.selectingTarget !== undefined ? updates.selectingTarget : selectingTarget,
-        selecting_jutsu_target: updates.selectingJutsuTarget !== undefined ? updates.selectingJutsuTarget : selectingJutsuTarget,
-        is_selecting_splash_targets: updates.isSelectingSplashTargets !== undefined ? updates.isSelectingSplashTargets : isSelectingSplashTargets,
-        splash_targets: updates.splashTargets || splashTargets,
+        // UI selection states - always save as null/false (not synced across players)
+        selected_character: null,
+        selected_jutsu: null,
+        selected_booster: null,
+        selecting_target: false,
+        selecting_jutsu_target: false,
+        is_selecting_splash_targets: false,
+        splash_targets: [],
         newly_drawn_card: updates.newlyDrawnCard !== undefined ? updates.newlyDrawnCard : newlyDrawnCard,
         double_attack_character: updates.doubleAttackCharacter !== undefined ? updates.doubleAttackCharacter : doubleAttackCharacter,
         healed_card: updates.healedCard !== undefined ? updates.healedCard : healedCard
@@ -608,6 +619,7 @@ export default function OnlineGamePlay() {
       });
     }
     
+    // Wait 1 second before updating state for opponent to see the move
     setTimeout(async () => {
       const nextPlayerHand = boosterHands[nextPlayer];
       if (nextPlayerHand.length < 5) {
@@ -636,7 +648,7 @@ export default function OnlineGamePlay() {
           doubleAttackCharacter: null
         });
       }
-    }, 100);
+    }, 1000);
   };
 
   const processStatusEffects = (newPlayers: [Player, Player]) => {
@@ -912,20 +924,12 @@ export default function OnlineGamePlay() {
     
     if (hasDoubleAttack && newJutsuCount === 1) {
       setDoubleAttackCharacter({playerIndex: selectedCharacter.playerIndex, cardIndex: selectedCharacter.cardIndex});
+      alert('Double Attack is active! You can use another jutsu from the same character.');
       
-      await saveCurrentState({
-        players: newPlayers,
-        jutsusUsedThisTurn: newJutsuCount,
-        doubleAttackCharacter: {playerIndex: selectedCharacter.playerIndex, cardIndex: selectedCharacter.cardIndex}
-      });
+      // Don't end turn, allow another jutsu
     } else {
+      // Turn ends after using jutsu
       setDoubleAttackCharacter(null);
-      
-      await saveCurrentState({
-        players: newPlayers,
-        jutsusUsedThisTurn: newJutsuCount
-      });
-      
       setTimeout(() => endTurn(), 500);
     }
   };
@@ -1028,27 +1032,16 @@ export default function OnlineGamePlay() {
       setSelectingJutsuTarget(false);
       setIsSelectingSplashTargets(false);
       setSplashTargets([]);
-      
-      await saveCurrentState({
-        players: newPlayers,
-        jutsusUsedThisTurn: newJutsuCount,
-        doubleAttackCharacter: {playerIndex: selectedCharacter.playerIndex, cardIndex: selectedCharacter.cardIndex}
-      });
     } else {
       setPlayers(newPlayers);
-      
-      await saveCurrentState({
-        players: newPlayers,
-        jutsusUsedThisTurn: newJutsuCount
-      });
-      
-      setTimeout(() => endTurn(), 100);
-      
       setSelectedCharacter(null);
       setSelectedJutsu(null);
       setSelectingJutsuTarget(false);
       setIsSelectingSplashTargets(false);
       setSplashTargets([]);
+      
+      // Turn ends automatically after jutsu
+      setTimeout(() => endTurn(), 500);
     }
   };
 
@@ -1273,20 +1266,15 @@ export default function OnlineGamePlay() {
     
     if (hasDoubleAttack && newJutsuCount === 1) {
       setDoubleAttackCharacter({playerIndex: selectedCharacter.playerIndex, cardIndex: selectedCharacter.cardIndex});
+      alert('Double Attack is active! You can use another jutsu from the same character.');
       
-      await saveCurrentState({
-        players: newPlayers,
-        jutsusUsedThisTurn: newJutsuCount,
-        doubleAttackCharacter: {playerIndex: selectedCharacter.playerIndex, cardIndex: selectedCharacter.cardIndex}
-      });
+      // Don't end turn yet, allow another jutsu
+      setPlayers(newPlayers);
     } else {
       setDoubleAttackCharacter(null);
+      setPlayers(newPlayers);
       
-      await saveCurrentState({
-        players: newPlayers,
-        jutsusUsedThisTurn: newJutsuCount
-      });
-      
+      // Turn ends automatically after jutsu
       setTimeout(() => endTurn(), 500);
     }
   };
