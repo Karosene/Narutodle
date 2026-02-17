@@ -34,6 +34,7 @@ export default function OnlineGamePlay() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const currentPlayerIndexRef = useRef<0 | 1>(0);
   
   // Game data
   const [allCharacters, setAllCharacters] = useState<Character[]>([]);
@@ -166,7 +167,9 @@ export default function OnlineGamePlay() {
         
         // Set current player from session
         if (sessionResult.session.current_player_index !== undefined) {
-          setCurrentPlayerIndex(sessionResult.session.current_player_index as 0 | 1);
+          const initialPlayerIndex = sessionResult.session.current_player_index as 0 | 1;
+          currentPlayerIndexRef.current = initialPlayerIndex;
+          setCurrentPlayerIndex(initialPlayerIndex);
         }
         
         setLoading(false);
@@ -226,7 +229,12 @@ export default function OnlineGamePlay() {
               const newPlayerIndex = sessionResult.session.current_player_index as 0 | 1;
               
               // If turn changed, clear any local selection states
-              if (newPlayerIndex !== currentPlayerIndex) {
+              // Use ref to avoid stale closure issues
+              if (newPlayerIndex !== currentPlayerIndexRef.current) {
+                console.log('Turn changed! Clearing selection states', {
+                  from: currentPlayerIndexRef.current,
+                  to: newPlayerIndex
+                });
                 setSelectedCharacter(null);
                 setSelectedJutsu(null);
                 setSelectedBooster(null);
@@ -237,6 +245,7 @@ export default function OnlineGamePlay() {
                 setShowJutsuSelector(false);
               }
               
+              currentPlayerIndexRef.current = newPlayerIndex;
               setCurrentPlayerIndex(newPlayerIndex);
             }
           }
@@ -412,6 +421,7 @@ export default function OnlineGamePlay() {
     
     // Set game state
     setPlayers(newPlayers);
+    currentPlayerIndexRef.current = startingPlayer;
     setCurrentPlayerIndex(startingPlayer);
     setGameStarted(true);
     
@@ -609,6 +619,7 @@ export default function OnlineGamePlay() {
     setDoubleAttackCharacter(null);
     
     const nextPlayer: 0 | 1 = currentPlayerIndex === 0 ? 1 : 0;
+    currentPlayerIndexRef.current = nextPlayer;
     setCurrentPlayerIndex(nextPlayer);
     setPlayers(newPlayers);
     
