@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { getCurrentUser, getUserProfile, updateUserProfile, logoutUser, type Profile } from '../utils/auth';
-import { getUserOnlineStats } from '../utils/onlineGame';
 import type { Route } from './+types/profile';
 
 export const meta: Route.MetaFunction = () => {
@@ -77,7 +76,6 @@ export default function Profile() {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [saving, setSaving] = useState(false);
   const [fileUploading, setFileUploading] = useState(false);
-  const [onlineStats, setOnlineStats] = useState({ gamesPlayed: 0, wins: 0, losses: 0 });
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -93,12 +91,6 @@ export default function Profile() {
         setDisplayName(userProfile.display_name);
         setFavoriteCharacter(userProfile.favorite_character || '');
         setSelectedAvatar(userProfile.profile_picture);
-      }
-
-      // Load online multiplayer stats
-      const statsResult = await getUserOnlineStats(user.id);
-      if (statsResult.success && statsResult.stats) {
-        setOnlineStats(statsResult.stats);
       }
 
       setLoading(false);
@@ -353,12 +345,12 @@ export default function Profile() {
 
           {/* Card Game Stats */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-blue-500 dark:text-blue-400 mb-4">🎴 Card Game (Local)</h3>
+            <h3 className="text-lg font-semibold text-blue-500 dark:text-blue-400 mb-4">🎴 Card Game (Online)</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-blue-200 dark:border-slate-700">
                 <div className="text-xs uppercase tracking-wide text-blue-600 dark:text-blue-400 font-semibold">Games Played</div>
                 <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
-                  {(profile as any)?.cardgame_games_played ?? 0}
+                  {((profile as any)?.cardgame_games_won ?? 0) + ((profile as any)?.cardgame_games_lost ?? 0)}
                 </div>
               </div>
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-green-200 dark:border-slate-700">
@@ -371,31 +363,6 @@ export default function Profile() {
                 <div className="text-xs uppercase tracking-wide text-red-600 dark:text-red-400 font-semibold">Losses</div>
                 <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
                   {(profile as any)?.cardgame_games_lost ?? 0}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Online Multiplayer Stats */}
-          <div>
-            <h3 className="text-lg font-semibold text-purple-500 dark:text-purple-400 mb-4">🌐 Online Multiplayer</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-purple-200 dark:border-slate-700">
-                <div className="text-xs uppercase tracking-wide text-purple-600 dark:text-purple-400 font-semibold">Games Played</div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
-                  {onlineStats.gamesPlayed}
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-green-200 dark:border-slate-700">
-                <div className="text-xs uppercase tracking-wide text-green-600 dark:text-green-400 font-semibold">Wins</div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
-                  {onlineStats.wins}
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-red-200 dark:border-slate-700">
-                <div className="text-xs uppercase tracking-wide text-red-600 dark:text-red-400 font-semibold">Losses</div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
-                  {onlineStats.losses}
                 </div>
               </div>
             </div>

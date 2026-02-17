@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { CharacterCardComponent } from '~/components/CharacterCard';
 import type { CharacterCard, AttributeBoosterCard, CharacterJutsuData, Jutsu, StatusEffect, PassiveAbility } from '~/types/tcg';
 import { boosterDeck } from '~/data/boosters';
-import { getCurrentUser, getUserProfile, type Profile } from '../utils/auth';
+import { getCurrentUser, getUserProfile, updateUserProfile, type Profile } from '../utils/auth';
 import { getGameSession, loadGameState, saveGameState, updateGameSession, type OnlineGameSession } from '../utils/onlineGame';
 
 interface Character {
@@ -64,13 +64,67 @@ interface PlayerHeaderProps {
   wins?: number;
   losses?: number;
   isLeftSide: boolean;
+  playerIndex: 0 | 1;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  isHovered: boolean;
 }
 
-function PlayerHeader({ username, profilePicture, level = 1, xp = 0, wins = 0, losses = 0, isLeftSide }: PlayerHeaderProps) {
+function PlayerHeader({ username, profilePicture, level = 1, xp = 0, wins = 0, losses = 0, isLeftSide, playerIndex, onMouseEnter, onMouseLeave, isHovered }: PlayerHeaderProps) {
   if (isLeftSide) {
     // Player 1 layout: Avatar → Username → Level → W/L
     return (
-      <div className="bg-slate-800 rounded-lg px-4 py-3 flex items-center justify-between h-fit">
+      <div 
+        className="bg-slate-800 rounded-lg px-4 py-3 flex items-center justify-between h-fit relative cursor-pointer transition-all hover:bg-slate-700"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
+        {isHovered && (
+          <div className="absolute top-full left-0 mt-2 bg-slate-900 border-2 border-purple-500 rounded-lg p-4 z-50 min-w-[320px] shadow-2xl">
+            <h4 className="text-white font-bold text-lg mb-3 border-b border-slate-700 pb-2">Player Statistics</h4>
+            <div className="space-y-2 text-sm mb-4">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Username:</span>
+                <span className="text-white font-semibold">{username}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Level:</span>
+                <span className="text-purple-400 font-semibold">{level}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Total XP:</span>
+                <span className="text-blue-400 font-semibold">{xp}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Win Rate:</span>
+                <span className="text-yellow-400 font-semibold">
+                  {wins + losses > 0 ? `${((wins / (wins + losses)) * 100).toFixed(1)}%` : '0%'}
+                </span>
+              </div>
+            </div>
+            
+            {/* Game Stats Boxes */}
+            <div className="space-y-2">
+              {/* Total Games - Big Box */}
+              <div className="bg-slate-800 border-2 border-blue-500 rounded-lg p-3 text-center">
+                <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Total Games</div>
+                <div className="text-white text-3xl font-bold">{wins + losses}</div>
+              </div>
+              
+              {/* Games Won and Lost - Side by Side */}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-slate-800 border-2 border-green-500 rounded-lg p-3 text-center">
+                  <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Won</div>
+                  <div className="text-green-400 text-2xl font-bold">{wins}</div>
+                </div>
+                <div className="bg-slate-800 border-2 border-red-500 rounded-lg p-3 text-center">
+                  <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Lost</div>
+                  <div className="text-red-400 text-2xl font-bold">{losses}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="flex items-center gap-3">
           {profilePicture ? (
             <img 
@@ -98,7 +152,57 @@ function PlayerHeader({ username, profilePicture, level = 1, xp = 0, wins = 0, l
   } else {
     // Player 2 layout: W/L → Level → Username → Avatar
     return (
-      <div className="bg-slate-800 rounded-lg px-4 py-3 flex items-center justify-between h-fit">
+      <div 
+        className="bg-slate-800 rounded-lg px-4 py-3 flex items-center justify-between h-fit relative cursor-pointer transition-all hover:bg-slate-700"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
+        {isHovered && (
+          <div className="absolute top-full right-0 mt-2 bg-slate-900 border-2 border-purple-500 rounded-lg p-4 z-50 min-w-[320px] shadow-2xl">
+            <h4 className="text-white font-bold text-lg mb-3 border-b border-slate-700 pb-2">Player Statistics</h4>
+            <div className="space-y-2 text-sm mb-4">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Username:</span>
+                <span className="text-white font-semibold">{username}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Level:</span>
+                <span className="text-purple-400 font-semibold">{level}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Total XP:</span>
+                <span className="text-blue-400 font-semibold">{xp}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Win Rate:</span>
+                <span className="text-yellow-400 font-semibold">
+                  {wins + losses > 0 ? `${((wins / (wins + losses)) * 100).toFixed(1)}%` : '0%'}
+                </span>
+              </div>
+            </div>
+            
+            {/* Game Stats Boxes */}
+            <div className="space-y-2">
+              {/* Total Games - Big Box */}
+              <div className="bg-slate-800 border-2 border-blue-500 rounded-lg p-3 text-center">
+                <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Total Games</div>
+                <div className="text-white text-3xl font-bold">{wins + losses}</div>
+              </div>
+              
+              {/* Games Won and Lost - Side by Side */}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-slate-800 border-2 border-green-500 rounded-lg p-3 text-center">
+                  <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Won</div>
+                  <div className="text-green-400 text-2xl font-bold">{wins}</div>
+                </div>
+                <div className="bg-slate-800 border-2 border-red-500 rounded-lg p-3 text-center">
+                  <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Lost</div>
+                  <div className="text-red-400 text-2xl font-bold">{losses}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="text-lg font-bold">
           <span className="text-green-400">{wins}W</span>
           <span className="text-slate-400"> / </span>
@@ -434,6 +538,7 @@ export default function OnlineGamePlay() {
   const [healedCard, setHealedCard] = useState<{playerIndex: 0 | 1, cardIndex: number} | null>(null);
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [hoveredPlayer, setHoveredPlayer] = useState<0 | 1 | null>(null);
 
   // Initialize game - load data and check session
   useEffect(() => {
@@ -1622,6 +1727,24 @@ export default function OnlineGamePlay() {
         alert(`🎉 ${newPlayers[1].name} wins! ${newPlayers[0].name} has no characters left!`);
         if (sessionId) {
           const winnerUserId = isHost ? session?.guest_user_id : session?.host_user_id;
+          const loserUserId = isHost ? session?.host_user_id : session?.guest_user_id;
+          
+          // Update winner stats
+          if (winnerUserId) {
+            const winnerProfile = await getUserProfile(winnerUserId);
+            await updateUserProfile(winnerUserId, {
+              cardgame_games_won: (winnerProfile?.cardgame_games_won || 0) + 1
+            });
+          }
+          
+          // Update loser stats
+          if (loserUserId) {
+            const loserProfile = await getUserProfile(loserUserId);
+            await updateUserProfile(loserUserId, {
+              cardgame_games_lost: (loserProfile?.cardgame_games_lost || 0) + 1
+            });
+          }
+          
           await updateGameSession(sessionId, {
             status: 'finished',
             winner_user_id: winnerUserId || ''
@@ -1636,6 +1759,24 @@ export default function OnlineGamePlay() {
         alert(`🎉 ${newPlayers[0].name} wins! ${newPlayers[1].name} has no characters left!`);
         if (sessionId) {
           const winnerUserId = isHost ? session?.host_user_id : session?.guest_user_id;
+          const loserUserId = isHost ? session?.guest_user_id : session?.host_user_id;
+          
+          // Update winner stats
+          if (winnerUserId) {
+            const winnerProfile = await getUserProfile(winnerUserId);
+            await updateUserProfile(winnerUserId, {
+              cardgame_games_won: (winnerProfile?.cardgame_games_won || 0) + 1
+            });
+          }
+          
+          // Update loser stats
+          if (loserUserId) {
+            const loserProfile = await getUserProfile(loserUserId);
+            await updateUserProfile(loserUserId, {
+              cardgame_games_lost: (loserProfile?.cardgame_games_lost || 0) + 1
+            });
+          }
+          
           await updateGameSession(sessionId, {
             status: 'finished',
             winner_user_id: winnerUserId || ''
@@ -1788,6 +1929,10 @@ export default function OnlineGamePlay() {
             wins={player1Profile?.cardgame_games_won}
             losses={player1Profile?.cardgame_games_lost}
             isLeftSide={true}
+            playerIndex={0}
+            onMouseEnter={() => setHoveredPlayer(0)}
+            onMouseLeave={() => setHoveredPlayer(null)}
+            isHovered={hoveredPlayer === 0}
           />
           
           <div className="flex gap-1 h-full">
@@ -1940,6 +2085,10 @@ export default function OnlineGamePlay() {
             wins={player2Profile?.cardgame_games_won}
             losses={player2Profile?.cardgame_games_lost}
             isLeftSide={false}
+            playerIndex={1}
+            onMouseEnter={() => setHoveredPlayer(1)}
+            onMouseLeave={() => setHoveredPlayer(null)}
+            isHovered={hoveredPlayer === 1}
           />
           
           <div className="flex gap-1 h-full">
