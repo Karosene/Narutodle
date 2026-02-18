@@ -484,6 +484,31 @@ function BoosterHandSection({
   );
 }
 
+interface GameHistorySectionProps {
+  history: string[];
+}
+
+function GameHistorySection({ history }: GameHistorySectionProps) {
+  return (
+    <div className="bg-slate-700/30 rounded-lg p-3 w-full h-fit">
+      <h4 className="text-sm font-bold text-white mb-2">📜 Game History</h4>
+      <div className="max-h-48 overflow-y-auto">
+        {history.length === 0 ? (
+          <p className="text-slate-400 text-xs italic py-2">No actions yet...</p>
+        ) : (
+          <div className="divide-y divide-slate-600">
+            {history.map((action, index) => (
+              <div key={index} className="py-2">
+                <p className="text-xs text-slate-200 leading-relaxed">{action}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function OnlineGamePlay() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -539,6 +564,7 @@ export default function OnlineGamePlay() {
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [hoveredPlayer, setHoveredPlayer] = useState<0 | 1 | null>(null);
+  const [gameHistory, setGameHistory] = useState<string[]>([]);
 
   // Initialize game - load data and check session
   useEffect(() => {
@@ -1158,7 +1184,8 @@ export default function OnlineGamePlay() {
               case 'poison':
               case 'burn':
               case 'bleed':
-                card.currentHealth = Math.max(0, card.currentHealth - (effect.value || 0));
+                const effectDamage = effect.value || 0;
+                card.currentHealth = Math.max(0, card.currentHealth - effectDamage);
                 break;
             }
             effect.duration--;
@@ -1396,14 +1423,17 @@ export default function OnlineGamePlay() {
       switch (selectedJutsu.effect.type) {
         case 'shield':
           caster.shieldRoundsLeft = selectedJutsu.effect.duration || 3;
+          addToHistory(`${caster.name} used ${selectedJutsu.name}`);
           break;
         case 'buff':
           caster.buffRoundsLeft = selectedJutsu.effect.duration || 3;
           caster.buffPowerIncrease = selectedJutsu.effect.value || 10;
+          addToHistory(`${caster.name} used ${selectedJutsu.name}`);
           break;
         case 'damage_suppress':
           caster.damageSuppressActive = true;
           caster.damageSuppressAmount = selectedJutsu.effect.value || 20;
+          addToHistory(`${caster.name} used ${selectedJutsu.name}`);
           break;
       }
     }
@@ -1548,6 +1578,8 @@ export default function OnlineGamePlay() {
     const caster = newPlayers[selectedCharacter.playerIndex].hand[selectedCharacter.cardIndex];
     const target = newPlayers[targetPlayerIndex].hand[targetCardIndex];
     
+    addToHistory(`${caster.name} used ${selectedJutsu.name} on ${target.name}`);
+    
     caster.currentChakra -= selectedJutsu.chakraCost;
     
     if (!caster.jutsuCooldowns) caster.jutsuCooldowns = {};
@@ -1649,8 +1681,9 @@ export default function OnlineGamePlay() {
           if (target.currentHealth >= targetMaxHealth) {
             alert(`${target.name} already has full health! Jutsu wasted.`);
           } else {
+            const healAmount = selectedJutsu.effect.value || 0;
             target.currentHealth = Math.min(
-              target.currentHealth + (selectedJutsu.effect.value || 0),
+              target.currentHealth + healAmount,
               targetMaxHealth
             );
           }
@@ -1686,7 +1719,8 @@ export default function OnlineGamePlay() {
           target.stunRoundsLeft = selectedJutsu.effect.duration || 2;
           break;
         case 'chakra_drain':
-          target.currentChakra = Math.max(0, target.currentChakra - (selectedJutsu.effect.value || 0));
+          const drainAmount = selectedJutsu.effect.value || 0;
+          target.currentChakra = Math.max(0, target.currentChakra - drainAmount);
           break;
       }
     }
@@ -1817,6 +1851,14 @@ export default function OnlineGamePlay() {
     if (isHost && currentPlayerIndex === 0) return true;
     if (!isHost && currentPlayerIndex === 1) return true;
     return false;
+  };
+
+  // Helper function to add action to history (keep last 5)
+  const addToHistory = (action: string) => {
+    setGameHistory(prev => {
+      const newHistory = [action, ...prev];
+      return newHistory.slice(0, 5); // Keep only last 5 actions
+    });
   };
 
   // Helper function to check if a card is a healer
@@ -2013,7 +2055,17 @@ export default function OnlineGamePlay() {
                 >
                   📖 Rules
                 </button>
-                
+              </div>
+              
+              {/* Divider */}
+              <hr className="border-slate-600 my-4" />
+              
+              {/* Game History */}
+              <div>
+                <GameHistorySection history={gameHistory} />
+              </div>
+              
+              <div>
                 {isSelectingSplashTargets && (
                   <>
                     <hr className="border-slate-600 my-3" />
