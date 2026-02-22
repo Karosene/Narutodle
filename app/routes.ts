@@ -11,6 +11,7 @@ export default [
 	route("online-game", "routes/online-game.tsx"),
 	route("online-game/play", "routes/online-game.play.tsx"),
 	route("rules", "routes/rules.tsx"),
+	route("friends", "routes/friends.tsx"),
 	route("login", "routes/login.tsx"),
 	route("profile", "routes/profile.tsx"),
 	route("robots.txt", "routes/robots.txt.ts"),

@@ -59,7 +59,7 @@ function LevelBadge({ level, xp, size = 72 }: { level: number | null; xp?: numbe
         <circle cx={size/2} cy={size/2} r={radius} stroke="#7c3aed" strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={dash} transform={`rotate(-90 ${size/2} ${size/2})`} />
       </svg>
       <div style={{ position: 'relative', top: -size, height: size }} className="flex items-center justify-center">
-        <div className="text-white font-semibold mr-0.5" style={{ fontSize: size * 0.35  }}>{level ?? '-'}</div>
+        <div className="text-white font-semibold" style={{ fontSize: size * 0.35  }}>{level ?? '-'}</div>
       </div>
     </div>
   );
@@ -68,6 +68,8 @@ function LevelBadge({ level, xp, size = 72 }: { level: number | null; xp?: numbe
 export default function Profile() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState('');
@@ -84,6 +86,7 @@ export default function Profile() {
         navigate('/login');
         return;
       }
+      setCurrentUser(user);
 
       const userProfile = await getUserProfile(user.id);
       if (userProfile) {
@@ -148,7 +151,7 @@ export default function Profile() {
   const avgGuesses = Number.isFinite(Number(avgGuessesRaw)) ? Number(avgGuessesRaw) : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-blue-900 to-slate-900 px-4 py-12 relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
@@ -210,19 +213,46 @@ export default function Profile() {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center">
-                  <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                      {profile.display_name}
-                    </h1>
-                    {profile.favorite_character && (
-                      <p className="text-slate-600 dark:text-slate-400">⭐ Favorite: {profile.favorite_character}</p>
-                    )}
+                <>
+                  <div className="flex items-center">
+                    <div>
+                      <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+                        {profile.display_name}
+                      </h1>
+                      {profile.favorite_character && (
+                        <p className="text-slate-600 dark:text-slate-400">⭐ Favorite: {profile.favorite_character}</p>
+                      )}
+                    </div>
+                    <div className="mr-auto ml-5">
+                      <LevelBadge level={(profile as any)?.level ?? null} xp={(profile as any)?.xp ?? null} size={70} />
+                    </div>
                   </div>
-                  <div className="mr-auto ml-5">
-                    <LevelBadge level={(profile as any)?.level ?? null} xp={(profile as any)?.xp ?? null} size={70} />
-                  </div>
-                </div>
+
+                  {/* Friend ID */}
+                  {currentUser && (
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(currentUser.username);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      title="Copy Friend ID"
+                      className="mt-3 inline-flex items-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-500 rounded-lg px-3 py-2 cursor-pointer transition-colors group">
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Friend ID</span>
+                      <span className="text-sm font-mono text-white select-all">{currentUser.username}</span>
+                      {copied ? (
+                        <svg className="w-4 h-4 text-green-400 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <rect x="9" y="9" width="13" height="13" rx="2" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                      )}
+                    </button>
+                  )}
+                </>
               )}
             </div>
 
@@ -328,13 +358,13 @@ export default function Profile() {
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-orange-500 dark:text-orange-400 mb-4">🍜 Narutodle</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-orange-200 dark:border-slate-700">
+              <div className="bg-linear-to-br from-orange-50 to-yellow-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-orange-200 dark:border-slate-700">
                 <div className="text-xs uppercase tracking-wide text-orange-600 dark:text-orange-400 font-semibold">Games Played</div>
                 <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
                   {(profile as any)?.narutodle_games_played ?? 0}
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-orange-200 dark:border-slate-700">
+              <div className="bg-linear-to-br from-orange-50 to-yellow-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-orange-200 dark:border-slate-700">
                 <div className="text-xs uppercase tracking-wide text-orange-600 dark:text-orange-400 font-semibold">Average Guesses</div>
                 <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
                   {avgGuesses.toFixed(1)}
@@ -347,19 +377,19 @@ export default function Profile() {
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-blue-500 dark:text-blue-400 mb-4">🎴 Card Game (Online)</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-blue-200 dark:border-slate-700">
+              <div className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-blue-200 dark:border-slate-700">
                 <div className="text-xs uppercase tracking-wide text-blue-600 dark:text-blue-400 font-semibold">Games Played</div>
                 <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
                   {((profile as any)?.cardgame_games_won ?? 0) + ((profile as any)?.cardgame_games_lost ?? 0)}
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-green-200 dark:border-slate-700">
+              <div className="bg-linear-to-br from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-green-200 dark:border-slate-700">
                 <div className="text-xs uppercase tracking-wide text-green-600 dark:text-green-400 font-semibold">Wins</div>
                 <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
                   {(profile as any)?.cardgame_games_won ?? 0}
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-red-200 dark:border-slate-700">
+              <div className="bg-linear-to-br from-red-50 to-rose-50 dark:from-slate-800 dark:to-slate-800/70 rounded-lg px-5 py-4 border border-red-200 dark:border-slate-700">
                 <div className="text-xs uppercase tracking-wide text-red-600 dark:text-red-400 font-semibold">Losses</div>
                 <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
                   {(profile as any)?.cardgame_games_lost ?? 0}

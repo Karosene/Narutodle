@@ -916,35 +916,32 @@ export default function PlayGame() {
     }
 
     // Update jutsus used this turn
-    setJutsusUsedThisTurn(prev => prev + 1);
-    
+    const newJutsuCount = jutsusUsedThisTurn + 1;
+    setJutsusUsedThisTurn(newJutsuCount);
+
     // Check if caster has double attack active
     const hasDoubleAttack = caster.doubleAttackRoundsLeft && caster.doubleAttackRoundsLeft > 0;
-    
-    if (hasDoubleAttack && jutsusUsedThisTurn === 0) {
+
+    if (hasDoubleAttack && newJutsuCount === 1) {
       setDoubleAttackCharacter({playerIndex: selectedCharacter.playerIndex, cardIndex: selectedCharacter.cardIndex});
       alert('Double Attack is active! You can use another jutsu from the same character.');
-    } else {
-      // Update players state first
       setPlayers(newPlayers);
-      
-      // End turn automatically after state update
-      setTimeout(() => endTurn(), 100);
-      
       setSelectedCharacter(null);
       setSelectedJutsu(null);
       setSelectingJutsuTarget(false);
       setIsSelectingSplashTargets(false);
       setSplashTargets([]);
+    } else {
+      // Update players state first and end turn
+      setPlayers(newPlayers);
+      setSelectedCharacter(null);
+      setSelectedJutsu(null);
+      setSelectingJutsuTarget(false);
+      setIsSelectingSplashTargets(false);
+      setSplashTargets([]);
+      setTimeout(() => endTurn(), 100);
       return;
     }
-    
-    setPlayers(newPlayers);
-    setSelectedCharacter(null);
-    setSelectedJutsu(null);
-    setSelectingJutsuTarget(false);
-    setIsSelectingSplashTargets(false);
-    setSplashTargets([]);
   };
 
   const useJutsuOnTarget = (targetPlayerIndex: 0 | 1, targetCardIndex: number) => {
@@ -1198,8 +1195,8 @@ export default function PlayGame() {
 
   if (showNumberGuess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-500">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+        <div className="bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-500">
           <div className="text-center mb-8">
             <div className="text-7xl mb-4">🎲</div>
             <h2 className="text-4xl font-bold text-white mb-2">Number Guessing Game</h2>
@@ -1208,7 +1205,7 @@ export default function PlayGame() {
           </div>
           
           {gameResult && (
-            <div className="mb-6 p-8 bg-gradient-to-br from-purple-600/30 to-blue-600/30 border-4 border-purple-500/50 rounded-2xl shadow-2xl">
+            <div className="mb-6 p-8 bg-linear-to-br from-purple-600/30 to-blue-600/30 border-4 border-purple-500/50 rounded-2xl shadow-2xl">
               <p className="text-purple-200 text-xl font-semibold text-center mb-3">The number was:</p>
               <p className="text-white text-8xl font-bold text-center mb-4">{targetNumber}</p>
               <p className="text-white text-center text-lg font-semibold">{gameResult}</p>
@@ -1247,7 +1244,7 @@ export default function PlayGame() {
             <button
               onClick={handleGuessSubmit}
               disabled={!player1Guess || !player2Guess}
-              className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold text-xl rounded-xl transition-all transform hover:scale-105 shadow-lg"
+              className="w-full px-8 py-4 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold text-xl rounded-xl transition-all transform hover:scale-105 shadow-lg"
             >
               Submit Guesses
             </button>
@@ -1259,7 +1256,7 @@ export default function PlayGame() {
 
   if (!gameStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-12 px-4 relative overflow-hidden">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-blue-900 to-slate-900 py-12 px-4 relative overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -1273,7 +1270,7 @@ export default function PlayGame() {
             <div className="inline-block mb-4">
               <div className="text-8xl mb-4 animate-bounce" style={{animationDuration: '2s'}}>🎴</div>
             </div>
-            <h1 className="text-7xl font-black mb-4 bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 bg-clip-text text-transparent">
+            <h1 className="text-7xl font-black mb-4 bg-linear-to-r from-orange-400 via-red-500 to-pink-500 bg-clip-text text-transparent">
               Naruto Card Game
             </h1>
             <p className="text-xl text-slate-300 font-medium">
@@ -1285,17 +1282,17 @@ export default function PlayGame() {
           <div className="mb-8 flex flex-col items-center gap-4">
             <button 
               onClick={startGame}
-              className="group relative px-12 py-6 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white font-bold text-2xl rounded-2xl transition-all transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-orange-500/50 border-4 border-white/20"
+              className="group relative px-12 py-6 bg-linear-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white font-bold text-2xl rounded-2xl transition-all transform hover:scale-110 hover:rotate-1 shadow-2xl hover:shadow-orange-500/50 border-4 border-white/20"
             >
               <span className="relative z-10">⚔️ Start Local Battle (2 Players)</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-600 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-yellow-400 to-orange-600 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity"></div>
             </button>
             
             <div className="text-center">
               <p className="text-slate-400 mb-2">Or play online with a friend</p>
               <Link
                 to="/online-game"
-                className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xl rounded-xl transition-all transform hover:scale-105 shadow-lg border-2 border-white/20"
+                className="inline-block px-8 py-4 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xl rounded-xl transition-all transform hover:scale-105 shadow-lg border-2 border-white/20"
               >
                 🌐 Play Online Multiplayer
               </Link>
@@ -1304,7 +1301,7 @@ export default function PlayGame() {
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {/* View Characters Card */}
-            <div className="group bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50 hover:border-blue-500/50 transition-all hover:scale-105 hover:shadow-blue-500/20">
+            <div className="group bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50 hover:border-blue-500/50 transition-all hover:scale-105 hover:shadow-blue-500/20">
               <div className="text-center">
                 <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">📖</div>
                 <h3 className="text-2xl font-bold mb-3 text-white">Character Gallery</h3>
@@ -1319,7 +1316,7 @@ export default function PlayGame() {
             </div>
 
             {/* Game Rules Card */}
-            <div className="group bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50 hover:border-purple-500/50 transition-all hover:scale-105 hover:shadow-purple-500/20">
+            <div className="group bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50 hover:border-purple-500/50 transition-all hover:scale-105 hover:shadow-purple-500/20">
               <div className="text-center">
                 <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">📜</div>
                 <h3 className="text-2xl font-bold mb-3 text-white">Game Rules</h3>
@@ -1337,62 +1334,62 @@ export default function PlayGame() {
           </div>
 
           {/* How to Play Section */}
-          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50">
-            <h3 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          <div className="bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50">
+            <h3 className="text-3xl font-bold mb-6 text-center bg-linear-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               ⚡ How to Play
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex items-start p-4 bg-slate-700/20 rounded-xl hover:bg-slate-700/30 transition-colors border border-slate-600/30">
-                <span className="mr-4 text-3xl flex-shrink-0">⚔️</span>
+                <span className="mr-4 text-3xl shrink-0">⚔️</span>
                 <div>
                   <h4 className="font-bold text-white mb-1">Card Selection</h4>
                   <p className="text-slate-300 text-sm">Each player gets 9 random character cards with unique abilities</p>
                 </div>
               </div>
               <div className="flex items-start p-4 bg-slate-700/20 rounded-xl hover:bg-slate-700/30 transition-colors border border-slate-600/30">
-                <span className="mr-4 text-3xl flex-shrink-0">🎲</span>
+                <span className="mr-4 text-3xl shrink-0">🎲</span>
                 <div>
                   <h4 className="font-bold text-white mb-1">Turn Order</h4>
                   <p className="text-slate-300 text-sm">Number guessing game determines who goes first</p>
                 </div>
               </div>
               <div className="flex items-start p-4 bg-slate-700/20 rounded-xl hover:bg-slate-700/30 transition-colors border border-slate-600/30">
-                <span className="mr-4 text-3xl flex-shrink-0">🎴</span>
+                <span className="mr-4 text-3xl shrink-0">🎴</span>
                 <div>
                   <h4 className="font-bold text-white mb-1">Turn Actions</h4>
                   <p className="text-slate-300 text-sm">Draw booster → Use/Skip → Use jutsu on opponent's card</p>
                 </div>
               </div>
               <div className="flex items-start p-4 bg-slate-700/20 rounded-xl hover:bg-slate-700/30 transition-colors border border-slate-600/30">
-                <span className="mr-4 text-3xl flex-shrink-0">⚡</span>
+                <span className="mr-4 text-3xl shrink-0">⚡</span>
                 <div>
                   <h4 className="font-bold text-white mb-1">Boosters</h4>
                   <p className="text-slate-300 text-sm">Power up with health, chakra, damage, or special abilities</p>
                 </div>
               </div>
               <div className="flex items-start p-4 bg-slate-700/20 rounded-xl hover:bg-slate-700/30 transition-colors border border-slate-600/30">
-                <span className="mr-4 text-3xl flex-shrink-0">🛡️</span>
+                <span className="mr-4 text-3xl shrink-0">🛡️</span>
                 <div>
                   <h4 className="font-bold text-white mb-1">Resistances</h4>
                   <p className="text-slate-300 text-sm">Characters have type resistances that reduce or negate damage</p>
                 </div>
               </div>
               <div className="flex items-start p-4 bg-slate-700/20 rounded-xl hover:bg-slate-700/30 transition-colors border border-slate-600/30">
-                <span className="mr-4 text-3xl flex-shrink-0">💙</span>
+                <span className="mr-4 text-3xl shrink-0">💙</span>
                 <div>
                   <h4 className="font-bold text-white mb-1">Chakra System</h4>
                   <p className="text-slate-300 text-sm">Chakra regenerates each turn for powerful jutsu attacks</p>
                 </div>
               </div>
               <div className="flex items-start p-4 bg-slate-700/20 rounded-xl hover:bg-slate-700/30 transition-colors border border-slate-600/30">
-                <span className="mr-4 text-3xl flex-shrink-0">🎯</span>
+                <span className="mr-4 text-3xl shrink-0">🎯</span>
                 <div>
                   <h4 className="font-bold text-white mb-1">Strategic Combat</h4>
                   <p className="text-slate-300 text-sm">Use type advantages and special jutsus tactically</p>
                 </div>
               </div>
               <div className="flex items-start p-4 bg-slate-700/20 rounded-xl hover:bg-slate-700/30 transition-colors border border-slate-600/30">
-                <span className="mr-4 text-3xl flex-shrink-0">🏆</span>
+                <span className="mr-4 text-3xl shrink-0">🏆</span>
                 <div>
                   <h4 className="font-bold text-white mb-1">Victory</h4>
                   <p className="text-slate-300 text-sm">Eliminate all opponent's cards to win the battle!</p>
@@ -2009,9 +2006,9 @@ export default function PlayGame() {
                 
                 {/* Divider between base and upgraded jutsus */}
                 <div className="flex items-center gap-3 my-4">
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-yellow-500 to-transparent"></div>
+                  <div className="flex-1 h-px bg-linear-to-r from-transparent via-yellow-500 to-transparent"></div>
                   <span className="text-xs font-semibold text-yellow-400 uppercase tracking-wider">Upgraded Jutsu</span>
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-yellow-500 to-transparent"></div>
+                  <div className="flex-1 h-px bg-linear-to-r from-transparent via-yellow-500 to-transparent"></div>
                 </div>
                 
                 {/* Upgraded Jutsu (always shown, but disabled if mastery not active) */}
@@ -2091,12 +2088,12 @@ export default function PlayGame() {
       {/* Rules Modal */}
       {showRulesModal && (
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 overflow-y-auto" onClick={() => setShowRulesModal(false)}>
-          <div className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-sm rounded-2xl shadow-2xl max-w-5xl w-full my-8 border border-slate-700/50 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-linear-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-sm rounded-2xl shadow-2xl max-w-5xl w-full my-8 border border-slate-700/50 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
-            <div className="sticky top-0 bg-gradient-to-br from-slate-800 to-slate-900 p-4 border-b border-slate-700/50 z-10">
+            <div className="sticky top-0 bg-linear-to-br from-slate-800 to-slate-900 p-4 border-b border-slate-700/50 z-10">
               <div className="text-center">
                 <div className="text-4xl mb-2">📜</div>
-                <h1 className="text-3xl font-black mb-1 bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-black mb-1 bg-linear-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
                   Game Rules
                 </h1>
                 <p className="text-sm text-slate-300 font-medium">
@@ -2309,7 +2306,7 @@ export default function PlayGame() {
                 <h2 className="text-3xl font-bold text-yellow-400 mb-6 flex items-center gap-3">
                   <span className="text-4xl">🏆</span> Victory Condition
                 </h2>
-                <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 p-6 rounded-lg border-2 border-yellow-500/50 text-slate-300">
+                <div className="bg-linear-to-r from-yellow-600/20 to-orange-600/20 p-6 rounded-lg border-2 border-yellow-500/50 text-slate-300">
                   <p className="text-2xl font-bold text-yellow-300 mb-3">Win by eliminating all opponent's characters!</p>
                   <p className="text-lg">Reduce all 9 of your opponent's character cards to 0 health to achieve victory.</p>
                 </div>
@@ -2322,7 +2319,7 @@ export default function PlayGame() {
       {/* Reset Confirmation Modal */}
       {showResetConfirm && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setShowResetConfirm(false)}>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-8 border-2 border-red-500" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-linear-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-8 border-2 border-red-500" onClick={(e) => e.stopPropagation()}>
             <div className="text-center mb-6">
               <div className="text-6xl mb-4">⚠️</div>
               <h2 className="text-2xl font-bold text-white mb-3">Reset Game?</h2>

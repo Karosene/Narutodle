@@ -9,6 +9,7 @@ import {
 } from "react-router";
 import { useState, useEffect } from "react";
 import { getCurrentUser, getUserProfile } from "./utils/auth";
+import { getFriendRows } from "./utils/friends";
 
 
 import type { Route } from "./+types/root";
@@ -53,9 +54,7 @@ import { Analytics } from "@vercel/analytics/react";
 
 const navLinks = [
   { to: "/characters", label: "Character Cards" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact" },
-  { to: "/privacy", label: "Privacy" },
+  { to: "/friends", label: "Friends" },
 ];
 
 const gameLinks = [
@@ -68,6 +67,7 @@ export default function App() {
   const [gamesOpen, setGamesOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [pendingCount, setPendingCount] = useState(0);
 
   const toggle = () => setOpen((v) => !v);
   const close = () => setOpen(false);
@@ -81,8 +81,12 @@ export default function App() {
       if (currentUser) {
         const profile = await getUserProfile(currentUser.id);
         setUserProfile(profile);
+        const rows = await getFriendRows(currentUser.id);
+        const incoming = rows.filter(r => r.status === 'pending' && r.to_user_id === currentUser.id);
+        setPendingCount(incoming.length);
       } else {
         setUserProfile(null);
+        setPendingCount(0);
       }
     };
     
@@ -161,7 +165,12 @@ export default function App() {
                   }`
                 }
               >
-                {label}
+                <span className="flex items-center gap-1.5">
+                  {label}
+                  {to === '/friends' && pendingCount > 0 && (
+                    <span className="bg-amber-400 text-slate-900 text-xs rounded-full px-1.5 py-0.5 leading-none font-bold min-w-[18px] text-center">{pendingCount}</span>
+                  )}
+                </span>
               </NavLink>
             ))}
           </nav>
@@ -244,7 +253,12 @@ export default function App() {
                   }`
                 }
               >
-                {label}
+                <span className="flex items-center gap-1.5">
+                  {label}
+                  {to === '/friends' && pendingCount > 0 && (
+                    <span className="bg-amber-400 text-slate-900 text-xs rounded-full px-1.5 py-0.5 leading-none font-bold min-w-[18px] text-center">{pendingCount}</span>
+                  )}
+                </span>
               </NavLink>
             ))}
             <NavLink
@@ -281,7 +295,11 @@ export default function App() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-700 dark:text-slate-300">
             <div className="font-semibold text-slate-900 dark:text-slate-100">Narutodle</div>
             <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
-              <span>Naruto character guessing game</span>
+              <nav className="flex flex-col sm:flex-row items-center gap-3 text-sm">
+                <NavLink to="/about" className="text-slate-700 dark:text-slate-200 hover:underline">About</NavLink>
+                <NavLink to="/contact" className="text-slate-700 dark:text-slate-200 hover:underline">Contact</NavLink>
+                <NavLink to="/privacy" className="text-slate-700 dark:text-slate-200 hover:underline">Privacy</NavLink>
+              </nav>
               <span className="hidden sm:inline">•</span>
               <span className="text-xs">© {new Date().getFullYear()} Fan-made project</span>
             </div>
