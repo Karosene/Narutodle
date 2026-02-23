@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+  import { useState, useEffect } from 'react';
 import { getCurrentUser, getUserProfile, type Profile } from '~/utils/auth';
 import {
   getFriendRows,
