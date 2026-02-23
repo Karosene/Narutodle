@@ -4,8 +4,15 @@ import bcrypt from 'bcryptjs';
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
-// Use service role client for admin operations
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+// Lazy-init: only create client when first needed so missing env vars don't crash the module
+let _supabaseAdmin: ReturnType<typeof createClient> | null = null;
+function getAdmin() {
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in environment variables.');
+  }
+  if (!_supabaseAdmin) _supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+  return _supabaseAdmin;
+}
 
 export interface AdminUser {
   id: number;
@@ -29,7 +36,7 @@ async function verifyPassword(password: string, hash: string): Promise<boolean> 
 // Admin login
 export async function adminLogin(email: string, password: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const { data: admin, error } = await supabaseAdmin
+    const { data: admin, error } = await getAdmin()
       .from('admin_settings_main')
       .select('*')
       .eq('setting_key', email)
@@ -56,7 +63,7 @@ export async function adminLogin(email: string, password: string): Promise<{ suc
 // Check if email is admin
 export async function isAdminEmail(email: string): Promise<boolean> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getAdmin()
       .from('admin_users_main')
       .select('id')
       .eq('email', email)
@@ -71,7 +78,7 @@ export async function isAdminEmail(email: string): Promise<boolean> {
 // Get all admin emails
 export async function getAllAdminEmails(): Promise<string[]> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getAdmin()
       .from('admin_users_main')
       .select('email')
       .order('email', { ascending: true });
@@ -98,7 +105,7 @@ export async function addAdminEmail(email: string, password: string, addedBy: st
     const passwordHash = await hashPassword(password);
 
     // Insert into admin_users_main
-    const { error: userError } = await supabaseAdmin
+    const { error: userError } = await getAdmin()
       .from('admin_users_main')
       .insert({
         email: email,
@@ -112,7 +119,7 @@ export async function addAdminEmail(email: string, password: string, addedBy: st
     }
 
     // Insert into admin_settings_main
-    const { error: settingsError } = await supabaseAdmin
+    const { error: settingsError } = await getAdmin()
       .from('admin_settings_main')
       .insert({
         setting_key: email,
@@ -123,7 +130,7 @@ export async function addAdminEmail(email: string, password: string, addedBy: st
     if (settingsError) {
       console.error('Error adding admin password:', settingsError);
       // Rollback: remove from admin_users_main
-      await supabaseAdmin.from('admin_users_main').delete().eq('email', email);
+      await getAdmin().from('admin_users_main').delete().eq('email', email);
       return { success: false, error: 'Failed to add admin password' };
     }
 
@@ -146,7 +153,7 @@ export async function removeAdminEmail(email: string): Promise<{ success: boolea
     }
 
     // Remove from admin_settings_main
-    const { error: settingsError } = await supabaseAdmin
+    const { error: settingsError } = await getAdmin()
       .from('admin_settings_main')
       .delete()
       .eq('setting_key', email);
@@ -157,7 +164,7 @@ export async function removeAdminEmail(email: string): Promise<{ success: boolea
     }
 
     // Remove from admin_users_main
-    const { error: userError } = await supabaseAdmin
+    const { error: userError } = await getAdmin()
       .from('admin_users_main')
       .delete()
       .eq('email', email);
@@ -179,7 +186,7 @@ export async function updateAdminPassword(email: string, newPassword: string): P
   try {
     const passwordHash = await hashPassword(newPassword);
 
-    const { error } = await supabaseAdmin
+    const { error } = await getAdmin()
       .from('admin_settings_main')
       .update({
         setting_value: passwordHash,
@@ -227,7 +234,7 @@ export interface UserWithProfile {
  */
 export async function getAllUsers(): Promise<UserWithProfile[]> {
   try {
-    const { data: users, error } = await supabaseAdmin
+    const { data: users, error } = await getAdmin()
       .from('users')
       .select('id, nick, email, created_at')
       .order('created_at', { ascending: false });
@@ -249,7 +256,7 @@ export async function getAllUsers(): Promise<UserWithProfile[]> {
  */
 export async function getUserDetails(userId: string): Promise<UserWithProfile | null> {
   try {
-    const { data: user, error: userError } = await supabaseAdmin
+    const { data: user, error: userError } = await getAdmin()
       .from('users')
       .select('id, nick, email, created_at')
       .eq('id', userId)
@@ -260,7 +267,7 @@ export async function getUserDetails(userId: string): Promise<UserWithProfile | 
       return null;
     }
 
-    const { data: profile, error: profileError } = await supabaseAdmin
+    const { data: profile, error: profileError } = await getAdmin()
       .from('profiles')
       .select('*')
       .eq('user_id', userId)
