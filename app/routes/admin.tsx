@@ -78,26 +78,31 @@ export async function action({ request }: Route.ActionArgs) {
 
 // Server-side loader to check session and get data
 export async function loader({ request }: Route.LoaderArgs) {
-  // Import server functions only in server context
-  const { getAllAdminEmails, getAllUsers } = await import('~/utils/admin.server');
-  
-  const cookieHeader = request.headers.get('Cookie');
-  const adminEmail = cookieHeader?.split(';').find(c => c.trim().startsWith('admin_session='))?.split('=')[1];
+  try {
+    const cookieHeader = request.headers.get('Cookie');
+    const adminEmail = cookieHeader?.split(';').find(c => c.trim().startsWith('admin_session='))?.split('=')[1];
 
-  if (!adminEmail) {
-    return { isLoggedIn: false, adminEmail: null, adminEmails: [], users: [] };
+    if (!adminEmail) {
+      return { isLoggedIn: false, adminEmail: null, adminEmails: [], users: [], loaderError: null };
+    }
+
+    // Import server functions only in server context
+    const { getAllAdminEmails, getAllUsers } = await import('~/utils/admin.server');
+
+    const [adminEmails, users] = await Promise.all([
+      getAllAdminEmails(),
+      getAllUsers()
+    ]);
+
+    return { isLoggedIn: true, adminEmail, adminEmails, users, loaderError: null };
+  } catch (err) {
+    console.error('Admin loader error:', err);
+    return { isLoggedIn: false, adminEmail: null, adminEmails: [], users: [], loaderError: String(err) };
   }
-
-  const [adminEmails, users] = await Promise.all([
-    getAllAdminEmails(),
-    getAllUsers()
-  ]);
-  
-  return { isLoggedIn: true, adminEmail, adminEmails, users };
 }
 
 export default function Admin() {
-  const { isLoggedIn, adminEmail, adminEmails, users } = useLoaderData<typeof loader>();
+  const { isLoggedIn, adminEmail, adminEmails, users, loaderError } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'admins' | 'users' | 'settings'>('admins');
@@ -117,6 +122,12 @@ export default function Admin() {
             <h1 className="text-3xl font-bold text-white mb-2">🔐 Admin Panel</h1>
             <p className="text-slate-400">Enter credentials to continue</p>
           </div>
+
+          {loaderError && (
+            <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm mb-4 break-all">
+              Server error: {loaderError}
+            </div>
+          )}
 
           <Form method="post" className="space-y-4" autoComplete="off">
             <input type="hidden" name="_action" value="login" />
