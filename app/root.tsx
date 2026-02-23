@@ -6,6 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
 import { useState, useEffect } from "react";
 import { getCurrentUser, getUserProfile } from "./utils/auth";
@@ -63,11 +64,13 @@ const gameLinks = [
 ];
 
 export default function App() {
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [gamesOpen, setGamesOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [pendingCount, setPendingCount] = useState(0);
+  const isAdminRoute = location.pathname === '/admin';
 
   const toggle = () => setOpen((v) => !v);
   const close = () => setOpen(false);
@@ -175,27 +178,34 @@ export default function App() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <NavLink
-              to={user ? "/profile" : "/login"}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-full transition hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
-              title={user ? "Profile" : "Login"}
-            >
-              {user && userProfile ? (
-                <img
-                  src={userProfile.profile_picture}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full object-cover border-2 border-orange-400"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/images/logo.png';
-                  }}
-                />
-              ) : (
+            {isAdminRoute ? (
+              <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-purple-600/20 border border-purple-500/50 text-purple-300">
                 <span className="text-xl">🔐</span>
-              )}
-              <span className="hidden md:inline text-sm font-semibold">
-                {user ? user.username || "Profile" : "Login"}
-              </span>
-            </NavLink>
+                <span className="hidden md:inline text-sm font-semibold">Admin Panel</span>
+              </div>
+            ) : (
+              <NavLink
+                to={user ? "/profile" : "/login"}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-full transition hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
+                title={user ? "Profile" : "Login"}
+              >
+                {user && userProfile ? (
+                  <img
+                    src={userProfile.profile_picture}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover border-2 border-orange-400"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/images/logo.png';
+                    }}
+                  />
+                ) : (
+                  <span className="text-xl">🔐</span>
+                )}
+                <span className="hidden md:inline text-sm font-semibold">
+                  {user ? user.username || "Profile" : "Login"}
+                </span>
+              </NavLink>
+            )}
             <button
               type="button"
               onClick={toggle}
@@ -261,27 +271,33 @@ export default function App() {
                 </span>
               </NavLink>
             ))}
-            <NavLink
-              to={user ? "/profile" : "/login"}
-              onClick={close}
-              className="block w-full px-3 py-2 rounded-lg border border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 font-semibold transition hover:bg-orange-100 dark:hover:bg-orange-900/50"
-            >
-              {user && userProfile ? (
-                <div className="flex items-center gap-2">
-                  <img
-                    src={userProfile.profile_picture}
-                    alt="Profile"
-                    className="w-6 h-6 rounded-full object-cover border-2 border-orange-500"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/logo.png';
-                    }}
-                  />
-                  <span>{user.username || 'Profile'}</span>
-                </div>
-              ) : (
-                <span>🔐 Login</span>
-              )}
-            </NavLink>
+            {isAdminRoute ? (
+              <div className="block w-full px-3 py-2 rounded-lg border border-purple-500/50 bg-purple-600/20 text-purple-300 font-semibold">
+                🔐 Admin Panel
+              </div>
+            ) : (
+              <NavLink
+                to={user ? "/profile" : "/login"}
+                onClick={close}
+                className="block w-full px-3 py-2 rounded-lg border border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 font-semibold transition hover:bg-orange-100 dark:hover:bg-orange-900/50"
+              >
+                {user && userProfile ? (
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={userProfile.profile_picture}
+                      alt="Profile"
+                      className="w-6 h-6 rounded-full object-cover border-2 border-orange-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/images/logo.png';
+                      }}
+                    />
+                    <span>{user.username || 'Profile'}</span>
+                  </div>
+                ) : (
+                  <span>🔐 Login</span>
+                )}
+              </NavLink>
+            )}
           </nav>
         </div>
       </header>

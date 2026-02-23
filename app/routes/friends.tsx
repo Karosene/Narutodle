@@ -126,17 +126,20 @@ export default function Friends() {
 
   if (!user) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-16 text-center">
-        <div className="text-5xl mb-4">👥</div>
-        <h1 className="text-2xl font-bold text-white mb-2">Friends</h1>
-        <p className="text-slate-400 mb-6">Sign in to connect with other players.</p>
-        <a href="/login" className="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl transition-colors">Sign In</a>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-10">
+        <div className="mx-auto max-w-5xl px-4 py-16 text-center">
+          <div className="text-5xl mb-4">👥</div>
+          <h1 className="text-2xl font-bold text-white mb-2">Friends</h1>
+          <p className="text-slate-400 mb-6">Sign in to connect with other players.</p>
+          <a href="/login" className="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl transition-colors">Sign In</a>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-10">
+      <div className="mx-auto max-w-5xl px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -542,6 +545,7 @@ export default function Friends() {
           </div>
         );
       })()}
+      </div>
     </div>
   );
 }

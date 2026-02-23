@@ -1414,11 +1414,11 @@ export default function PlayGame() {
 
   return (
     <div className="min-h-screen bg-slate-900 p-4">
-      <div className="h-[calc(100vh-2rem)] flex gap-3 justify-center items-start">
+      <div className="flex gap-3 justify-center items-start">
         {/* Player 1 Section - Left Side */}
         <div className="flex gap-3 h-full">
           {/* Player 1 Cards */}
-          <div className="bg-slate-800 rounded-lg p-3 h-auto flex-1 flex flex-col max-w-xl">
+          <div className="bg-slate-800 rounded-lg p-3 w-auto h-fit flex flex-col">
             <div className="grid grid-cols-3 gap-3">
               {/* Passive ability card Box */}
               {players[0].hand.filter(card => card.passiveAbility).slice(0, 1).length > 0 && (
@@ -1755,7 +1755,7 @@ export default function PlayGame() {
           </div>
           
           {/* Player 2 Hand */}
-          <div className="bg-slate-800 rounded-lg p-3 h-auto flex-1 flex flex-col max-w-xl">
+          <div className="bg-slate-800 rounded-lg p-3 w-auto h-fit flex flex-col">
             <div className="grid grid-cols-3 gap-3">
               {/* Healers Box */}
               {players[1].hand.filter(card => isHealer(card) && !card.passiveAbility).length > 0 && (
