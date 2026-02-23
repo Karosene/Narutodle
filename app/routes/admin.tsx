@@ -111,7 +111,7 @@ export default function Admin() {
   // Login Screen
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
         <div className="bg-slate-800/90 backdrop-blur-sm rounded-2xl p-8 w-full max-w-md border border-slate-700">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-white mb-2">🔐 Admin Panel</h1>
@@ -169,7 +169,7 @@ export default function Admin() {
 
   // Admin Dashboard
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -355,7 +355,7 @@ export default function Admin() {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold">
                           {user.nick.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1">
@@ -387,7 +387,7 @@ export default function Admin() {
                 <div className="space-y-6">
                   {/* User Header */}
                   <div className="flex items-center gap-4 pb-6 border-b border-slate-700">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-2xl font-bold">
+                    <div className="w-16 h-16 rounded-full bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-2xl font-bold">
                       {selectedUser.nick.charAt(0).toUpperCase()}
                     </div>
                     <div>

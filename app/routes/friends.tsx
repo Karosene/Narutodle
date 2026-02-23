@@ -126,7 +126,7 @@ export default function Friends() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-10">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-blue-900 to-slate-900 py-10">
         <div className="mx-auto max-w-5xl px-4 py-16 text-center">
           <div className="text-5xl mb-4">👥</div>
           <h1 className="text-2xl font-bold text-white mb-2">Friends</h1>
@@ -138,7 +138,7 @@ export default function Friends() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-10">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-blue-900 to-slate-900 py-10">
       <div className="mx-auto max-w-5xl px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
