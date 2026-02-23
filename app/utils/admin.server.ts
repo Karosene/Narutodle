@@ -5,7 +5,8 @@ const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 // Lazy-init: only create client when first needed so missing env vars don't crash the module
-let _supabaseAdmin: ReturnType<typeof createClient> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _supabaseAdmin: any = null;
 function getAdmin() {
   if (!supabaseUrl || !supabaseServiceKey) {
     throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in environment variables.');
@@ -87,7 +88,7 @@ export async function getAllAdminEmails(): Promise<string[]> {
       return [];
     }
 
-    return data.map(admin => admin.email);
+    return data.map((admin: any) => admin.email);
   } catch {
     return [];
   }
