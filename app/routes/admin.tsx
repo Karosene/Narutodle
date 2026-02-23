@@ -171,16 +171,21 @@ export default function Admin() {
           <p className="text-slate-400">Enter credentials to continue</p>
         </div>
         <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
+          {/* Hidden dummy inputs to trick browser autofill */}
+          <input type="text" style={{display:'none'}} aria-hidden="true" />
+          <input type="password" style={{display:'none'}} aria-hidden="true" />
           {loginError && <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">{loginError}</div>}
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">Email</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              autoComplete="off" readOnly onFocus={e => e.target.removeAttribute('readOnly')}
               className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
               placeholder="admin@example.com" required />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">Password</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              autoComplete="new-password" readOnly onFocus={e => e.target.removeAttribute('readOnly')}
               className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
               placeholder="" required />
           </div>
@@ -219,19 +224,23 @@ export default function Admin() {
           <div className="space-y-6">
             <div className="bg-slate-800/90 rounded-2xl p-6 border border-slate-700">
               <h2 className="text-xl font-bold text-white mb-4">Add New Admin</h2>
-              <form onSubmit={handleAddAdmin} className="space-y-4">
+              <form onSubmit={handleAddAdmin} className="space-y-4" autoComplete="off">
+                <input type="text" style={{display:'none'}} aria-hidden="true" />
+                <input type="password" style={{display:'none'}} aria-hidden="true" />
                 {addAdminError && <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">{addAdminError}</div>}
                 {addAdminSuccess && <div className="bg-green-500/20 border border-green-500 text-green-400 px-4 py-3 rounded-lg text-sm">{addAdminSuccess}</div>}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-slate-300 mb-2">Email</label>
                     <input type="email" value={newAdminEmail} onChange={e => setNewAdminEmail(e.target.value)}
+                      autoComplete="off" readOnly onFocus={e => e.target.removeAttribute('readOnly')}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
                       placeholder="newadmin@example.com" required />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-300 mb-2">Password</label>
                     <input type="password" value={newAdminPassword} onChange={e => setNewAdminPassword(e.target.value)}
+                      autoComplete="new-password" readOnly onFocus={e => e.target.removeAttribute('readOnly')}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
                       placeholder="Min. 8 characters" minLength={8} required />
                   </div>
