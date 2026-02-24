@@ -89,18 +89,18 @@ export default function OnlineGame() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-6xl font-black mb-4 bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 bg-clip-text text-transparent">
+          <h1 className="text-6xl font-black mb-4 bg-linear-to-r from-orange-400 via-red-500 to-pink-500 bg-clip-text text-transparent">
             Online Multiplayer
           </h1>
           <p className="text-slate-300 text-xl">Play with friends anywhere!</p>
@@ -108,7 +108,7 @@ export default function OnlineGame() {
 
         {/* Main Menu */}
         {view === 'menu' && (
-          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50">
+          <div className="bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Create Game */}
               <div className="bg-slate-700/30 p-6 rounded-xl border border-slate-600/50 hover:border-purple-500/50 transition-all">
@@ -120,7 +120,7 @@ export default function OnlineGame() {
                 <button
                   onClick={handleCreateGame}
                   disabled={loading}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition transform hover:scale-105"
+                  className="w-full px-6 py-3 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition transform hover:scale-105"
                 >
                   {loading ? 'Creating...' : 'Create Game'}
                 </button>
@@ -145,7 +145,7 @@ export default function OnlineGame() {
                   <button
                     onClick={handleJoinGame}
                     disabled={loading || !inputCode.trim()}
-                    className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition transform hover:scale-105"
+                    className="w-full px-6 py-3 bg-linear-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition transform hover:scale-105"
                   >
                     {loading ? 'Joining...' : 'Join Game'}
                   </button>
@@ -172,12 +172,12 @@ export default function OnlineGame() {
 
         {/* Waiting for Opponent */}
         {view === 'waiting' && session && (
-          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50">
+          <div className="bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-700/50">
             <div className="text-center">
               <div className="text-7xl mb-6 animate-bounce">⏳</div>
               <h2 className="text-3xl font-bold text-white mb-4">Waiting for Opponent...</h2>
               
-              <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 p-6 rounded-xl border-2 border-purple-500/50 mb-6">
+              <div className="bg-linear-to-r from-purple-600/20 to-blue-600/20 p-6 rounded-xl border-2 border-purple-500/50 mb-6">
                 <p className="text-slate-300 mb-4">Share this code with your friend:</p>
                 <div className="flex items-center justify-center gap-4">
                   <div className="bg-slate-800 px-8 py-4 rounded-lg border-2 border-purple-500">

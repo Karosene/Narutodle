@@ -2,6 +2,7 @@ import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { normalize } from "~/utils/normalize";
+import { getCurrentUser, getUserProfile, updateUserProfile } from "~/utils/auth";
 
 export function Welcome() {
   return (
@@ -123,6 +124,7 @@ export default function Site() {
   const [showAttributes, setShowAttributes] = useState(false);
   const [showHintCard, setShowHintCard] = useState(false);
   const mounted = useRef(false);
+  const [statsSaved, setStatsSaved] = useState(false);
 
   const TRIES_REQUIRED = 10;
   const CLUE_COUNT = 7;
@@ -220,9 +222,53 @@ export default function Site() {
       setRevealed(false);
       setShowHintCard(false);
       setFeedback(null);
+      setStatsSaved(false); // Reset stats saved flag for new game
     }
     mounted.current = true;
   }, [idx]);
+
+  // Update stats when game is completed
+  useEffect(() => {
+    const updateStats = async () => {
+      // Don't update if already saved or if game not completed
+      if (statsSaved) return;
+      
+      // Check if game is won (revealed) or lost (25 guesses or give up)
+      const isWon = revealed;
+      const isLost = showAttributes && !revealed && guesses.length > 0;
+      const isOutOfGuesses = guesses.length >= 25 && !revealed;
+      
+      if (!isWon && !isLost && !isOutOfGuesses) return;
+
+      const user = getCurrentUser();
+      if (!user) return;
+
+      try {
+        const profile = await getUserProfile(user.id);
+        if (!profile) return;
+
+        const currentGames = profile.narutodle_games_played ?? 0;
+        const currentAvg = profile.narutodle_avg_guesses ?? 0;
+        const currentGuesses = guesses.length;
+
+        // Calculate new average
+        const newTotalGuesses = (currentAvg * currentGames) + currentGuesses;
+        const newGamesPlayed = currentGames + 1;
+        const newAverage = newTotalGuesses / newGamesPlayed;
+
+        await updateUserProfile(user.id, {
+          narutodle_games_played: newGamesPlayed,
+          narutodle_avg_guesses: parseFloat(newAverage.toFixed(2))
+        });
+
+        setStatsSaved(true);
+      } catch (error) {
+        console.error('Failed to update stats:', error);
+      }
+    };
+
+    updateStats();
+  }, [revealed, showAttributes, guesses.length, statsSaved]);
 
   const current = useMemo(() => {
     if (!characters || idx === null) return null;
