@@ -231,39 +231,85 @@ export default function Site() {
   useEffect(() => {
     const updateStats = async () => {
       // Don't update if already saved or if game not completed
-      if (statsSaved) return;
+      if (statsSaved) {
+        console.log('[Narutodle] Stats already saved, skipping');
+        return;
+      }
       
       // Check if game is won (revealed) or lost (25 guesses or give up)
       const isWon = revealed;
       const isLost = showAttributes && !revealed && guesses.length > 0;
       const isOutOfGuesses = guesses.length >= 25 && !revealed;
       
-      if (!isWon && !isLost && !isOutOfGuesses) return;
+      console.log('[Narutodle] Game state:', { isWon, isLost, isOutOfGuesses, guessCount: guesses.length, revealed, showAttributes });
+      
+      if (!isWon && !isLost && !isOutOfGuesses) {
+        console.log('[Narutodle] Game not completed yet');
+        return;
+      }
 
       const user = getCurrentUser();
-      if (!user) return;
+      if (!user) {
+        console.log('[Narutodle] No user logged in, cannot save stats');
+        return;
+      }
+
+      console.log('[Narutodle] Saving stats for user:', user.id);
 
       try {
         const profile = await getUserProfile(user.id);
-        if (!profile) return;
+        if (!profile) {
+          console.error('[Narutodle] Profile not found');
+          return;
+        }
 
         const currentGames = profile.narutodle_games_played ?? 0;
         const currentAvg = profile.narutodle_avg_guesses ?? 0;
         const currentGuesses = guesses.length;
+        const currentXP = profile.xp ?? 0;
+
+        console.log('[Narutodle] Current stats:', { currentGames, currentAvg, currentGuesses, currentXP });
 
         // Calculate new average
         const newTotalGuesses = (currentAvg * currentGames) + currentGuesses;
         const newGamesPlayed = currentGames + 1;
         const newAverage = newTotalGuesses / newGamesPlayed;
 
-        await updateUserProfile(user.id, {
+        // Calculate XP award
+        let xpEarned = 0;
+        if (isWon) {
+          xpEarned = 5; // Base XP for winning
+          if (currentGuesses < 5) {
+            xpEarned += 5; // Bonus for guessing under 5 tries
+          }
+        }
+        const newXP = currentXP + xpEarned;
+
+        // Calculate level from XP
+        const levelFromXp = (value: number) => {
+          if (value <= 0) return 1;
+          const scaled = (2 * value) / 5;
+          return Math.max(1, Math.floor((1 + Math.sqrt(1 + 4 * scaled)) / 2));
+        };
+        const newLevel = levelFromXp(newXP);
+
+        console.log('[Narutodle] New stats:', { newGamesPlayed, newAverage, xpEarned, newXP, newLevel });
+
+        const result = await updateUserProfile(user.id, {
           narutodle_games_played: newGamesPlayed,
-          narutodle_avg_guesses: parseFloat(newAverage.toFixed(2))
+          narutodle_avg_guesses: parseFloat(newAverage.toFixed(2)),
+          xp: newXP,
+          level: newLevel
         });
 
-        setStatsSaved(true);
+        if (result.success) {
+          console.log('[Narutodle] Stats saved successfully!');
+          setStatsSaved(true);
+        } else {
+          console.error('[Narutodle] Failed to save stats:', result.error);
+        }
       } catch (error) {
-        console.error('Failed to update stats:', error);
+        console.error('[Narutodle] Error updating stats:', error);
       }
     };
 
