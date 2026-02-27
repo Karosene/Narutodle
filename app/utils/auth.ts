@@ -27,6 +27,7 @@ export interface Profile {
   cardgame_games_won?: number;
   cardgame_games_lost?: number;
   narutodle_games_played?: number;
+  narutodle_total_guesses?: number;
   narutodle_avg_guesses?: number;
 }
 

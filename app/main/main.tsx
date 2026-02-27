@@ -264,14 +264,14 @@ export default function Site() {
         }
 
         const currentGames = profile.narutodle_games_played ?? 0;
-        const currentAvg = profile.narutodle_avg_guesses ?? 0;
+        const currentTotalGuesses = profile.narutodle_total_guesses ?? 0;
         const currentGuesses = guesses.length;
         const currentXP = profile.xp ?? 0;
 
-        console.log('[Narutodle] Current stats:', { currentGames, currentAvg, currentGuesses, currentXP });
+        console.log('[Narutodle] Current stats:', { currentGames, currentTotalGuesses, currentGuesses, currentXP });
 
-        // Calculate new average
-        const newTotalGuesses = (currentAvg * currentGames) + currentGuesses;
+        // Calculate new totals using stored total from DB
+        const newTotalGuesses = currentTotalGuesses + currentGuesses;
         const newGamesPlayed = currentGames + 1;
         const newAverage = newTotalGuesses / newGamesPlayed;
 
@@ -297,6 +297,7 @@ export default function Site() {
 
         const result = await updateUserProfile(user.id, {
           narutodle_games_played: newGamesPlayed,
+          narutodle_total_guesses: newTotalGuesses,
           narutodle_avg_guesses: parseFloat(newAverage.toFixed(2)),
           xp: newXP,
           level: newLevel
