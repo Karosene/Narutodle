@@ -54,6 +54,7 @@ export default function PlayGame() {
   const [healedCard, setHealedCard] = useState<{playerIndex: 0 | 1, cardIndex: number} | null>(null);
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [guessAttempts, setGuessAttempts] = useState(0);
 
   useEffect(() => {
     Promise.all([
@@ -239,23 +240,50 @@ export default function PlayGame() {
     setGameResult('');
   };
 
-  const handleGuessSubmit = () => {
+  const handleGuessSubmit = async () => {
     const guess1 = parseInt(player1Guess);
     const guess2 = parseInt(player2Guess);
-    
+
     if (isNaN(guess1) || isNaN(guess2)) {
       alert('Both players must enter valid numbers!');
       return;
     }
-    
+
     if (guess1 < 0 || guess1 > 50 || guess2 < 0 || guess2 > 50) {
       alert('Guesses must be between 0 and 50!');
       return;
     }
-    
+
+    const newGuessAttempts = guessAttempts + 1;
+    setGuessAttempts(newGuessAttempts);
+
+    if (newGuessAttempts === 25) {
+      // Save data to the database
+      try {
+        await fetch('/api/save-game-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guessCount: 25,
+            gamesPlayed: 1,
+          }),
+        });
+        alert('Game over! Maximum attempts reached. Data saved.');
+      } catch (error) {
+        console.error('Failed to save game data:', error);
+        alert('Failed to save game data.');
+      }
+
+      // Reset the game
+      setShowNumberGuess(false);
+      setGameResult('');
+      setGuessAttempts(0);
+      return;
+    }
+
     const distance1 = Math.abs(targetNumber - guess1);
     const distance2 = Math.abs(targetNumber - guess2);
-    
+
     if (distance1 === distance2) {
       // Tie - generate new number and try again
       const newRandomNum = Math.floor(Math.random() * 51);
@@ -267,9 +295,9 @@ export default function PlayGame() {
       // Determine winner
       const winner: 0 | 1 = distance1 < distance2 ? 0 : 1;
       const winnerName = winner === 0 ? 'Player 1' : 'Player 2';
-      
+
       setGameResult(`🎯 ${winnerName} was closer and goes first!`);
-      
+
       // Start the game after showing result
       setTimeout(() => {
         if (pendingPlayers) {
@@ -277,18 +305,18 @@ export default function PlayGame() {
           setCurrentPlayerIndex(winner);
           setGameStarted(true);
           setShowNumberGuess(false);
-          
+
           // Auto-draw first booster card only for the player whose turn it is
           setTimeout(() => {
             const randomIndex = Math.floor(Math.random() * boosterDeck.length);
             const booster = boosterDeck[randomIndex];
-            
+
             const newHands: [AttributeBoosterCard[], AttributeBoosterCard[]] = [[], []];
             newHands[winner] = [booster];
             setBoosterHands(newHands);
-            
+
             // Show animation for the card
-            setNewlyDrawnCard({playerIndex: winner, cardIndex: 0});
+            setNewlyDrawnCard({ playerIndex: winner, cardIndex: 0 });
             setTimeout(() => setNewlyDrawnCard(null), 1500);
           }, 500);
         }
@@ -1412,6 +1440,9 @@ export default function PlayGame() {
     return charJutsu.jutsus.some(jutsu => jutsu.effect?.type === 'heal');
   };
 
+  // Helper function to determine if a card should be grayed out
+  const isCardGrayedOut = (playerIndex: 0 | 1): boolean => playerIndex !== currentPlayerIndex;
+
   return (
     <div className="min-h-screen bg-slate-900 p-4">
       <div className="flex gap-3 justify-center items-start">
@@ -1420,158 +1451,24 @@ export default function PlayGame() {
           {/* Player 1 Cards */}
           <div className="bg-slate-800 rounded-lg p-3 w-auto h-fit flex flex-col">
             <div className="grid grid-cols-3 gap-3">
-              {/* Passive ability card Box */}
-              {players[0].hand.filter(card => card.passiveAbility).slice(0, 1).length > 0 && (
-                <div className="border-2 border-blue-600 rounded-lg p-3 relative">
-                  <div className="absolute -top-3 left-2">
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-blue-600 text-white rounded-md">
-                      Passive ability cards
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-3">
-                    {players[0].hand.filter(card => card.passiveAbility).slice(0, 1).map((card) => {
-                      const index = players[0].hand.indexOf(card);
-                      let isValidTarget = false;
-                      if (selectingJutsuTarget && selectedJutsu) {
-                        if (selectedJutsu.damage) {
-                          isValidTarget = (currentPlayerIndex === 1);
-                        }
-                        else if (selectedJutsu.effect) {
-                          const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                            selectedJutsu.effect.target === 'self' || 
-                            selectedJutsu.effect.target === 'ally' || 
-                            selectedJutsu.effect.target === 'all_allies';
-                          const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                            selectedJutsu.effect.target === 'all_opponents';
-                          
-                          if (isHealOrAlly && currentPlayerIndex === 0) isValidTarget = true;
-                          if (isOpponent && currentPlayerIndex === 1) isValidTarget = true;
-                        }
-                      }
-                      const isSplashTarget = splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index);
-                      
-                      return (
-                        <div 
-                          key={index}
-                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                          onClick={() => handleCharacterClick(0, index)}
-                        >
-                          <CharacterCardComponent 
-                            card={card}
-                            onClick={() => {}}
-                            isSelectable={
-                              (selectingTarget && currentPlayerIndex === 0) || 
-                              (selectingJutsuTarget && isValidTarget) ||
-                              (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
-                            }
-                            isHealer={isHealer(card)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
+              {players[0].hand.map((card, index) => (
+                <div
+                  key={index}
+                  className={`w-auto cursor-pointer ${isCardGrayedOut(0) ? 'opacity-50' : ''}`}
+                  onClick={() => handleCharacterClick(0, index)}
+                >
+                  <CharacterCardComponent
+                    card={card}
+                    onClick={() => {}}
+                    isSelectable={
+                      (selectingTarget && currentPlayerIndex === 0) ||
+                      (selectingJutsuTarget && currentPlayerIndex === 0) ||
+                      (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
+                    }
+                    isHealer={isHealer(card)}
+                  />
                 </div>
-              )}
-              
-              {/* Healers Box */}
-              {players[0].hand.filter(card => isHealer(card) && !card.passiveAbility).length > 0 && (
-                <div className="col-span-2 border-2 border-green-600 rounded-lg p-3 relative">
-                  <div className="absolute -top-3 left-2">
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-green-600 text-white rounded-md">
-                      Healers
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {players[0].hand.filter(card => isHealer(card) && !card.passiveAbility).map((card) => {
-                      const index = players[0].hand.indexOf(card);
-                      let isValidTarget = false;
-                      if (selectingJutsuTarget && selectedJutsu) {
-                        if (selectedJutsu.damage) {
-                          isValidTarget = (currentPlayerIndex === 1);
-                        }
-                        else if (selectedJutsu.effect) {
-                          const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                            selectedJutsu.effect.target === 'self' || 
-                            selectedJutsu.effect.target === 'ally' || 
-                            selectedJutsu.effect.target === 'all_allies';
-                          const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                            selectedJutsu.effect.target === 'all_opponents';
-                          
-                          if (isHealOrAlly && currentPlayerIndex === 0) isValidTarget = true;
-                          if (isOpponent && currentPlayerIndex === 1) isValidTarget = true;
-                        }
-                      }
-                      const isSplashTarget = splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index);
-                      
-                      return (
-                        <div 
-                          key={index}
-                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                          onClick={() => handleCharacterClick(0, index)}
-                        >
-                          <CharacterCardComponent 
-                            card={card}
-                            onClick={() => {}}
-                            isSelectable={
-                              (selectingTarget && currentPlayerIndex === 0) || 
-                              (selectingJutsuTarget && isValidTarget) ||
-                              (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
-                            }
-                            isHealer={isHealer(card)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              
-              {/* Normal cards */}
-              {players[0].hand.filter(card => !card.passiveAbility && !isHealer(card)).map((card) => {
-                const index = players[0].hand.indexOf(card);
-                // Determine if this card is a valid target
-                let isValidTarget = false;
-                if (selectingJutsuTarget && selectedJutsu) {
-                  // Damage jutsus always target opponents (even if they have self-buff effects)
-                  if (selectedJutsu.damage) {
-                    isValidTarget = (currentPlayerIndex === 1);
-                  }
-                  // Effect-based targeting (only if no damage)
-                  else if (selectedJutsu.effect) {
-                    const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                      selectedJutsu.effect.target === 'self' || 
-                      selectedJutsu.effect.target === 'ally' || 
-                      selectedJutsu.effect.target === 'all_allies';
-                    const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                      selectedJutsu.effect.target === 'all_opponents';
-                    
-                    if (isHealOrAlly && currentPlayerIndex === 0) isValidTarget = true;
-                    if (isOpponent && currentPlayerIndex === 1) isValidTarget = true;
-                  }
-                }
-                
-                // Check if this card is a selected splash target
-                const isSplashTarget = splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index);
-                
-                return (
-                  <div 
-                    key={index}
-                    className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                    onClick={() => handleCharacterClick(0, index)}
-                  >
-                    <CharacterCardComponent 
-                      card={card}
-                      onClick={() => {}}
-                      isSelectable={
-                        (selectingTarget && currentPlayerIndex === 0) || 
-                        (selectingJutsuTarget && isValidTarget) ||
-                        (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
-                      }
-                      isHealer={isHealer(card)}
-                    />
-                  </div>
-                );
-              })}
+              ))}
             </div>
           </div>
           
@@ -1757,158 +1654,24 @@ export default function PlayGame() {
           {/* Player 2 Hand */}
           <div className="bg-slate-800 rounded-lg p-3 w-auto h-fit flex flex-col">
             <div className="grid grid-cols-3 gap-3">
-              {/* Healers Box */}
-              {players[1].hand.filter(card => isHealer(card) && !card.passiveAbility).length > 0 && (
-                <div className="col-span-2 border-2 border-green-600 rounded-lg p-3 relative">
-                  <div className="absolute -top-3 left-2">
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-green-600 text-white rounded-md">
-                      Healers
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {players[1].hand.filter(card => isHealer(card) && !card.passiveAbility).map((card) => {
-                      const index = players[1].hand.indexOf(card);
-                      let isValidTarget = false;
-                      if (selectingJutsuTarget && selectedJutsu) {
-                        if (selectedJutsu.damage) {
-                          isValidTarget = (currentPlayerIndex === 0);
-                        }
-                        else if (selectedJutsu.effect) {
-                          const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                            selectedJutsu.effect.target === 'self' || 
-                            selectedJutsu.effect.target === 'ally' || 
-                            selectedJutsu.effect.target === 'all_allies';
-                          const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                            selectedJutsu.effect.target === 'all_opponents';
-                          
-                          if (isHealOrAlly && currentPlayerIndex === 1) isValidTarget = true;
-                          if (isOpponent && currentPlayerIndex === 0) isValidTarget = true;
-                        }
-                      }
-                      const isSplashTarget = splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index);
-                      
-                      return (
-                        <div 
-                          key={index}
-                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                          onClick={() => handleCharacterClick(1, index)}
-                        >
-                          <CharacterCardComponent 
-                            card={card}
-                            onClick={() => {}}
-                            isSelectable={
-                              (selectingTarget && currentPlayerIndex === 1) || 
-                              (selectingJutsuTarget && isValidTarget) ||
-                              (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
-                            }
-                            isHealer={isHealer(card)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
+              {players[1].hand.map((card, index) => (
+                <div
+                  key={index}
+                  className={`w-auto cursor-pointer ${isCardGrayedOut(1) ? 'opacity-50' : ''}`}
+                  onClick={() => handleCharacterClick(1, index)}
+                >
+                  <CharacterCardComponent
+                    card={card}
+                    onClick={() => {}}
+                    isSelectable={
+                      (selectingTarget && currentPlayerIndex === 1) ||
+                      (selectingJutsuTarget && currentPlayerIndex === 1) ||
+                      (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
+                    }
+                    isHealer={isHealer(card)}
+                  />
                 </div>
-              )}
-              
-              {/* Passive ability card Box */}
-              {players[1].hand.filter(card => card.passiveAbility).slice(0, 1).length > 0 && (
-                <div className="border-2 border-blue-600 rounded-lg p-3 relative">
-                  <div className="absolute -top-3 left-2">
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-blue-600 text-white rounded-md">
-                      Passive ability cards
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-3">
-                    {players[1].hand.filter(card => card.passiveAbility).slice(0, 1).map((card) => {
-                      const index = players[1].hand.indexOf(card);
-                      let isValidTarget = false;
-                      if (selectingJutsuTarget && selectedJutsu) {
-                        if (selectedJutsu.damage) {
-                          isValidTarget = (currentPlayerIndex === 0);
-                        }
-                        else if (selectedJutsu.effect) {
-                          const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                            selectedJutsu.effect.target === 'self' || 
-                            selectedJutsu.effect.target === 'ally' || 
-                            selectedJutsu.effect.target === 'all_allies';
-                          const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                            selectedJutsu.effect.target === 'all_opponents';
-                          
-                          if (isHealOrAlly && currentPlayerIndex === 1) isValidTarget = true;
-                          if (isOpponent && currentPlayerIndex === 0) isValidTarget = true;
-                        }
-                      }
-                      const isSplashTarget = splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index);
-                      
-                      return (
-                        <div 
-                          key={index}
-                          className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                          onClick={() => handleCharacterClick(1, index)}
-                        >
-                          <CharacterCardComponent 
-                            card={card}
-                            onClick={() => {}}
-                            isSelectable={
-                              (selectingTarget && currentPlayerIndex === 1) || 
-                              (selectingJutsuTarget && isValidTarget) ||
-                              (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
-                            }
-                            isHealer={isHealer(card)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              
-              {/* Normal cards */}
-              {players[1].hand.filter(card => !card.passiveAbility && !isHealer(card)).map((card) => {
-                const index = players[1].hand.indexOf(card);
-                // Determine if this card is a valid target
-                let isValidTarget = false;
-                if (selectingJutsuTarget && selectedJutsu) {
-                  // Damage jutsus always target opponents (even if they have self-buff effects)
-                  if (selectedJutsu.damage) {
-                    isValidTarget = (currentPlayerIndex === 0);
-                  }
-                  // Effect-based targeting (only if no damage)
-                  else if (selectedJutsu.effect) {
-                    const isHealOrAlly = selectedJutsu.effect.type === 'heal' || 
-                      selectedJutsu.effect.target === 'self' || 
-                      selectedJutsu.effect.target === 'ally' || 
-                      selectedJutsu.effect.target === 'all_allies';
-                    const isOpponent = selectedJutsu.effect.target === 'opponent' || 
-                      selectedJutsu.effect.target === 'all_opponents';
-                    
-                    if (isHealOrAlly && currentPlayerIndex === 1) isValidTarget = true;
-                    if (isOpponent && currentPlayerIndex === 0) isValidTarget = true;
-                  }
-                }
-                
-                // Check if this card is a selected splash target
-                const isSplashTarget = splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index);
-                
-                return (
-                  <div 
-                    key={index}
-                    className={`w-auto cursor-pointer ${isSplashTarget ? 'ring-4 ring-yellow-400 rounded-lg' : ''}`}
-                    onClick={() => handleCharacterClick(1, index)}
-                  >
-                    <CharacterCardComponent 
-                      card={card}
-                      onClick={() => {}}
-                      isSelectable={
-                        (selectingTarget && currentPlayerIndex === 1) || 
-                        (selectingJutsuTarget && isValidTarget) ||
-                        (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
-                      }
-                      isHealer={isHealer(card)}
-                    />
-                  </div>
-                );
-              })}
+              ))}
             </div>
           </div>
         </div>

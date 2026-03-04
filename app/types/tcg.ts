@@ -89,6 +89,7 @@ export interface CharacterCard {
   doubleAttackRoundsLeft?: number;
   passiveAbility?: PassiveAbility;
   dodgeNextAttack?: boolean;
+  buffIncrease?: number; // Added the missing property to fix the error in play-game.tsx
 }
 
 export type BoosterType = 'health' | 'chakra' | 'jutsu_recovery' | 'jutsu_mastery' | 'damage_boost' | 'splash_damage' | 'double_attack';

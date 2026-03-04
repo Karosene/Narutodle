@@ -15,6 +15,7 @@ export default [
 	route("login", "routes/login.tsx"),
 	route("profile", "routes/profile.tsx"),
 	route("admin", "routes/admin.tsx"),
+	route("win-screen", "routes/win-screen.tsx"),
 	route("robots.txt", "routes/robots.txt.ts"),
 	route("sitemap.xml", "routes/sitemap.xml.ts"),
 ] satisfies RouteConfig;

@@ -230,19 +230,17 @@ export default function Site() {
   // Update stats when game is completed
   useEffect(() => {
     const updateStats = async () => {
-      // Don't update if already saved or if game not completed
       if (statsSaved) {
         console.log('[Narutodle] Stats already saved, skipping');
         return;
       }
-      
-      // Check if game is won (revealed) or lost (25 guesses or give up)
+
       const isWon = revealed;
       const isLost = showAttributes && !revealed && guesses.length > 0;
       const isOutOfGuesses = guesses.length >= 25 && !revealed;
-      
+
       console.log('[Narutodle] Game state:', { isWon, isLost, isOutOfGuesses, guessCount: guesses.length, revealed, showAttributes });
-      
+
       if (!isWon && !isLost && !isOutOfGuesses) {
         console.log('[Narutodle] Game not completed yet');
         return;
@@ -270,22 +268,19 @@ export default function Site() {
 
         console.log('[Narutodle] Current stats:', { currentGames, currentTotalGuesses, currentGuesses, currentXP });
 
-        // Calculate new totals using stored total from DB
-        const newTotalGuesses = currentTotalGuesses + currentGuesses;
+        const newTotalGuesses = currentTotalGuesses + (isOutOfGuesses ? 25 : currentGuesses);
         const newGamesPlayed = currentGames + 1;
         const newAverage = newTotalGuesses / newGamesPlayed;
 
-        // Calculate XP award
         let xpEarned = 0;
         if (isWon) {
-          xpEarned = 5; // Base XP for winning
+          xpEarned = 5;
           if (currentGuesses < 5) {
-            xpEarned += 5; // Bonus for guessing under 5 tries
+            xpEarned += 5;
           }
         }
         const newXP = currentXP + xpEarned;
 
-        // Calculate level from XP
         const levelFromXp = (value: number) => {
           if (value <= 0) return 1;
           const scaled = (2 * value) / 5;
@@ -314,8 +309,10 @@ export default function Site() {
       }
     };
 
-    updateStats();
-  }, [revealed, showAttributes, guesses.length, statsSaved]);
+    if (guesses.length >= 25 || revealed) {
+      updateStats();
+    }
+  }, [revealed, showAttributes, guesses]); // Updated logic to ensure the game ends at 25 guesses or when revealed
 
   const current = useMemo(() => {
     if (!characters || idx === null) return null;
@@ -481,7 +478,7 @@ export default function Site() {
 
     const { matches, ageComparison, arcComparison, rankComparison, heightComparison } = computeComparison(guessed, current);
     const tries = guesses.length + 1;
-    setGuesses((s) => [{ char: guessed, matches, ageComparison, arcComparison, rankComparison, heightComparison }, ...s].slice(0, 20));
+    setGuesses((s) => [{ char: guessed, matches, ageComparison, arcComparison, rankComparison, heightComparison }, ...s].slice(0, 25));
     setGuess("");
     setShowSuggestions(false);
     setShowHintCard(false);
@@ -509,7 +506,7 @@ export default function Site() {
 
 
   return (
-    <main className="flex items-start justify-center min-h-screen px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden overflow-y-auto md:overflow-visible bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative">
+    <main className="flex items-start justify-center min-h-screen px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden overflow-y-auto md:overflow-visible bg-linear-to-br from-slate-900 via-blue-900 to-slate">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -572,7 +569,7 @@ export default function Site() {
                         if (current) {
                           const { matches, ageComparison, arcComparison, rankComparison, heightComparison } = computeComparison(s, current);
                           const tries = guesses.length + 1;
-                          setGuesses((st) => [{ char: s, matches, ageComparison, arcComparison, rankComparison, heightComparison }, ...st].slice(0, 20));
+                          setGuesses((st) => [{ char: s, matches, ageComparison, arcComparison, rankComparison, heightComparison }, ...st].slice(0, 25));
                           if (matches.name) {
                             setRevealed(true);
                           }
@@ -594,7 +591,7 @@ export default function Site() {
               />
 
               {showSuggestions && suggestions.length > 0 ? (
-                <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-xl max-h-96 overflow-auto border border-white/20 dark:border-gray-700/50">
+                <div id="suggestions-list" role="listbox" className="absolute left-0 right-0 top-full mt-2 z-100 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-xl max-h-96 overflow-auto border border-white/20 dark:border-gray-700/50">
                   {suggestions.map((s, i) => (
                     <div
                       id={`suggestion-${i}`}
@@ -832,8 +829,8 @@ export default function Site() {
                     <div className={`px-2 rounded-md text-center flex items-center justify-center h-20 ${matches.rank ? 'bg-emerald-500 text-white shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                       <div className="flex items-center justify-center gap-1">
                         <span>{char.rank ?? '—'}</span>
-                        {rankComparison === 'higher' && <span className="text-lg" title="Target has higher rank">↑</span>}
-                        {rankComparison === 'lower' && <span className="text-lg" title="Target has lower rank">↓</span>}
+                        {rankComparison === 'higher' && <span className="text-base">↑</span>}
+                        {rankComparison === 'lower' && <span className="text-base">↓</span>}
                       </div>
                     </div>
 
@@ -845,8 +842,8 @@ export default function Site() {
                       <div className="flex items-center justify-center gap-1">
                         <span>{char.firstAppearance ?? '—'}</span>
                         {(typeof arcComparison !== 'undefined' && arcComparison !== null) ? (
-                          arcComparison === 'later' ? <span className="text-lg" title="Target appears later than guessed">↑</span>
-                          : arcComparison === 'earlier' ? <span className="text-lg" title="Target appears earlier than guessed">↓</span>
+                          arcComparison === 'later' ? <span className="text-base">↑</span>
+                          : arcComparison === 'earlier' ? <span className="text-base">↓</span>
                           : null
                         ) : null}
                       </div>

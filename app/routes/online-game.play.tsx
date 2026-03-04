@@ -258,7 +258,7 @@ function PlayerCardsSection({
   const player = players[playerIndex];
   
   return (
-    <div className="bg-slate-800 rounded-lg px-3 pt-3 pb-0 h-fit flex-1 flex flex-col w-full max-w-2xl">
+    <div className="bg-slate-800 rounded-lg px-3 pt-3 pb-4 h-fit flex-1 flex flex-col w-full max-w-2xl">
       <div className="grid grid-cols-3 gap-3">
         {/* Passive ability card Box */}
         {player.hand.filter(card => card.passiveAbility).slice(0, 1).length > 0 && (
@@ -524,6 +524,9 @@ export default function OnlineGamePlay() {
   const [player2Profile, setPlayer2Profile] = useState<Profile | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentPlayerIndexRef = useRef<0 | 1>(0);
+  const playersRef = useRef<[Player, Player]>([{ name: 'Player 1', hand: [] }, { name: 'Player 2', hand: [] }]);
+  const currentUserIdRef = useRef<string>('');
+  const winnerAlreadyShownRef = useRef(false);
   
   // Game data
   const [allCharacters, setAllCharacters] = useState<Character[]>([]);
@@ -565,6 +568,10 @@ export default function OnlineGamePlay() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [hoveredPlayer, setHoveredPlayer] = useState<0 | 1 | null>(null);
   const [gameHistory, setGameHistory] = useState<string[]>([]);
+  const [winner, setWinner] = useState<{ name: string; loserName: string; isMe: boolean } | null>(null);
+
+  // Keep playersRef in sync with players state
+  useEffect(() => { playersRef.current = players; }, [players]);
 
   // Initialize game - load data and check session
   useEffect(() => {
@@ -613,6 +620,7 @@ export default function OnlineGamePlay() {
       }
       
       setIsHost(userIsHost);
+      currentUserIdRef.current = currentUser.id;
 
       // Load game data
       try {
@@ -747,6 +755,22 @@ export default function OnlineGamePlay() {
               
               currentPlayerIndexRef.current = newPlayerIndex;
               setCurrentPlayerIndex(newPlayerIndex);
+            }
+
+            // Detect game over for the loser (winner already has their screen from local logic)
+            if (
+              sessionResult.session.status === 'finished' &&
+              sessionResult.session.winner_user_id &&
+              !winnerAlreadyShownRef.current
+            ) {
+              winnerAlreadyShownRef.current = true;
+              const winnerUserId = sessionResult.session.winner_user_id;
+              const isMeWinner = winnerUserId === currentUserIdRef.current;
+              const winnerIdx = winnerUserId === sessionResult.session.host_user_id ? 0 : 1;
+              const loserIdx: 0 | 1 = winnerIdx === 0 ? 1 : 0;
+              const winnerName = playersRef.current[winnerIdx]?.name || 'Opponent';
+              const loserName = playersRef.current[loserIdx]?.name || 'You';
+              setTimeout(() => setWinner({ name: winnerName, loserName, isMe: isMeWinner }), 1000);
             }
           }
         }
@@ -1121,7 +1145,7 @@ export default function OnlineGamePlay() {
     setSplashTargets([]);
     setShowPassiveTab(false);
 
-    const newPlayers: [Player, Player] = [...players] as [Player, Player];
+    const newPlayers: [Player, Player] = [{ ...playersRef.current[0], hand: [...playersRef.current[0].hand] }, { ...playersRef.current[1], hand: [...playersRef.current[1].hand] }] as [Player, Player];
     regenerateChakra(newPlayers);
     processStatusEffects(newPlayers);
     decrementCooldowns(newPlayers);
@@ -1451,8 +1475,8 @@ export default function OnlineGamePlay() {
     if (hasDoubleAttack && newJutsuCount === 1) {
       const dac = {playerIndex: selectedCharacter.playerIndex, cardIndex: selectedCharacter.cardIndex};
       setDoubleAttackCharacter(dac);
-      // Persist this state for online clients
-      await saveCurrentState({ players: newPlayers, jutsusUsedThisTurn: newJutsuCount, doubleAttackCharacter: dac, newlyDrawnCard });
+      // Persist this state so both players see the allowance
+      await saveCurrentState({ players: newPlayers, jutsusUsedThisTurn: newJutsuCount, doubleAttackCharacter: dac });
       alert('Double Attack is active! You can use another jutsu from the same character.');
       // Don't end turn, allow another jutsu
     } else {
@@ -1554,23 +1578,14 @@ export default function OnlineGamePlay() {
     if (hasDoubleAttack && newJutsuCount === 1) {
       const dac = {playerIndex: selectedCharacter.playerIndex, cardIndex: selectedCharacter.cardIndex};
       setDoubleAttackCharacter(dac);
-      setPlayers(newPlayers);
-      setSelectedCharacter(null);
-      setSelectedJutsu(null);
-      setSelectingJutsuTarget(false);
-      setIsSelectingSplashTargets(false);
-      setSplashTargets([]);
+      // Persist this state so both players see the allowance
       await saveCurrentState({ players: newPlayers, jutsusUsedThisTurn: newJutsuCount, doubleAttackCharacter: dac });
       alert('Double Attack is active! You can use another jutsu from the same character.');
+      // Don't end turn, allow another jutsu
     } else {
-      setPlayers(newPlayers);
-      setSelectedCharacter(null);
-      setSelectedJutsu(null);
-      setSelectingJutsuTarget(false);
-      setIsSelectingSplashTargets(false);
-      setSplashTargets([]);
+      // Turn ends after using jutsu
+      setDoubleAttackCharacter(null);
       await saveCurrentState({ players: newPlayers, jutsusUsedThisTurn: newJutsuCount, doubleAttackCharacter: null });
-      // Turn ends automatically after jutsu
       setTimeout(() => endTurn(), 500);
     }
   };
@@ -1760,67 +1775,75 @@ export default function OnlineGamePlay() {
     const player0Alive = newPlayers[0].hand.filter(card => card.currentHealth > 0).length;
     const player1Alive = newPlayers[1].hand.filter(card => card.currentHealth > 0).length;
     
+    const levelFromXp = (value: number) => {
+      if (value <= 0) return 1;
+      const scaled = (2 * value) / 5;
+      return Math.max(1, Math.floor((1 + Math.sqrt(1 + 4 * scaled)) / 2));
+    };
+
     if (player0Alive === 0) {
       setTimeout(async () => {
-        alert(`🎉 ${newPlayers[1].name} wins! ${newPlayers[0].name} has no characters left!`);
         if (sessionId) {
           const winnerUserId = isHost ? session?.guest_user_id : session?.host_user_id;
           const loserUserId = isHost ? session?.host_user_id : session?.guest_user_id;
-          
-          // Update winner stats
           if (winnerUserId) {
             const winnerProfile = await getUserProfile(winnerUserId);
+            const newWinXP = (winnerProfile?.xp ?? 0) + 15;
             await updateUserProfile(winnerUserId, {
-              cardgame_games_won: (winnerProfile?.cardgame_games_won || 0) + 1
+              cardgame_games_won: (winnerProfile?.cardgame_games_won || 0) + 1,
+              xp: newWinXP,
+              level: levelFromXp(newWinXP)
             });
           }
-          
-          // Update loser stats
           if (loserUserId) {
             const loserProfile = await getUserProfile(loserUserId);
+            const newLoseXP = (loserProfile?.xp ?? 0) + 8;
             await updateUserProfile(loserUserId, {
-              cardgame_games_lost: (loserProfile?.cardgame_games_lost || 0) + 1
+              cardgame_games_lost: (loserProfile?.cardgame_games_lost || 0) + 1,
+              xp: newLoseXP,
+              level: levelFromXp(newLoseXP)
             });
           }
-          
-          await updateGameSession(sessionId, {
-            status: 'finished',
-            winner_user_id: winnerUserId || ''
-          });
+          await updateGameSession(sessionId, { status: 'finished', winner_user_id: winnerUserId || '' });
         }
-        navigate('/online-game');
+        const winnerName = newPlayers[1].name;
+        const loserName = newPlayers[0].name;
+        const isMeWinner = !isHost;
+        winnerAlreadyShownRef.current = true;
+        setWinner({ name: winnerName, loserName, isMe: isMeWinner });
       }, 500);
       return;
     }
     if (player1Alive === 0) {
       setTimeout(async () => {
-        alert(`🎉 ${newPlayers[0].name} wins! ${newPlayers[1].name} has no characters left!`);
         if (sessionId) {
           const winnerUserId = isHost ? session?.host_user_id : session?.guest_user_id;
           const loserUserId = isHost ? session?.guest_user_id : session?.host_user_id;
-          
-          // Update winner stats
           if (winnerUserId) {
             const winnerProfile = await getUserProfile(winnerUserId);
+            const newWinXP = (winnerProfile?.xp ?? 0) + 15;
             await updateUserProfile(winnerUserId, {
-              cardgame_games_won: (winnerProfile?.cardgame_games_won || 0) + 1
+              cardgame_games_won: (winnerProfile?.cardgame_games_won || 0) + 1,
+              xp: newWinXP,
+              level: levelFromXp(newWinXP)
             });
           }
-          
-          // Update loser stats
           if (loserUserId) {
             const loserProfile = await getUserProfile(loserUserId);
+            const newLoseXP = (loserProfile?.xp ?? 0) + 8;
             await updateUserProfile(loserUserId, {
-              cardgame_games_lost: (loserProfile?.cardgame_games_lost || 0) + 1
+              cardgame_games_lost: (loserProfile?.cardgame_games_lost || 0) + 1,
+              xp: newLoseXP,
+              level: levelFromXp(newLoseXP)
             });
           }
-          
-          await updateGameSession(sessionId, {
-            status: 'finished',
-            winner_user_id: winnerUserId || ''
-          });
+          await updateGameSession(sessionId, { status: 'finished', winner_user_id: winnerUserId || '' });
         }
-        navigate('/online-game');
+        const winnerName = newPlayers[0].name;
+        const loserName = newPlayers[1].name;
+        const isMeWinner = isHost;
+        winnerAlreadyShownRef.current = true;
+        setWinner({ name: winnerName, loserName, isMe: isMeWinner });
       }, 500);
       return;
     }
@@ -1873,6 +1896,17 @@ export default function OnlineGamePlay() {
     if (!charJutsu) return false;
     return charJutsu.jutsus.some(jutsu => jutsu.effect?.type === 'heal');
   };
+
+  const [isPlayerTurn, setIsPlayerTurn] = useState(false); // State to track if it's the player's turn
+
+  useEffect(() => {
+    // Simulate turn change for demonstration purposes
+    const interval = setInterval(() => {
+      setIsPlayerTurn((prev) => !prev);
+    }, 5000); // Change turn every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return (
@@ -1958,6 +1992,96 @@ export default function OnlineGamePlay() {
     );
   }
 
+  // Win/Loss overlay
+  if (winner) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center relative overflow-hidden">
+        {/* Animated background particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {winner.isMe && (
+            <>
+              <div className="absolute top-10 left-1/4 w-3 h-3 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+              <div className="absolute top-20 left-1/3 w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+              <div className="absolute top-16 right-1/4 w-4 h-4 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+              <div className="absolute top-8 right-1/3 w-2 h-2 bg-yellow-300 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+              <div className="absolute top-32 left-1/5 w-3 h-3 bg-orange-300 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+              <div className="absolute top-24 right-1/5 w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }} />
+            </>
+          )}
+        </div>
+
+        <div className="text-center z-10 px-8">
+          {winner.isMe ? (
+            <>
+              {/* WIN SCREEN */}
+              <div className="mb-6 text-9xl animate-bounce">🏆</div>
+              <h1 className="text-8xl font-black mb-4 bg-linear-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent drop-shadow-lg">
+                VICTORY!
+              </h1>
+              <p className="text-2xl text-yellow-300 font-semibold mb-2">
+                🎉 <span className="text-white">{winner.name}</span> wins the battle!
+              </p>
+              <p className="text-slate-400 text-lg mb-10">All enemy shinobi have been defeated.</p>
+
+              <div className="flex gap-3 flex-col items-center">
+                <div className="flex gap-3">
+                  <div className="bg-yellow-500/20 border border-yellow-500 rounded-xl px-6 py-3 text-center">
+                    <div className="text-yellow-400 text-2xl font-bold">+1</div>
+                    <div className="text-slate-300 text-sm">Win</div>
+                  </div>
+                  <div className="bg-purple-500/20 border border-purple-500 rounded-xl px-6 py-3 text-center">
+                    <div className="text-purple-400 text-2xl font-bold">+15 XP</div>
+                    <div className="text-slate-300 text-sm">Experience</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('/online-game')}
+                  className="mt-6 px-10 py-4 bg-linear-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-bold text-xl rounded-xl transition-all transform hover:scale-105 shadow-xl"
+                >
+                  🎮 Play Again
+                </button>
+                <Link to="/" className="text-slate-400 hover:text-slate-200 transition text-sm mt-1">← Back to Home</Link>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* LOSS SCREEN */}
+              <div className="mb-6 text-9xl">💀</div>
+              <h1 className="text-8xl font-black mb-4 bg-linear-to-r from-slate-400 via-slate-300 to-slate-500 bg-clip-text text-transparent">
+                DEFEAT
+              </h1>
+              <p className="text-2xl text-slate-300 font-semibold mb-2">
+                <span className="text-white">{winner.name}</span> wins the battle.
+              </p>
+              <p className="text-slate-500 text-lg mb-4">All your shinobi have fallen.</p>
+              <p className="text-slate-400 text-base mb-8">Better luck next time, <span className="text-slate-200 font-semibold">{winner.loserName}</span>.</p>
+
+              <div className="flex gap-3 flex-col items-center">
+                <div className="flex gap-3">
+                  <div className="bg-red-500/20 border border-red-500 rounded-xl px-6 py-3 text-center">
+                    <div className="text-red-400 text-2xl font-bold">+1</div>
+                    <div className="text-slate-300 text-sm">Loss</div>
+                  </div>
+                  <div className="bg-slate-600/40 border border-slate-500 rounded-xl px-6 py-3 text-center">
+                    <div className="text-slate-300 text-2xl font-bold">+8 XP</div>
+                    <div className="text-slate-400 text-sm">Experience</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('/online-game')}
+                  className="mt-6 px-10 py-4 bg-linear-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 text-white font-bold text-xl rounded-xl transition-all transform hover:scale-105 shadow-xl"
+                >
+                  🔄 Try Again
+                </button>
+                <Link to="/" className="text-slate-400 hover:text-slate-200 transition text-sm mt-1">← Back to Home</Link>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Main game screen
   const currentPlayer = players[currentPlayerIndex];
   const opponent = players[currentPlayerIndex === 0 ? 1 : 0];
@@ -1972,7 +2096,7 @@ export default function OnlineGamePlay() {
     <div className="min-h-screen bg-slate-900 p-4">
       <div className="h-[calc(100vh-2rem)] flex gap-1 justify-center items-start">
         {/* Left Side - Current User */}
-        <div className="flex flex-col gap-1 h-full">
+        <div className={`flex flex-col gap-1 h-fit rounded-xl border-4 transition-all duration-500 ${isMyTurn() ? 'border-green-400 shadow-[0_0_24px_4px_rgba(74,222,128,0.5)]' : 'border-transparent opacity-50'}`}>
           {/* Left Profile Header */}
           <PlayerHeader
             username={getProfile(leftIndex)?.display_name || (leftIndex === 0 ? session?.host_user_id : session?.guest_user_id) || `Player ${leftIndex + 1}`}
@@ -2066,6 +2190,39 @@ export default function OnlineGamePlay() {
                 >
                   📖 Rules
                 </button>
+                {/* TEMP DEBUG — remove before release */}
+                <button
+                  onClick={() => {
+                    const enemyIdx = myPlayerIndex === 0 ? 1 : 0;
+                    let gameEnded = false;
+                    setPlayers(prev => {
+                      const updated: [Player, Player] = [
+                        { ...prev[0], hand: [...prev[0].hand] },
+                        { ...prev[1], hand: [...prev[1].hand] },
+                      ];
+                      updated[enemyIdx].hand = updated[enemyIdx].hand.map((card, i) =>
+                        i < 8 ? { ...card, currentHealth: 0 } : card
+                      );
+                      const allEnemiesDead = updated[enemyIdx].hand.every(c => c.currentHealth <= 0);
+                      if (allEnemiesDead) {
+                        gameEnded = true;
+                        const winnerName = updated[myPlayerIndex].name;
+                        const loserName = updated[enemyIdx].name;
+                        setTimeout(() => {
+                          winnerAlreadyShownRef.current = true;
+                          setWinner({ name: winnerName, loserName, isMe: true });
+                        }, 1000);
+                      }
+                      return updated;
+                    });
+                    if (!gameEnded) {
+                      setTimeout(() => endTurn(), 300);
+                    }
+                  }}
+                  className="px-4 py-2 bg-pink-700 hover:bg-pink-600 text-white font-semibold rounded-lg transition text-center text-xs"
+                >
+                  💀 Kill 8 enemies (test)
+                </button>
               </div>
               
               {/* Divider */}
@@ -2138,7 +2295,7 @@ export default function OnlineGamePlay() {
         </div>
 
         {/* Right Side - Opponent */}
-        <div className="flex flex-col gap-1 h-full">
+        <div className={`flex flex-col gap-1 h-fit rounded-xl border-4 transition-all duration-500 ${!isMyTurn() ? 'border-green-400 shadow-[0_0_24px_4px_rgba(74,222,128,0.5)]' : 'border-transparent opacity-50'}`}>
           {/* Right Profile Header */}
           <PlayerHeader
             username={getProfile(rightIndex)?.display_name || (rightIndex === 0 ? session?.host_user_id : session?.guest_user_id) || `Player ${rightIndex + 1}`}
