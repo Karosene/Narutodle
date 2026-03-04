@@ -107,6 +107,17 @@ type Character = {
   firstAppearance?: string;
 };
 
+type LeaderboardEntry = {
+  display_name: string;
+  level?: number;
+  xp?: number;
+  narutodle_avg_guesses?: number;
+  narutodle_games_played?: number;
+};
+
+const SUPA_URL = 'https://ttphcrctvvnrdxtsquso.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0cGhjcmN0dnZucmR4dHNxdXNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjI2NTIsImV4cCI6MjA4NjIzODY1Mn0.8sq6_4TQF8S3sFytFm0xI4eCLq4ECwBAEXfiR1Qeksc';
+
 export default function Site() {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const suggRef = useRef<HTMLFormElement | null>(null);
@@ -125,6 +136,21 @@ export default function Site() {
   const [showHintCard, setShowHintCard] = useState(false);
   const mounted = useRef(false);
   const [statsSaved, setStatsSaved] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [levelBoard, setLevelBoard] = useState<LeaderboardEntry[]>([]);
+  const [avgBoard, setAvgBoard] = useState<LeaderboardEntry[]>([]);
+
+  useEffect(() => {
+    const headers = { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` };
+    fetch(`${SUPA_URL}/rest/v1/profiles?select=display_name,level,xp&order=level.desc,xp.desc&limit=5`, { headers })
+      .then(r => r.json())
+      .then(data => setLevelBoard(Array.isArray(data) ? data : []))
+      .catch(() => {});
+    fetch(`${SUPA_URL}/rest/v1/profiles?select=display_name,narutodle_avg_guesses,narutodle_games_played&narutodle_games_played=gt.0&order=narutodle_avg_guesses.asc&limit=5`, { headers })
+      .then(r => r.json())
+      .then(data => setAvgBoard(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
 
   const TRIES_REQUIRED = 10;
   const CLUE_COUNT = 7;
@@ -506,7 +532,51 @@ export default function Site() {
 
 
   return (
-    <main className="flex items-start justify-center min-h-screen px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden overflow-y-auto md:overflow-visible bg-linear-to-br from-slate-900 via-blue-900 to-slate">
+    <main className="flex items-start justify-center min-h-screen px-4 sm:px-6 lg:px-8 pt-8 overflow-x-hidden overflow-y-auto md:overflow-visible bg-linear-to-br from-slate-900 via-blue-900 to-slate">
+      {/* How to Play button */}
+      <button
+        type="button"
+        onClick={() => setShowHowToPlay(true)}
+        className="fixed right-4 top-22 z-50 w-10 h-10 rounded-full bg-linear-to-br from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 border-2 border-yellow-300/50 text-black font-bold text-lg transition hover:scale-110 flex items-center justify-center"
+        title="How to play"
+      >
+        ?
+      </button>
+
+      {/* How to Play modal */}
+      {showHowToPlay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowHowToPlay(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div
+            className="relative bg-slate-800 border border-slate-600 rounded-2xl shadow-2xl w-full max-w-md p-6 text-white"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setShowHowToPlay(false)}
+              className="absolute top-3 right-4 text-slate-400 hover:text-white text-2xl leading-none"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-extrabold mb-4 text-center">How to Play</h2>
+            <ol className="space-y-3 text-sm text-slate-200 list-decimal list-inside">
+              <li>Type a Naruto character's name in the search box and select them from the dropdown.</li>
+              <li>After each guess, every attribute is colour-coded:
+                <ul className="mt-1 ml-4 space-y-1 list-none">
+                  <li><span className="inline-block w-3 h-3 rounded-sm bg-emerald-500 mr-2 align-middle" />Green — exact match ✓</li>
+                  <li><span className="inline-block w-3 h-3 rounded-sm bg-gray-500 mr-2 align-middle" />Grey — no match ✗</li>
+                </ul>
+              </li>
+              <li>Numbers (Age, Height, Rank, First Arc) show an <strong>↑</strong> or <strong>↓</strong> arrow when the correct answer is higher or lower.</li>
+              <li>Keep guessing until you find the character — you have up to <strong>25 guesses</strong>.</li>
+              <li>After <strong>10 guesses</strong> a blurred image hint appears.</li>
+              <li>Stuck? Hit <strong>Give Up</strong> to reveal the answer.</li>
+            </ol>
+            <p className="mt-4 text-xs text-slate-400 text-center">Good luck, ninja!</p>
+          </div>
+        </div>
+      )}
+
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -514,7 +584,7 @@ export default function Site() {
         <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
 
-      <div className="w-full max-w-6xl space-y-6 relative z-10 mt-10">
+      <div className="w-full max-w-6xl relative z-10 mt-10 space-y-6">
         <h1 className="text-5xl sm:text-6xl font-extrabold mb-2 text-center">Narutodle</h1>
         <p className="text-sm text-slate-300 mb-10 text-center">Character guessing from Naruto and Naruto Shippuden</p>
 
@@ -747,11 +817,38 @@ export default function Site() {
           
         </div>
 
-        {guesses.length > 0 && (
+        {/* Guesses box + leaderboards */}
+        <div className="relative mb-8">
+
+          {/* Left leaderboard – Top Levels */}
+          <aside className="hidden lg:block absolute -left-[216px] top-0 w-[200px]">
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50 shadow-lg">
+              <h2 className="text-sm font-extrabold text-yellow-400 uppercase tracking-wider mb-3 text-center">🏆 Top Levels</h2>
+              {levelBoard.length === 0 ? (
+                <p className="text-xs text-slate-400 text-center py-4">No data yet</p>
+              ) : (
+                <ol className="space-y-2">
+                  {levelBoard.map((entry, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs">
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0 ${
+                        i === 0 ? 'bg-yellow-400 text-black' :
+                        i === 1 ? 'bg-slate-300 text-black' :
+                        i === 2 ? 'bg-amber-600 text-white' :
+                        'bg-slate-700 text-slate-300'
+                      }`}>{i + 1}</span>
+                      <span className="flex-1 truncate text-white">{entry.display_name}</span>
+                      <span className="text-yellow-400 font-bold shrink-0">Lv {entry.level ?? 1}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          </aside>
+
           <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-700/50 w-full overflow-x-auto">
             {/* Desktop view - horizontal grid */}
             <div className="hidden md:block">
-              <div className="grid grid-cols-11 gap-2 items-center mb-3">
+              <div className="grid grid-cols-11 gap-2 items-center mb-3 px-4">
                 {[
                   'Photo',
                   'Name',
@@ -774,7 +871,13 @@ export default function Site() {
                 ))}
               </div>
 
-              <div className="space-y-3">
+              {guesses.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 gap-2 text-slate-400">
+                  <p className="text-sm font-medium">No guesses yet — who could it be?</p>
+                  <p className="text-xs opacity-60">Type any character to begin</p>
+                </div>
+              ) : (
+              <div className="guesses-scroll space-y-3 max-h-[484px] overflow-y-auto pr-2">
                 {guesses.map(({ char, matches, ageComparison, arcComparison, rankComparison, heightComparison }, i) => (
                   <div
                     key={i}
@@ -851,10 +954,18 @@ export default function Site() {
                   </div>
                 ))}
               </div>
+              )}
             </div>
 
             {/* Mobile view - vertical columns */}
             <div className="md:hidden">
+              {guesses.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 gap-2 text-slate-400">
+                  <span className="text-3xl">🥷</span>
+                  <p className="text-sm font-medium">No guesses yet — who could it be?</p>
+                  <p className="text-xs opacity-60">Type a character name above to start guessing</p>
+                </div>
+              ) : (
               <div className="flex gap-4">
                 {guesses.map(({ char, matches, ageComparison, arcComparison, rankComparison, heightComparison }, i) => (
                   <div key={i} className="shrink-0 w-48 bg-white/5 p-3 rounded-lg shadow-inner">
@@ -942,9 +1053,36 @@ export default function Site() {
                   </div>
                 ))}
               </div>
+              )}
             </div>
           </div>
-        )}
+
+          {/* Right leaderboard – Best Avg Guesses */}
+          <aside className="hidden lg:block absolute -right-[216px] top-0 w-[200px]">
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50 shadow-lg">
+              <h2 className="text-sm font-extrabold text-emerald-400 uppercase tracking-wider mb-3 text-center">🎯 Best Avg</h2>
+              {avgBoard.length === 0 ? (
+                <p className="text-xs text-slate-400 text-center py-4">No data yet</p>
+              ) : (
+                <ol className="space-y-2">
+                  {avgBoard.map((entry, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs">
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0 ${
+                        i === 0 ? 'bg-yellow-400 text-black' :
+                        i === 1 ? 'bg-slate-300 text-black' :
+                        i === 2 ? 'bg-amber-600 text-white' :
+                        'bg-slate-700 text-slate-300'
+                      }`}>{i + 1}</span>
+                      <span className="flex-1 truncate text-white">{entry.display_name}</span>
+                      <span className="text-emerald-400 font-bold shrink-0">{entry.narutodle_avg_guesses?.toFixed(1) ?? '—'}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          </aside>
+
+        </div>{/* end guesses grid */}
       </div>
     </main>
   );

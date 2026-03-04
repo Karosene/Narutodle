@@ -14,6 +14,26 @@ body {
   }
 }
 
+/* Styled scrollbar for guesses list */
+.guesses-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.guesses-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.guesses-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+.guesses-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+/* Firefox */
+.guesses-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
 /* Hide right-side scrollbar on desktop while keeping scroll functional */
 @media (min-width: 1024px) {
   html, body {
