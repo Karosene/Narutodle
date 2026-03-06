@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import { CharacterCardComponent } from '~/components/CharacterCard';
 import type { CharacterCard, AttributeBoosterCard, CharacterJutsuData, Jutsu, StatusEffect, PassiveAbility } from '~/types/tcg';
@@ -24,6 +24,8 @@ export default function PlayGame() {
   const [attackTypes, setAttackTypes] = useState<Record<string, 'taijutsu' | 'ninjutsu' | 'genjutsu'>>({});
   const [jutsuData, setJutsuData] = useState<Record<string, CharacterJutsuData>>({});
   const [passiveAbilities, setPassiveAbilities] = useState<Record<string, PassiveAbility>>({});
+  const passiveAbilitiesRef = useRef<Record<string, PassiveAbility>>({});
+  useEffect(() => { passiveAbilitiesRef.current = passiveAbilities; }, [passiveAbilities]);
   const [gameStarted, setGameStarted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [players, setPlayers] = useState<[Player, Player]>([
@@ -57,36 +59,31 @@ export default function PlayGame() {
   const [guessAttempts, setGuessAttempts] = useState(0);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/attackTypes.json').then(res => res.json()),
-      fetch('/characters.json').then(res => res.json()),
-      fetch('/jutsusData.json').then(res => res.json()),
-      fetch('/passiveAbilities.json').then(res => res.json())
-    ])
-      .then(([attackTypesData, charactersData, jutsusDataArray, passiveAbilitiesArray]: [Record<string, 'taijutsu' | 'ninjutsu' | 'genjutsu'>, Character[], CharacterJutsuData[], PassiveAbility[]]) => {
-        setAttackTypes(attackTypesData);
-        setAllCharacters(charactersData);
-        
-        // Convert jutsu array to object indexed by character name
-        const jutsuMap: Record<string, CharacterJutsuData> = {};
-        jutsusDataArray.forEach(charJutsu => {
-          jutsuMap[charJutsu.name] = charJutsu;
-        });
-        setJutsuData(jutsuMap);
-        
-        // Convert passive abilities array to object indexed by character name
-        const passiveMap: Record<string, PassiveAbility> = {};
-        passiveAbilitiesArray.forEach(passive => {
-          passiveMap[passive.characterName] = passive;
-        });
-        setPassiveAbilities(passiveMap);
-        
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Failed to load data:', err);
-        setLoading(false);
-      });
+    import('~/utils/gameData').then(({ fetchAttackTypes, fetchCharacters, fetchJutsusData, fetchPassiveAbilities }) =>
+      Promise.all([fetchAttackTypes(), fetchCharacters(), fetchJutsusData(), fetchPassiveAbilities()])
+        .then(([attackTypesData, charactersData, jutsusDataArray, passiveAbilitiesArray]) => {
+          setAttackTypes(attackTypesData);
+          setAllCharacters(charactersData);
+
+          const jutsuMap: Record<string, CharacterJutsuData> = {};
+          jutsusDataArray.forEach((charJutsu: CharacterJutsuData) => {
+            jutsuMap[charJutsu.name] = charJutsu;
+          });
+          setJutsuData(jutsuMap);
+
+          const passiveMap: Record<string, PassiveAbility> = {};
+          passiveAbilitiesArray.forEach((passive: PassiveAbility) => {
+            passiveMap[passive.characterName] = passive;
+          });
+          setPassiveAbilities(passiveMap);
+
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error('Failed to load data:', err);
+          setLoading(false);
+        })
+    );
   }, []);
 
   const convertToCard = (char: Character, index: number): CharacterCard => {
@@ -121,8 +118,8 @@ export default function PlayGame() {
     };
     
     // Add passive ability if character has one
-    if (passiveAbilities[char.name]) {
-      card.passiveAbility = passiveAbilities[char.name];
+    if (passiveAbilitiesRef.current[char.name]) {
+      card.passiveAbility = passiveAbilitiesRef.current[char.name];
     }
     
     return card;

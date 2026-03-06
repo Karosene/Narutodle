@@ -129,33 +129,27 @@ export default function Site() {
   const cluesLocked = guesses.length < TRIES_REQUIRED;
 
   useEffect(() => {
-    fetch("/characters.json")
-      .then((r) => r.json())
-      .then((data: Character[]) => {
-        const map = new Map<string, Character>();
-        for (const c of data) {
-          const key = normalize(c.name);
-          const existing = map.get(key);
-          if (!existing) {
-            map.set(key, c);
-            continue;
+    import('~/utils/gameData').then(({ fetchCharacters }) =>
+      fetchCharacters()
+        .then((data) => {
+          const map = new Map<string, Character>();
+          for (const c of data) {
+            const key = normalize(c.name);
+            const existing = map.get(key);
+            if (!existing) { map.set(key, c); continue; }
+            const existingHasFile = !!existing.file && existing.file.trim() !== "";
+            const cHasFile = !!c.file && c.file.trim() !== "";
+            if (!existingHasFile && cHasFile) { map.set(key, c); continue; }
           }
-          const existingHasFile = !!existing.file && existing.file.trim() !== "";
-          const cHasFile = !!c.file && c.file.trim() !== "";
-          if (!existingHasFile && cHasFile) {
-            map.set(key, c);
-            continue;
-          }
-        }
-
-        const uniq = Array.from(map.values());
-        setCharacters(uniq);
-        if (uniq.length) setIdx(Math.floor(Math.random() * uniq.length));
-      })
-      .catch((e) => {
-        console.error(e);
-        setFeedback("Failed to load characters.json");
-      });
+          const uniq = Array.from(map.values());
+          setCharacters(uniq);
+          if (uniq.length) setIdx(Math.floor(Math.random() * uniq.length));
+        })
+        .catch((e) => {
+          console.error(e);
+          setFeedback("Failed to load characters");
+        })
+    );
   }, []);
 
   useEffect(() => {

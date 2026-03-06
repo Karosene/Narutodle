@@ -307,21 +307,33 @@ export default function App() {
       </main>
 
       <footer className="border-t border-slate-200/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-700 dark:text-slate-300">
-            <div className="font-semibold text-slate-900 dark:text-slate-100">Narutodle</div>
-            <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
-              <nav className="flex flex-col sm:flex-row items-center gap-3 text-sm">
-                <NavLink to="/about" className="text-slate-700 dark:text-slate-200 hover:underline">About</NavLink>
-                <NavLink to="/contact" className="text-slate-700 dark:text-slate-200 hover:underline">Contact</NavLink>
-                <NavLink to="/privacy" className="text-slate-700 dark:text-slate-200 hover:underline">Privacy</NavLink>
-              </nav>
-              <span className="hidden sm:inline">•</span>
-              <span className="text-xs">© {new Date().getFullYear()} Fan-made project</span>
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 flex flex-col gap-8">
+          {/* Main row */}
+          <div className="flex flex-col sm:flex-row gap-10 sm:gap-0 sm:justify-between">
+            {/* Left: logo + brand + description */}
+            <div className="flex flex-col gap-3 max-w-xs">
+              <div className="flex items-center gap-3">
+                <img src="/images/logo.png" alt="Narutodle Logo" className="w-10 h-8 select-none" />
+                <span className="text-xl font-bold text-slate-900 dark:text-slate-100">Narutodle</span>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                A Naruto-themed guessing game. Test your knowledge of characters, jutsus, and the ninja world.
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-500 leading-relaxed">
+                Naruto and all related content are trademarks of Masashi Kishimoto and Shueisha. Unofficial fan-made project.
+              </p>
+            </div>
+            {/* Right: nav links column */}
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">Pages</span>
+              <NavLink to="/about" className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">About</NavLink>
+              <NavLink to="/contact" className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">Contact</NavLink>
+              <NavLink to="/privacy" className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">Privacy</NavLink>
             </div>
           </div>
-          <div className="text-xs text-slate-600 dark:text-slate-400 text-center sm:text-left">
-            <p>Naruto and all related content are trademarks of Masashi Kishimoto and Shueisha. This is an unofficial fan-made project for entertainment purposes only.</p>
+          {/* Bottom bar */}
+          <div className="border-t border-slate-200/70 dark:border-slate-800/80 pt-6 flex justify-end">
+            <span className="text-xs text-slate-500 dark:text-slate-500">© {new Date().getFullYear()} Fan-made project</span>
           </div>
         </div>
       </footer>

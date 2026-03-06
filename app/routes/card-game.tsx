@@ -22,13 +22,10 @@ export default function CardGame() {
 
   useEffect(() => {
     // Load both attack types and characters
-    Promise.all([
-      fetch('/tcg-attackTypes.json').then(res => res.json()),
-      fetch('/characters.json').then(res => res.json())
-    ])
-      .then(([attackTypesData, charactersData]: [Record<string, 'taijutsu' | 'ninjutsu' | 'genjutsu'>, Character[]]) => {
-        console.log('Attack Types Data:', attackTypesData);
-        setAllCharacters(charactersData);
+    import('~/utils/gameData').then(({ fetchAttackTypes, fetchCharacters }) =>
+      Promise.all([fetchAttackTypes(), fetchCharacters()])
+        .then(([attackTypesData, charactersData]) => {
+          setAllCharacters(charactersData);
         
         // Convert all characters to card format
         const cards: CharacterCard[] = charactersData.map((char, index) => {
@@ -71,7 +68,8 @@ export default function CardGame() {
       .catch(err => {
         console.error('Failed to load data:', err);
         setLoading(false);
-      });
+      })
+    );
   }, []);
 
   return (

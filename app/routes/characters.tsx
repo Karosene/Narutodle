@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CharacterCardComponent } from '~/components/CharacterCard';
 import type { CharacterCard } from '~/types/tcg';
-import { getCharacterJutsus, type Jutsu } from '../data/jutsus';
+import type { Jutsu } from '../data/jutsus';
 import { normalize } from '~/utils/normalize';
 
 interface Character {
@@ -25,8 +25,8 @@ export default function Characters() {
   const [selectedRank, setSelectedRank] = useState<string>('all');
   const [selectedJutsuType, setSelectedJutsuType] = useState<string>('all');
   const [selectedCharacter, setSelectedCharacter] = useState<{ card: CharacterCard; rawData: Character } | null>(null);
-
-  // Prevent background scrolling when modal is open
+  const [jutsuData, setJutsuData] = useState<Record<string, { jutsus: Jutsu[]; upgradedJutsu?: Jutsu }>>({});
+  const [passiveData, setPassiveData] = useState<Record<string, { passiveName: string; description: string; trigger: string; chance: number; effect: any }>>({});  const [showPassiveTab, setShowPassiveTab] = useState(false);  // Prevent background scrolling when modal is open
   useEffect(() => {
     if (selectedCharacter) {
       document.body.style.overflow = 'hidden';
@@ -41,12 +41,22 @@ export default function Characters() {
   }, [selectedCharacter]);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/attackTypes.json').then(res => res.json()),
-      fetch('/characters.json').then(res => res.json())
-    ])
-      .then(([attackTypesData, data]: [Record<string, 'taijutsu' | 'ninjutsu' | 'genjutsu'>, Character[]]) => {
-        setAllCharacters(data);
+    import('~/utils/gameData').then(({ fetchAttackTypes, fetchCharacters, fetchJutsusData, fetchPassiveAbilities }) =>
+      Promise.all([fetchAttackTypes(), fetchCharacters(), fetchJutsusData(), fetchPassiveAbilities()])
+        .then(([attackTypesData, data, jutsusArray, passivesArray]) => {
+          setAllCharacters(data);
+
+          const jutsuMap: Record<string, { jutsus: Jutsu[]; upgradedJutsu?: Jutsu }> = {};
+          jutsusArray.forEach((entry: any) => {
+            jutsuMap[entry.name] = { jutsus: entry.jutsus ?? [], upgradedJutsu: entry.upgradedJutsu ?? undefined };
+          });
+          setJutsuData(jutsuMap);
+
+          const passiveMap: Record<string, any> = {};
+          passivesArray.forEach((p: any) => {
+            passiveMap[p.characterName] = p;
+          });
+          setPassiveData(passiveMap);
         
         const cards: CharacterCard[] = data.map((char, index) => {
           const clanName = char.clan && char.clan !== 'None' ? char.clan : undefined;
@@ -86,7 +96,8 @@ export default function Characters() {
       .catch(err => {
         console.error('Failed to load characters:', err);
         setLoading(false);
-      });
+      })
+    );
   }, []);
 
   // Filter characters based on search and filters
@@ -224,7 +235,7 @@ export default function Characters() {
                 <div key={card.id} className="transform transition-transform hover:scale-105 h-full">
                   <CharacterCardComponent
                     card={card}
-                    onClick={() => rawData && setSelectedCharacter({ card, rawData })}
+                    onClick={() => { if (rawData) { setSelectedCharacter({ card, rawData }); setShowPassiveTab(false); } }}
                   />
                 </div>
               );
@@ -340,15 +351,58 @@ export default function Characters() {
                   </div>
                 </div>
 
-                {/* Jutsus */}
+                {/* Jutsus + Passive Tabs */}
                 {(() => {
-                  const baseJutsus = getCharacterJutsus(selectedCharacter.card.name, false);
-                  const upgradedJutsu = getCharacterJutsus(selectedCharacter.card.name, true);
-                  const hasUpgradedJutsu = upgradedJutsu && !Array.isArray(upgradedJutsu);
-                  
-                  return baseJutsus && Array.isArray(baseJutsus) ? (
+                  const passive = passiveData[selectedCharacter.card.name];
+                  const charJutsu = jutsuData[selectedCharacter.card.name];
+                  const baseJutsus = charJutsu?.jutsus;
+                  const upgradedJutsu = charJutsu?.upgradedJutsu;
+                  const hasUpgradedJutsu = !!upgradedJutsu;
+                  const hasContent = (baseJutsus && baseJutsus.length > 0) || !!passive;
+                  if (!hasContent) return null;
+                  return (
                     <div>
                       <h3 className="text-xl font-bold text-white mb-3">Signature Jutsus</h3>
+
+                      {/* Tabs — only when character has a passive */}
+                      {passive && (
+                        <div className="flex gap-2 mb-4">
+                          <button
+                            onClick={() => setShowPassiveTab(false)}
+                            className={`flex-1 px-4 py-2 rounded-lg font-semibold transition ${
+                              !showPassiveTab
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                            }`}
+                          >
+                            Jutsus
+                          </button>
+                          <button
+                            onClick={() => setShowPassiveTab(true)}
+                            className={`flex-1 px-4 py-2 rounded-lg font-semibold transition ${
+                              showPassiveTab
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                            }`}
+                          >
+                            Passive Ability
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Passive tab content */}
+                      {showPassiveTab && passive ? (
+                        <div className="bg-slate-900 rounded-lg p-4 border-l-4 border-yellow-500">
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="text-lg font-bold text-white">{passive.passiveName}</h4>
+                            <span className="px-2 py-1 bg-yellow-600 text-white rounded text-xs font-semibold">
+                              {Math.round((passive.chance ?? 0) * 100)}% chance
+                            </span>
+                          </div>
+                          <p className="text-slate-400 text-sm">{passive.description}</p>
+                        </div>
+                      ) : baseJutsus && baseJutsus.length > 0 ? (
+                    <div>
                       
                       {/* Base Form Jutsus */}
                       <div className="mb-4">
@@ -423,7 +477,9 @@ export default function Characters() {
                         </div>
                       )}
                     </div>
-                  ) : null;
+                      ) : null}
+                    </div>
+                  );
                 })()}
               </div>
             </div>

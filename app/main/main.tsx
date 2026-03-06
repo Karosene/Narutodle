@@ -158,32 +158,39 @@ export default function Site() {
   const AFFILIATION_UNLOCK_TRIES = 7;
 
   useEffect(() => {
-    fetch("/characters.json")
+    const headers = { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Range': '0-999' };
+    fetch(`${SUPA_URL}/rest/v1/characters?select=name,file,gender,age,height,clan,team,rank,first_appearance,nature_affinity,affiliations`, { headers })
       .then((r) => r.json())
-      .then((data: Character[]) => {
+      .then((data: any[]) => {
+        const mapped: Character[] = data.map((c) => ({
+          name: c.name,
+          file: c.file,
+          gender: c.gender,
+          age: c.age,
+          height: c.height,
+          clan: c.clan,
+          team: c.team,
+          rank: c.rank,
+          firstAppearance: c.first_appearance,
+          natureAffinity: c.nature_affinity,
+          affiliations: c.affiliations,
+        }));
         const map = new Map<string, Character>();
-        for (const c of data) {
+        for (const c of mapped) {
           const key = normalize(c.name);
           const existing = map.get(key);
-          if (!existing) {
-            map.set(key, c);
-            continue;
-          }
+          if (!existing) { map.set(key, c); continue; }
           const existingHasFile = !!existing.file && existing.file.trim() !== "";
           const cHasFile = !!c.file && c.file.trim() !== "";
-          if (!existingHasFile && cHasFile) {
-            map.set(key, c);
-            continue;
-          }
+          if (!existingHasFile && cHasFile) { map.set(key, c); continue; }
         }
-
         const uniq = Array.from(map.values());
         setCharacters(uniq);
         if (uniq.length) setIdx(Math.floor(Math.random() * uniq.length));
       })
       .catch((e) => {
         console.error(e);
-        setFeedback("Failed to load characters.json");
+        setFeedback("Failed to load characters from database");
       });
   }, []);
 
@@ -537,7 +544,7 @@ export default function Site() {
       <button
         type="button"
         onClick={() => setShowHowToPlay(true)}
-        className="fixed right-4 top-22 z-50 w-10 h-10 rounded-full bg-linear-to-br from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 border-2 border-yellow-300/50 text-black font-bold text-lg transition hover:scale-110 flex items-center justify-center"
+        className="fixed right-4 bottom-4 z-50 w-10 h-10 rounded-full bg-linear-to-br from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 border-2 border-yellow-300/50 text-black font-bold text-lg transition hover:scale-110 flex items-center justify-center"
         title="How to play"
       >
         ?
@@ -589,14 +596,14 @@ export default function Site() {
         <p className="text-sm text-slate-300 mb-10 text-center">Character guessing from Naruto and Naruto Shippuden</p>
 
         <div className="w-1/2 mx-auto mb-6 flex justify-center">
-          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-lg px-4 py-3 shadow-lg border border-slate-700/50">
+          <div className="bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-lg px-4 py-3 shadow-lg border border-slate-700/50">
             <span className="text-lg text-white font-semibold">
               Guesses: {guesses.length}
             </span>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-slate-700/50 w-full md:w-1/2 mx-auto relative z-20">
+        <div className="bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-slate-700/50 w-full md:w-1/2 mx-auto relative z-20">
           {guesses.length > 0 && !revealed && !showAttributes ? (
             <button
               type="button"
@@ -845,7 +852,7 @@ export default function Site() {
             </div>
           </aside>
 
-          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-700/50 w-full overflow-x-auto">
+          <div className="bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-700/50 w-full overflow-x-auto">
             {/* Desktop view - horizontal grid */}
             <div className="hidden md:block">
               <div className="grid grid-cols-11 gap-2 items-center mb-3 px-4">
@@ -1083,6 +1090,54 @@ export default function Site() {
           </aside>
 
         </div>{/* end guesses grid */}
+
+        {/* Mobile leaderboards – shown below guesses on small screens */}
+        <div className="flex lg:hidden gap-4 mb-8">
+          {/* Top Levels */}
+          <div className="flex-1 bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50 shadow-lg">
+            <h2 className="text-sm font-extrabold text-yellow-400 uppercase tracking-wider mb-3 text-center">🏆 Top Levels</h2>
+            {levelBoard.length === 0 ? (
+              <p className="text-xs text-slate-400 text-center py-4">No data yet</p>
+            ) : (
+              <ol className="space-y-2">
+                {levelBoard.map((entry, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0 ${
+                      i === 0 ? 'bg-yellow-400 text-black' :
+                      i === 1 ? 'bg-slate-300 text-black' :
+                      i === 2 ? 'bg-amber-600 text-white' :
+                      'bg-slate-700 text-slate-300'
+                    }`}>{i + 1}</span>
+                    <span className="flex-1 truncate text-white">{entry.display_name}</span>
+                    <span className="text-yellow-400 font-bold shrink-0">Lv {entry.level ?? 1}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+          {/* Best Avg */}
+          <div className="flex-1 bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50 shadow-lg">
+            <h2 className="text-sm font-extrabold text-emerald-400 uppercase tracking-wider mb-3 text-center">🎯 Best Avg</h2>
+            {avgBoard.length === 0 ? (
+              <p className="text-xs text-slate-400 text-center py-4">No data yet</p>
+            ) : (
+              <ol className="space-y-2">
+                {avgBoard.map((entry, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0 ${
+                      i === 0 ? 'bg-yellow-400 text-black' :
+                      i === 1 ? 'bg-slate-300 text-black' :
+                      i === 2 ? 'bg-amber-600 text-white' :
+                      'bg-slate-700 text-slate-300'
+                    }`}>{i + 1}</span>
+                    <span className="flex-1 truncate text-white">{entry.display_name}</span>
+                    <span className="text-emerald-400 font-bold shrink-0">{entry.narutodle_avg_guesses?.toFixed(1) ?? '—'}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </div>
       </div>
     </main>
   );

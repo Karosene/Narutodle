@@ -1,5 +1,3 @@
-import jutsusData from '../../public/jutsusData.json';
-
 export interface Jutsu {
   name: string;
   description: string;
@@ -21,7 +19,8 @@ export interface CharacterJutsus {
   upgradedJutsu?: Jutsu; // 1 upgraded version when boosted
 }
 
-export const characterJutsus: CharacterJutsus[] = jutsusData as CharacterJutsus[];
+// Data is now fetched from Supabase at runtime via app/utils/gameData.ts
+export const characterJutsus: CharacterJutsus[] = [];
 
 export function getCharacterJutsus(characterName: string, upgraded: boolean = false): [Jutsu, Jutsu] | Jutsu | undefined {
   const characterData = characterJutsus.find(
@@ -46,3 +45,5 @@ export function calculateTotalJutsuDamage(jutsu: Jutsu): number {
   
   return totalDamage;
 }
+
+

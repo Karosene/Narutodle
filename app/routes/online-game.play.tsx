@@ -533,6 +533,9 @@ export default function OnlineGamePlay() {
   const [attackTypes, setAttackTypes] = useState<Record<string, 'taijutsu' | 'ninjutsu' | 'genjutsu'>>({});
   const [jutsuData, setJutsuData] = useState<Record<string, CharacterJutsuData>>({});
   const [passiveAbilities, setPassiveAbilities] = useState<Record<string, PassiveAbility>>({});
+  const passiveAbilitiesRef = useRef<Record<string, PassiveAbility>>({});
+  // Keep ref in sync so createCard always reads latest data even before re-render
+  useEffect(() => { passiveAbilitiesRef.current = passiveAbilities; }, [passiveAbilities]);
   
   // Game state
   const [gameStarted, setGameStarted] = useState(false);
@@ -624,22 +627,23 @@ export default function OnlineGamePlay() {
 
       // Load game data
       try {
+        const { fetchAttackTypes, fetchCharacters, fetchJutsusData, fetchPassiveAbilities } = await import('~/utils/gameData');
         const [attackTypesData, charactersData, jutsusDataArray, passiveAbilitiesArray] = await Promise.all([
-          fetch('/attackTypes.json').then(res => res.json()),
-          fetch('/characters.json').then(res => res.json()),
-          fetch('/jutsusData.json').then(res => res.json()),
-          fetch('/passiveAbilities.json').then(res => res.json())
+          fetchAttackTypes(),
+          fetchCharacters(),
+          fetchJutsusData(),
+          fetchPassiveAbilities(),
         ]);
-        
+
         setAttackTypes(attackTypesData);
         setAllCharacters(charactersData);
-        
+
         const jutsuMap: Record<string, CharacterJutsuData> = {};
         jutsusDataArray.forEach((charJutsu: CharacterJutsuData) => {
           jutsuMap[charJutsu.name] = charJutsu;
         });
         setJutsuData(jutsuMap);
-        
+
         const passiveMap: Record<string, PassiveAbility> = {};
         passiveAbilitiesArray.forEach((passive: PassiveAbility) => {
           passiveMap[passive.characterName] = passive;
@@ -651,7 +655,19 @@ export default function OnlineGamePlay() {
         if (stateResult.success && stateResult.state) {
           // Restore game state from database
           const state = stateResult.state;
-          if (state.players) setPlayers(state.players);
+          if (state.players) {
+            // Re-apply passive abilities to cards that may be missing them (e.g. pre-migration saves)
+            const restoredPlayers = (state.players as [Player, Player]).map(player => ({
+              ...player,
+              hand: player.hand.map((card: CharacterCard) => {
+                if (!card.passiveAbility && passiveMap[card.name]) {
+                  return { ...card, passiveAbility: passiveMap[card.name] };
+                }
+                return card;
+              })
+            })) as [Player, Player];
+            setPlayers(restoredPlayers);
+          }
           if (state.pending_players) setPendingPlayers(state.pending_players);
           if (state.booster_hands) setBoosterHands(state.booster_hands);
           if (typeof state.game_started === 'boolean') setGameStarted(state.game_started);
@@ -708,7 +724,19 @@ export default function OnlineGamePlay() {
           });
           
           // Update all state variables (except UI selection states which are player-specific)
-          if (state.players) setPlayers(state.players);
+          if (state.players) {
+            // Re-apply passive abilities to polled cards that may be missing them
+            const polledPlayers = (state.players as [Player, Player]).map(player => ({
+              ...player,
+              hand: player.hand.map((card: CharacterCard) => {
+                if (!card.passiveAbility && passiveAbilitiesRef.current[card.name]) {
+                  return { ...card, passiveAbility: passiveAbilitiesRef.current[card.name] };
+                }
+                return card;
+              })
+            })) as [Player, Player];
+            setPlayers(polledPlayers);
+          }
           if (state.pending_players) setPendingPlayers(state.pending_players);
           if (state.booster_hands) setBoosterHands(state.booster_hands);
           if (typeof state.game_started === 'boolean') {
@@ -870,8 +898,9 @@ export default function OnlineGamePlay() {
       boosters: []
     };
     
-    if (passiveAbilities[char.name]) {
-      card.passiveAbility = passiveAbilities[char.name];
+    const passiveMap = passiveAbilitiesRef.current;
+    if (passiveMap[char.name]) {
+      card.passiveAbility = passiveMap[char.name];
     }
     
     return card;
