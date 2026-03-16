@@ -78,7 +78,7 @@
 }
 
 .game-header h1 {
-  font-size:f;
+  font-size: 2em;
   margin-bottom: 10px;
 }
 
@@ -87,10 +87,11 @@
   padding: 15px;
   border-radius: 10px;
   margin-top: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1)0px;
-  margin-top: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
-fff;
+
+.turn-info {
+  color: #fff;
   margin: 0;
   font-size: 1.5em;
 }
@@ -106,14 +107,14 @@ fff;
   padding: 10px;
   border-radius: 5px;
   margin-top: 10px;
-  color: #ccc;
-  font-size: 1.1em;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #95e1d3;
   font-size: 1.1em;
 }
 
-/* Character C#2a2a3e;
+/* Character Card */
+.character-card {
+  background: #2a2a3e;
   border: 2px solid #444;
   border-radius: 12px;
   padding: 15px;
@@ -129,7 +130,7 @@ fff;
 
 .character-card.selected {
   border-color: #4ecdc4;
-  background: #323248
+  background: #323248;
   box-shadow: 0 0 20px rgba(255, 107, 53, 0.6);
   transform: scale(1.05);
 }
@@ -155,12 +156,12 @@ fff;
 .clan-badge {
   background: rgba(255, 107, 53, 0.3);
   padding: 3px 8px;
-  border-radius: 5px;255, 255, 0.1);
-  padding: 3px 8px;
   border-radius: 5px;
   font-size: 0.8em;
   color: #ccc;
-  border: 1px solid rgba(255, 255, 255, 0.2)
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 .card-form {
   display: flex;
   align-items: center;
@@ -171,7 +172,7 @@ fff;
 .form-name {
   color: #95e1d3;
   font-style: italic;
-  font-sizaaaem;
+  font-size: 1em;
 }
 
 .upgraded-badge {
@@ -189,11 +190,10 @@ fff;
   padding: 5px 0;
   border-bottom: 1px solid rgba(78, 205, 196, 0.2);
 }
-255, 255, 255, 0.1);
-}
 
 .stat-label {
-  color: #aaa
+  color: #aaa;
+}
 
 .stat-value {
   color: #fff;
@@ -212,7 +212,10 @@ fff;
   font-weight: bold;
 }
 
-.attack-type.tanormal;
+.attack-type.normal {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .attack-type.taijutsu {
@@ -230,8 +233,7 @@ fff;
 .attack-type.genjutsu {
   background: rgba(255, 255, 255, 0.1);
   color: #ddd;
-  border: 1px solid rgba(255, 255, 255, 0.2)
-  margin: 15px 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .health-bar, .chakra-bar {
@@ -264,12 +266,12 @@ fff;
 
 .bar-fill.chakra {
   background: #666;
-}255, 255, 255, 0.1);
 }
 
-.resistances-label {
-  font-size: 0.85em;
-  color: #aaax solid rgba(78, 205, 196, 0.2);
+.resistances-section {
+  border-top: 1px solid rgba(78, 205, 196, 0.2);
+  padding-top: 10px;
+  margin-top: 10px;
 }
 
 .resistances-label {
@@ -284,7 +286,14 @@ fff;
   flex-wrap: wrap;
   gap: 5px;
 }
-normal;
+
+.resistance {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: normal;
 }
 
 .resistance.half {
@@ -294,20 +303,15 @@ normal;
 }
 
 .resistance.full {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ccc;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.resistance.full {
   background: rgba(76, 175, 80, 0.3);
-  color: #4caf50;255, 255, 255, 0.1);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
-.boosters-label {
-  font-size: 0.85em;
-  color: #aaa0px;
+.boosters-section {
   border-top: 1px solid rgba(78, 205, 196, 0.2);
+  padding-top: 10px;
+  margin-top: 10px;
 }
 
 .boosters-label {
@@ -318,17 +322,30 @@ normal;
 }
 
 .booster-list {
-  display: flex;255, 255, 255, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.booster-tag {
+  background: rgba(255, 255, 255, 0.1);
   color: #ccc;
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 0.75em;
   cursor: help;
-  border: 1px solid rgba(255, 255, 255, 0.2) {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.booster-tag.active {
   background: rgba(149, 125, 173, 0.3);
   color: #957dad;
-  padding: 2px 8px;
-  border-radiu#2a2a3e;
+  border: 1px solid rgba(149, 125, 173, 0.5);
+}
+
+/* Booster Card */
+.booster-card {
+  background: #2a2a3e;
   border: 2px solid #444;
   border-radius: 12px;
   padding: 20px;
@@ -343,14 +360,9 @@ normal;
 }
 
 .booster-card.selected {
-  border-color: #4ecdc4;
-  background: #323248
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(212, 165, 212, 0.4);
-}
-
-.booster-card.selected {
   border-color: #ff6b35;
+  background: #323248;
+  transform: scale(1.05);
   box-shadow: 0 0 20px rgba(255, 107, 53, 0.6);
 }
 
@@ -362,7 +374,7 @@ normal;
 
 .booster-content h4 {
   margin: 0 0 10px 0;
-  color: #aaa
+  color: #aaa;
   text-align: center;
 }
 
@@ -391,15 +403,15 @@ normal;
 /* Game Board */
 .game-board {
   display: flex;
-  flex-direction: column;3);
+  flex-direction: column;
+  gap: 20px;
+}
+
+.opponent-area, .current-player-area {
+  background: rgba(255, 255, 255, 0.03);
   padding: 20px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.opponent-area h3, .current-player-area h3 {
-  color: #fff 15px;
-  border: 2px solid rgba(78, 205, 196, 0.3);
 }
 
 .opponent-area h3, .current-player-area h3 {
@@ -411,16 +423,16 @@ normal;
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;255, 255, 255, 0.05);
+  gap: 15px;
+}
+
+/* Booster Draw Panel */
+.booster-draw-panel {
+  background: rgba(255, 255, 255, 0.05);
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.booster-draw-panel h3 {
-  color: #fffnter;
   border: 2px solid #957dad;
 }
 
@@ -432,7 +444,9 @@ normal;
 .booster-actions {
   margin-top: 15px;
 }
-#4ecdc4;
+
+.booster-actions button {
+  background: #4ecdc4;
   color: white;
   border: none;
   padding: 10px 25px;
@@ -447,8 +461,6 @@ normal;
 }
 
 .booster-actions p {
-  margin-top: 10px;
-  color: #aaa p {
   margin-top: 10px;
   color: #d4a5d4;
   font-size: 0.9em;
@@ -477,10 +489,7 @@ normal;
 
 /* First Turn Setup */
 .first-turn-setup {
-  background: rgba(255, 107, 53, 0.2);
-  padding: 15px;
-  border-radius: 10px;
-  text-align: center;255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.05);
   padding: 15px;
   border-radius: 10px;
   text-align: center;
@@ -489,7 +498,9 @@ normal;
 }
 
 .first-turn-setup h3 {
-  color: #fff
+  color: #fff;
+}
+
 /* Game Over Panel */
 .game-over-panel {
   text-align: center;
@@ -498,19 +509,19 @@ normal;
   background: rgba(78, 205, 196, 0.2);
   border-radius: 15px;
 }
-255, 255, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1)*/
+
+/* Responsive */
 @media (max-width: 768px) {
   .card-grid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
-  
+
   .character-card {
     min-width: 200px;
   }
-  
+
   .game-header h1 {
     font-size: 2em;
   }
 }
+
