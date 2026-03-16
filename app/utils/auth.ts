@@ -29,6 +29,7 @@ export interface Profile {
   narutodle_games_played?: number;
   narutodle_total_guesses?: number;
   narutodle_avg_guesses?: number;
+  custom_id?: string;
 }
 
 // Simple session storage for client-side

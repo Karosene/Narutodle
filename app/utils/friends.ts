@@ -27,16 +27,36 @@ export interface FriendRow {
 }
 
 /**
- * Look up a user by username (nick) — returns their id or null.
+ * Look up a user by username (nick) or custom_id — returns their id or null.
  */
 export async function findUserByUsername(username: string): Promise<{ id: string; nick: string } | null> {
+  // First try by nick
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/users?nick=eq.${encodeURIComponent(username)}&select=id,nick&limit=1`,
     { headers: HEADERS }
   );
-  if (!res.ok) return null;
-  const rows = await res.json();
-  return rows[0] ?? null;
+  if (res.ok) {
+    const rows = await res.json();
+    if (rows.length > 0) return rows[0];
+  }
+
+  // Fall back: search profiles by custom_id, then resolve the user
+  const profRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/profiles?custom_id=eq.${encodeURIComponent(username)}&select=user_id&limit=1`,
+    { headers: HEADERS }
+  );
+  if (!profRes.ok) return null;
+  const profRows = await profRes.json();
+  if (profRows.length === 0) return null;
+
+  const userId = profRows[0].user_id;
+  const userRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/users?id=eq.${encodeURIComponent(userId)}&select=id,nick&limit=1`,
+    { headers: HEADERS }
+  );
+  if (!userRes.ok) return null;
+  const userRows = await userRes.json();
+  return userRows[0] ?? null;
 }
 
 /**

@@ -228,18 +228,18 @@ export default function Profile() {
                     </div>
                   </div>
 
-                  {/* Friend ID */}
+                  {/* User ID */}
                   {currentUser && (
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(currentUser.username);
+                        navigator.clipboard.writeText(profile?.custom_id || currentUser.username);
                         setCopied(true);
                         setTimeout(() => setCopied(false), 2000);
                       }}
-                      title="Copy Friend ID"
+                      title="Copy User ID"
                       className="mt-3 inline-flex items-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-500 rounded-lg px-3 py-2 cursor-pointer transition-colors group">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Friend ID</span>
-                      <span className="text-sm font-mono text-white select-all">{currentUser.username}</span>
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">User ID</span>
+                      <span className="text-sm font-mono text-white select-all">{profile?.custom_id || currentUser.username}</span>
                       {copied ? (
                         <svg className="w-4 h-4 text-green-400 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

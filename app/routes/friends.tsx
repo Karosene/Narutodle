@@ -36,12 +36,12 @@ function LevelBadge({ level, xp, size = 50 }: { level: number | null; xp?: numbe
 }
 
 export default function Friends() {
-  const TAB_ORDER: ('friends' | 'pending' | 'add')[] = ['friends', 'pending', 'add'];
-  const [tab, setTab] = useState<'friends' | 'pending' | 'add'>('friends');
+  const TAB_ORDER: ('friends' | 'pending')[] = ['friends', 'pending'];
+  const [tab, setTab] = useState<'friends' | 'pending'>('friends');
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('left');
   const [animKey, setAnimKey] = useState(0);
 
-  const switchTab = (next: 'friends' | 'pending' | 'add') => {
+  const switchTab = (next: 'friends' | 'pending') => {
     if (next === tab) return;
     const dir = TAB_ORDER.indexOf(next) > TAB_ORDER.indexOf(tab) ? 'left' : 'right';
     setSlideDir(dir);
@@ -152,13 +152,13 @@ export default function Friends() {
       </div>
 
       {/* Tab bar */}
-      <div className="mb-7">
+      <div className="mb-5">
         <div className="relative inline-flex items-center rounded-2xl bg-slate-900/80 border border-slate-800 p-1 gap-0.5 shadow-inner backdrop-blur-sm">
           <div
             className="absolute top-1 bottom-1 rounded-xl bg-slate-700/80 shadow-md border border-slate-600/30"
             style={{
-              width: 'calc(33.333% - 2.67px)',
-              transform: `translateX(${tab === 'friends' ? '0%' : tab === 'pending' ? '100%' : '200%'})`,
+              width: '8rem',
+              transform: `translateX(${tab === 'friends' ? '0px' : 'calc(8rem + 2px)'})`,
               transition: 'transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             }}
           />
@@ -181,14 +181,44 @@ export default function Friends() {
               </span>
             )}
           </button>
+        </div>
+      </div>
+
+      {/* Add Friend Input */}
+      <div className="mb-6">
+        <div className={`flex items-center gap-2 bg-slate-900/70 border rounded-2xl px-4 py-2.5 transition-colors ${sendError ? 'border-red-500/60' : 'border-slate-800 focus-within:border-indigo-500/70'}`}>
+          <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+          <input
+            value={newFriend}
+            onChange={(e) => { setNewFriend(e.target.value); setSendError(''); }}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend(e as any)}
+            className="flex-1 bg-transparent text-white placeholder-slate-600 outline-none text-sm"
+            placeholder="Add friend by username…"
+          />
+          {newFriend && (
+            <button type="button" onClick={() => { setNewFriend(''); setSendError(''); }} className="text-slate-600 hover:text-slate-300 transition-colors mr-1">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
           <button
-            onClick={() => switchTab('add')}
-            className={`relative z-10 px-5 py-2.5 w-32 whitespace-nowrap rounded-xl text-sm font-semibold transition-colors duration-200 ${
-              tab === 'add' ? 'text-white' : 'text-slate-500 hover:text-slate-300'
-            }`}>
-            Add Friend
+            onClick={handleSend}
+            disabled={!newFriend.trim() || sending}
+            className="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-35 disabled:cursor-not-allowed text-white font-semibold text-xs transition-all shadow-md shadow-indigo-900/40">
+            {sending ? (
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+            ) : 'Send'}
           </button>
         </div>
+        {sendError && (
+          <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1.5 px-1">
+            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01"/></svg>
+            {sendError}
+          </p>
+        )}
       </div>
 
       <style>{`
@@ -216,7 +246,7 @@ export default function Friends() {
               <div className="w-20 h-20 rounded-3xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-4xl mb-5 shadow-lg">👥</div>
               <p className="text-slate-300 font-semibold text-lg mb-1">No friends yet</p>
               <p className="text-slate-500 text-sm mb-6">Add someone to get started!</p>
-              <button onClick={() => switchTab('add')} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-colors shadow-lg shadow-indigo-900/40">+ Add a Friend</button>
+              <button onClick={() => switchTab('pending')} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-colors shadow-lg shadow-indigo-900/40">View Requests</button>
             </div>
           ) : (
             <ul className="space-y-2.5">
@@ -351,82 +381,6 @@ export default function Friends() {
         </div>
       )}
 
-      {/* ── ADD FRIEND TAB ── */}
-      {tab === 'add' && (
-        <div key={`add-${animKey}`} className={`${slideDir === 'left' ? 'slide-left' : 'slide-right'}`}>
-          <div className="max-w-md mx-auto">
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl shadow-slate-950/60">
-              {/* Hero strip */}
-              <div className="relative px-6 py-7 bg-linear-to-br from-indigo-600/90 via-indigo-600 to-violet-600 overflow-hidden">
-                <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-white/5 blur-2xl"></div>
-                <div className="absolute bottom-0 left-8 w-16 h-16 rounded-full bg-white/5 blur-xl"></div>
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center mb-3">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                    </svg>
-                  </div>
-                  <h2 className="text-lg font-bold text-white">Add a Friend</h2>
-                  <p className="text-indigo-200 text-sm mt-0.5">They'll receive a request to accept or decline.</p>
-                </div>
-              </div>
-
-              {/* Form */}
-              <div className="px-6 py-6 space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2.5">
-                    Friend ID <span className="normal-case font-normal text-slate-600">— found on their profile page</span>
-                  </label>
-                  <div className={`flex items-center gap-3 bg-slate-800/80 border rounded-2xl px-4 py-3.5 transition-colors ${sendError ? 'border-red-500/60' : 'border-slate-700 focus-within:border-indigo-500/70'}`}>
-                    <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-                    </svg>
-                    <input
-                      value={newFriend}
-                      onChange={(e) => { setNewFriend(e.target.value); setSendError(''); }}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSend(e as any)}
-                      className="flex-1 bg-transparent text-white placeholder-slate-600 outline-none text-sm"
-                      placeholder="Enter username…"
-                    />
-                    {newFriend && (
-                      <button type="button" onClick={() => { setNewFriend(''); setSendError(''); }} className="text-slate-600 hover:text-slate-300 transition-colors">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                  {sendError && (
-                    <p className="text-red-400 text-xs mt-2 flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01"/></svg>
-                      {sendError}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  onClick={handleSend}
-                  disabled={!newFriend.trim() || sending}
-                  className="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-35 disabled:cursor-not-allowed text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-900/40 hover:shadow-indigo-900/60">
-                  {sending ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
-                      Sending…
-                    </span>
-                  ) : 'Send Friend Request'}
-                </button>
-
-                <div className="flex items-start gap-3 bg-indigo-950/40 border border-indigo-900/40 rounded-2xl px-4 py-3.5">
-                  <svg className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z" />
-                  </svg>
-                  <p className="text-slate-500 text-xs leading-relaxed">The request will appear under <span className="text-slate-300 font-medium">Requests</span>. Once they accept, you'll both be added as friends automatically.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       </div>
 
       {/* ── CONFIRM DIALOG ── */}
@@ -537,7 +491,7 @@ export default function Friends() {
               <div className="px-6 pb-6">
                 <button
                   onClick={(e) => { e.stopPropagation(); const row = accepted.find(r => (r.from_user_id === viewingId || r.to_user_id === viewingId)); if (row) { handleRemove(row.id, nick); setViewingId(null); } }}
-                  className="w-full py-2.5 rounded-2xl bg-slate-800 hover:bg-red-600/30 border border-slate-700 hover:border-red-500/40 text-slate-500 hover:text-red-400 text-sm font-medium transition-all">
+                  className="w-full py-2.5 rounded-2xl bg-red-600 hover:bg-red-500 border border-red-500 text-white text-sm font-medium transition-all">
                   Remove Friend
                 </button>
               </div>
