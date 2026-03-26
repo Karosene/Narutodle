@@ -2219,39 +2219,7 @@ export default function OnlineGamePlay() {
                 >
                   📖 Rules
                 </button>
-                {/* TEMP DEBUG — remove before release */}
-                <button
-                  onClick={() => {
-                    const enemyIdx = myPlayerIndex === 0 ? 1 : 0;
-                    let gameEnded = false;
-                    setPlayers(prev => {
-                      const updated: [Player, Player] = [
-                        { ...prev[0], hand: [...prev[0].hand] },
-                        { ...prev[1], hand: [...prev[1].hand] },
-                      ];
-                      updated[enemyIdx].hand = updated[enemyIdx].hand.map((card, i) =>
-                        i < 8 ? { ...card, currentHealth: 0 } : card
-                      );
-                      const allEnemiesDead = updated[enemyIdx].hand.every(c => c.currentHealth <= 0);
-                      if (allEnemiesDead) {
-                        gameEnded = true;
-                        const winnerName = updated[myPlayerIndex].name;
-                        const loserName = updated[enemyIdx].name;
-                        setTimeout(() => {
-                          winnerAlreadyShownRef.current = true;
-                          setWinner({ name: winnerName, loserName, isMe: true });
-                        }, 1000);
-                      }
-                      return updated;
-                    });
-                    if (!gameEnded) {
-                      setTimeout(() => endTurn(), 300);
-                    }
-                  }}
-                  className="px-4 py-2 bg-pink-700 hover:bg-pink-600 text-white font-semibold rounded-lg transition text-center text-xs"
-                >
-                  💀 Kill 8 enemies (test)
-                </button>
+
               </div>
               
               {/* Divider */}

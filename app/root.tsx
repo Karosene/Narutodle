@@ -137,14 +137,14 @@ export default function App() {
                   <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg z-20 py-2">
                     {gameLinks.map(({ to, label, icon }) => (
                       <NavLink
-                        key={to}
+                        key={to}  
                         to={to}
                         onClick={closeGames}
                         className={({ isActive }) =>
                           `block px-4 py-2 text-sm transition hover:bg-slate-100 dark:hover:bg-slate-800 ${
                             isActive
                               ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
-                              : "text-slate-700 dark:text-slate-200"
+                                : "text-slate-700 dark:text-slate-200"
                           }`
                         }
                       >
@@ -154,7 +154,7 @@ export default function App() {
                     ))}
                   </div>
                 </>
-              )}
+              )}  
             </div>
             {navLinks.map(({ to, label }) => (
               <NavLink

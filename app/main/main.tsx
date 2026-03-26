@@ -358,7 +358,7 @@ export default function Site() {
     const A = a.map(normalize);
     const B = b.map(normalize);
     return A.some((x) => B.includes(x));
-  };
+  };  
 
   const parseAge = (ageStr?: string) => {
     if (!ageStr) return null;
