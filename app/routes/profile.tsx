@@ -89,13 +89,18 @@ export default function Profile() {
       setCurrentUser(user);
 
       const userProfile = await getUserProfile(user.id);
-      if (userProfile) {
-        setProfile(userProfile);
-        setDisplayName(userProfile.display_name);
-        setFavoriteCharacter(userProfile.favorite_character || '');
-        setSelectedAvatar(userProfile.profile_picture);
+
+      if (!userProfile) {
+        // Session references a user that no longer exists in the DB — clear it
+        logoutUser();
+        navigate('/login');
+        return;
       }
 
+      setProfile(userProfile);
+      setDisplayName(userProfile.display_name);
+      setFavoriteCharacter(userProfile.favorite_character || '');
+      setSelectedAvatar(userProfile.profile_picture);
       setLoading(false);
     };
 
