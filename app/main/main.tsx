@@ -146,7 +146,7 @@ export default function Site() {
       .then(r => r.json())
       .then(data => setLevelBoard(Array.isArray(data) ? data : []))
       .catch(() => {});
-      fetch(`${SUPA_URL}/rest/v1/profiles?select=display_name,narutodle_avg_guesses,narutodle_games_played&narutodle_games_played=gte.1&narutodle_avg_guesses=not.is.null&order=narutodle_avg_guesses.asc&limit=5`, { headers })        .then(r => r.json())
+    fetch(`${SUPA_URL}/rest/v1/profiles?select=display_name,narutodle_avg_guesses,narutodle_games_played&narutodle_games_played=gt.0&order=narutodle_avg_guesses.asc&limit=5`, { headers })
       .then(r => r.json())
       .then(data => setAvgBoard(Array.isArray(data) ? data : []))
       .catch(() => {});
@@ -255,7 +255,7 @@ export default function Site() {
       setRevealed(false);
       setShowHintCard(false);
       setFeedback(null);
-      setStatsSaved(false);
+      setStatsSaved(false); // Reset stats saved flag for new game
     }
     mounted.current = true;
   }, [idx]);
