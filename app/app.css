@@ -30,6 +30,10 @@ body {
 }
 /* Firefox */
 .guesses-scroll {
+  width: calc(100% + 1rem);
+  margin-right: -1rem;
+  padding-right: 1rem;
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
 }

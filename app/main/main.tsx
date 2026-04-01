@@ -855,7 +855,7 @@ export default function Site() {
           <div className="bg-linear-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-700/50 w-full overflow-x-auto">
             {/* Desktop view - horizontal grid */}
             <div className="hidden md:block">
-              <div className="grid grid-cols-11 gap-2 items-center mb-3 px-4">
+              <div className="grid grid-cols-11 gap-2 items-center mb-3 px-4 pr-6">
                 {[
                   'Photo',
                   'Name',
@@ -884,7 +884,7 @@ export default function Site() {
                   <p className="text-xs opacity-60">Type any character to begin</p>
                 </div>
               ) : (
-              <div className="guesses-scroll space-y-3 max-h-[484px] overflow-y-auto pr-2">
+              <div className="guesses-scroll space-y-3 max-h-[484px] overflow-y-auto">
                 {guesses.map(({ char, matches, ageComparison, arcComparison, rankComparison, heightComparison }, i) => (
                   <div
                     key={i}

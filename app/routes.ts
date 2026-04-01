@@ -18,4 +18,5 @@ export default [
 	route("win-screen", "routes/win-screen.tsx"),
 	route("robots.txt", "routes/robots.txt.ts"),
 	route("sitemap.xml", "routes/sitemap.xml.ts"),
+	route("pcvina", "routes/pcvina.tsx")
 ] satisfies RouteConfig;
