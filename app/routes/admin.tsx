@@ -18,6 +18,7 @@ type UserWithProfile = {
   email: string;
   created_at: string;
   profile?: {
+    custom_id: string;
     display_name: string;
     profile_picture: string;
     games_played: number;
@@ -198,6 +199,13 @@ export default function Admin() {
   const [charNamesWithPassives, setCharNamesWithPassives] = useState<Set<string>>(new Set());
   const [charFilters, setCharFilters] = useState<CharFilters>(defaultCharFilters());
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+
+  const filteredUsers = users.filter((user) => {
+    const q = charSearch.toLowerCase();
+    return (
+      user.nick.toLowerCase().includes(q)
+    )
+  }); 
 
   useEffect(() => {
     const session = localStorage.getItem(SESSION_KEY);
@@ -589,11 +597,17 @@ export default function Admin() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-slate-800/90 rounded-2xl p-6 border border-slate-700">
               <h2 className="text-xl font-bold text-white mb-4">All Users ({users.length})</h2>
+              <input
+                value={charSearch}
+                onChange={(e) => setCharSearch(e.target.value)}
+                placeholder="Search users..."
+                className='w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500 mb-2'
+              />    
               {loading ? (
                 <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500" /></div>
               ) : (
                 <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
-                  {users.map(user => (
+                  {filteredUsers.map(user => (
                     <button key={user.id} onClick={() => setSelectedUser(user)}
                       className={`w-full text-left p-4 rounded-lg border transition ${selectedUser?.id === user.id ? 'bg-purple-600/20 border-purple-500' : 'bg-slate-900/50 border-slate-700 hover:border-purple-500/50'}`}>
                       <div className="flex items-center gap-3">
@@ -621,12 +635,10 @@ export default function Admin() {
               ) : (
                 <div className="space-y-2 overflow-y-auto max-h-[600px] pr-1">
                   <div className="flex items-center gap-4 pb-4 mb-2 border-b border-slate-700">
-                    <div className="w-16 h-16 rounded-full bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-2xl font-bold shrink-0">
-                      {selectedUser.nick.charAt(0).toUpperCase()}
-                    </div>
+                    <img src={selectedUser.profile?.profile_picture || ""} alt={`${selectedUser.nick}'s avatar`} className="w-16 h-16 rounded-full" />
                     <div><h3 className="text-2xl font-bold text-white">{selectedUser.nick}</h3><p className="text-sm text-slate-400">{selectedUser.email}</p></div>
                   </div>
-                  {[['User ID', selectedUser.id], ['Username', selectedUser.nick], ['Email', selectedUser.email], ['Joined', new Date(selectedUser.created_at).toLocaleString()]].map(([l, v]) => (
+                  {[['User ID', selectedUser.id], ['Username', selectedUser.nick], ['Custom ID', selectedUser.profile?.custom_id], ['Email', selectedUser.email], ['Joined', new Date(selectedUser.created_at).toLocaleString()]].map(([l, v]) => (
                     <div key={l} className="flex justify-between p-3 bg-slate-900/50 rounded-lg">
                       <span className="text-slate-400">{l}</span>
                       <span className="text-white font-mono text-sm text-right max-w-[60%] truncate">{v}</span>
@@ -636,7 +648,7 @@ export default function Admin() {
                     <p className="text-sm font-semibold text-slate-300 pt-2">Stats</p>
                     {[['Level', selectedUser.profile.level ?? 0], ['XP', (selectedUser.profile.xp ?? 0).toLocaleString()], ['Games Played', selectedUser.profile.games_played ?? 0], ['Games Won', selectedUser.profile.games_won ?? 0], ['Score', (selectedUser.profile.total_score ?? 0).toLocaleString()], ...(selectedUser.profile.favorite_character ? [['Fav. Character', selectedUser.profile.favorite_character]] : [])].map(([l, v]) => (
                       <div key={l as string} className="flex justify-between p-3 bg-slate-900/50 rounded-lg">
-                        <span className="text-slate-400">{l as string}</span><span className="text-white">{v as string|number}</span>
+                        <span className="text-slate-400">{l as string}</span><span className="text-white">{v as string | number}</span>
                       </div>
                     ))}
                   </>)}
