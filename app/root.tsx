@@ -58,10 +58,10 @@ const navLinks = [
   { to: "/friends", label: "Friends" },
 ];
 
-const gameLinks = [
-  { to: "/", label: "Narutodle (Guess the Character)", icon: "🔮" },
-  { to: "/play-game", label: "Play Card Game", icon: "⚔️" },
-];
+// const gameLinks = [
+//   { to: "/", label: "Narutodle (Guess the Character)", icon: "🔮" },
+//   { to: "/play-game", label: "Play Card Game", icon: "⚔️" },
+// ];
 
 export default function App() {
   const location = useLocation();
@@ -113,49 +113,13 @@ export default function App() {
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <NavLink to="/" className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition">
             <img src="/images/logo.png" alt="Narutodle Logo" className="w-12 h-9 select-none" />
-            <span className="tracking-tight">Narutodle</span>
+            <span className="tracking-tight">Narutodle</span> 
           </NavLink>
           <nav
             aria-label="Primary"
             className="hidden sm:flex flex-wrap items-center gap-2 text-sm font-semibold"
           >
-            <div className="relative">
-              <button
-                type="button"
-                onClick={toggleGames}
-                className="px-3 py-2 rounded-full transition hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-1"
-              >
-                <span>🎮 Games</span>
-                <span className={`transition-transform ${gamesOpen ? 'rotate-180' : ''}`}>▼</span>
-              </button>
-              {gamesOpen && (
-                <>
-                  <div 
-                    className="fixed inset-0 z-10" 
-                    onClick={closeGames}
-                  />
-                  <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg z-20 py-2">
-                    {gameLinks.map(({ to, label, icon }) => (
-                      <NavLink
-                        key={to}  
-                        to={to}
-                        onClick={closeGames}
-                        className={({ isActive }) =>
-                          `block px-4 py-2 text-sm transition hover:bg-slate-100 dark:hover:bg-slate-800 ${
-                            isActive
-                              ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
-                                : "text-slate-700 dark:text-slate-200"
-                          }`
-                        }
-                      >
-                        <span className="mr-2">{icon}</span>
-                        {label}
-                      </NavLink>
-                    ))}
-                  </div>
-                </>
-              )}  
-            </div>
+            {/* Games dropdown hidden temporarily */}
             {navLinks.map(({ to, label }) => (
               <NavLink
                 key={to}
@@ -219,37 +183,7 @@ export default function App() {
         </div>
         <div className={`${open ? "max-h-96" : "max-h-0"} sm:hidden overflow-hidden transition-[max-height] duration-300`}>
           <nav aria-label="Mobile" className="px-4 pb-4 flex flex-col gap-2 text-sm font-semibold">
-            <div className="border border-slate-200/70 dark:border-slate-800/80 rounded-lg overflow-hidden">
-              <button
-                type="button"
-                onClick={toggleGames}
-                className="w-full px-3 py-2 bg-white/90 dark:bg-slate-900/70 text-slate-700 dark:text-slate-200 flex items-center justify-between"
-              >
-                <span>🎮 Games</span>
-                <span className={`transition-transform ${gamesOpen ? 'rotate-180' : ''}`}>▼</span>
-              </button>
-              {gamesOpen && (
-                <div className="border-t border-slate-200/70 dark:border-slate-800/80">
-                  {gameLinks.map(({ to, label, icon }) => (
-                    <NavLink
-                      key={to}
-                      to={to}
-                      onClick={() => { close(); closeGames(); }}
-                      className={({ isActive }) =>
-                        `block w-full px-5 py-2 text-sm transition hover:bg-slate-100 dark:hover:bg-slate-800 ${
-                          isActive
-                            ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-                            : "text-slate-700 dark:text-slate-200"
-                        }`
-                      }
-                    >
-                      <span className="mr-2">{icon}</span>
-                      {label}
-                    </NavLink>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Games dropdown hidden temporarily */}
             {navLinks.map(({ to, label }) => (
               <NavLink
                 key={to}

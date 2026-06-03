@@ -173,8 +173,8 @@ export default function PlayGame() {
       return;
     }
     
-    if (normalChars.length < 12) {
-      alert(`Not enough normal characters! Found ${normalChars.length}, need 12.`);
+    if (normalChars.length < 10) {
+      alert(`Not enough normal characters! Found ${normalChars.length}, need 10.`);
       return;
     }
 
@@ -183,29 +183,29 @@ export default function PlayGame() {
     const shuffledHealers = shuffleArray(healers);
     const shuffledNormal = shuffleArray(normalChars);
     
-    // Build player hands: 1 passive + 2 healers + 6 normal = 9 cards each
+    // Build player hands: 1 passive + 2 healers + 5 normal = 8 cards each
     const player1Chars = [
       shuffledPassive[0],      // 1 passive
       shuffledHealers[0],      // healer 1
       shuffledHealers[1],      // healer 2
-      ...shuffledNormal.slice(0, 6)  // 6 normal
+      ...shuffledNormal.slice(0, 5)  // 5 normal
     ];
     
     const player2Chars = [
       shuffledPassive[1],      // 1 passive
       shuffledHealers[2],      // healer 1
       shuffledHealers[3],      // healer 2
-      ...shuffledNormal.slice(6, 12)  // 6 normal
+      ...shuffledNormal.slice(5, 10)  // 5 normal
     ];
     
     // Validation
-    if (player1Chars.length !== 9) {
-      alert(`Error: Player 1 has ${player1Chars.length} cards instead of 9!`);
+    if (player1Chars.length !== 8) {
+      alert(`Error: Player 1 has ${player1Chars.length} cards instead of 8!`);
       return;
     }
     
-    if (player2Chars.length !== 9) {
-      alert(`Error: Player 2 has ${player2Chars.length} cards instead of 9!`);
+    if (player2Chars.length !== 8) {
+      alert(`Error: Player 2 has ${player2Chars.length} cards instead of 8!`);
       return;
     }
     
@@ -222,19 +222,25 @@ export default function PlayGame() {
     const player1Hand = player1Chars.map((char, index) => convertToCard(char, index));
     const player2Hand = player2Chars.map((char, index) => convertToCard(char, index + 9));
 
-    // Store the players and start the number guessing game
-    setPendingPlayers([
+    const newPlayers: [Player, Player] = [
       { name: 'Player 1', hand: player1Hand },
       { name: 'Player 2', hand: player2Hand }
-    ]);
-    
-    // Generate random number between 0 and 50
-    const randomNum = Math.floor(Math.random() * 51);
-    setTargetNumber(randomNum);
-    setShowNumberGuess(true);
-    setPlayer1Guess('');
-    setPlayer2Guess('');
-    setGameResult('');
+    ];
+
+    // Player 1 always goes first
+    setPlayers(newPlayers);
+    setCurrentPlayerIndex(0);
+    setGameStarted(true);
+
+    // Auto-draw first booster card for Player 1
+    setTimeout(() => {
+      const randomIndex = Math.floor(Math.random() * boosterDeck.length);
+      const booster = boosterDeck[randomIndex];
+      const newHands: [AttributeBoosterCard[], AttributeBoosterCard[]] = [[booster], []];
+      setBoosterHands(newHands);
+      setNewlyDrawnCard({ playerIndex: 0, cardIndex: 0 });
+      setTimeout(() => setNewlyDrawnCard(null), 1500);
+    }, 500);
   };
 
   const handleGuessSubmit = async () => {
@@ -1441,70 +1447,63 @@ export default function PlayGame() {
   const isCardGrayedOut = (playerIndex: 0 | 1): boolean => playerIndex !== currentPlayerIndex;
 
   return (
-    <div className="min-h-screen bg-slate-900 p-4">
-      <div className="flex gap-3 justify-center items-start">
-        {/* Player 1 Section - Left Side */}
-        <div className="flex gap-3 h-full">
-          {/* Player 1 Cards */}
-          <div className="bg-slate-800 rounded-lg p-3 w-auto h-fit flex flex-col">
-            <div className="grid grid-cols-3 gap-3">
-              {players[0].hand.map((card, index) => (
-                <div
-                  key={index}
-                  className={`w-auto cursor-pointer ${isCardGrayedOut(0) ? 'opacity-50' : ''}`}
-                  onClick={() => handleCharacterClick(0, index)}
-                >
-                  <CharacterCardComponent
-                    card={card}
-                    onClick={() => {}}
-                    isSelectable={
-                      (selectingTarget && currentPlayerIndex === 0) ||
-                      (selectingJutsuTarget && currentPlayerIndex === 0) ||
-                      (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
-                    }
-                    isHealer={isHealer(card)}
-                  />
-                </div>
-              ))}
+    <div className="h-screen bg-slate-900 flex flex-col overflow-hidden">
+
+      {/* ── TOP: Player 1 cards row ── */}
+      <div className={`shrink-0 px-3 pt-3 pb-1 border-b-2 transition-all duration-500 ${currentPlayerIndex === 0 ? 'border-green-400 shadow-[0_4px_20px_rgba(74,222,128,0.4)]' : 'border-slate-700 opacity-60'}`}>
+        <p className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Player 1</p>
+        <div className="flex gap-2">
+          {players[0].hand.map((card, index) => (
+            <div
+              key={index}
+              className={`cursor-pointer shrink-0 w-[11%] ${isCardGrayedOut(0) ? 'opacity-50' : ''} ${splashTargets.some(t => t.playerIndex === 0 && t.cardIndex === index) ? 'ring-4 ring-yellow-400 rounded-xl' : ''}`}
+              onClick={() => handleCharacterClick(0, index)}
+            >
+              <CharacterCardComponent
+                card={card}
+                onClick={() => {}}
+                isSelectable={
+                  (selectingTarget && currentPlayerIndex === 0) ||
+                  (selectingJutsuTarget && currentPlayerIndex === 0) ||
+                  (currentPlayerIndex === 0 && !selectingTarget && !selectingJutsuTarget)
+                }
+                isHealer={isHealer(card)}
+              />
             </div>
-          </div>
-          
-          {/* Player 1 Attribute Card Box */}
-          <div className="bg-slate-800 rounded-lg p-3 w-56 h-fit flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className=" text-lg font-bold text-white">Booster Hand ({boosterHands[0].length}/5)</h4>
-            </div>
-            <hr className="border-slate-600 mb-3" />
-            <div className="space-y-2">
-              {boosterHands[0].map((booster, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleBoosterClick(booster, index)}
-                  disabled={currentPlayerIndex !== 0 || selectingTarget}
-                  className={`border-2 rounded-lg p-2 w-full text-left transition-all h-16 ${
-                    currentPlayerIndex === 0 && !selectingTarget
-                      ? 'border-purple-500 hover:bg-purple-900 cursor-pointer'
-                      : 'border-slate-600 opacity-50 cursor-not-allowed'
-                  } ${
-                    selectedBooster?.index === index && selectedBooster?.booster === booster ? 'bg-purple-800' : ''
-                  } ${
-                    newlyDrawnCard?.playerIndex === 0 && newlyDrawnCard?.cardIndex === index
-                      ? 'animate-pulse ring-4 ring-yellow-400 shadow-xl shadow-yellow-400/50'
-                      : ''
-                  }`}
-                >
-                  <h5 className="text-xs font-bold text-white mb-1">{booster.name}</h5>
-                  <p className="text-[9px] text-slate-300 line-clamp-2">{booster.description}</p>
-                </button>
-              ))}
-            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── MIDDLE ROW: P1 booster | game info | P2 booster ── */}
+      <div className="flex-1 flex gap-3 px-3 py-2 min-h-0">
+
+        {/* Player 1 Booster Hand — left, horizontal */}
+        <div className="flex flex-col justify-start w-fit">
+          <p className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">P1 Boosters ({boosterHands[0].length}/5)</p>
+          <div className="flex gap-2">
+            {boosterHands[0].map((booster, index) => (
+              <button
+                key={index}
+                onClick={() => handleBoosterClick(booster, index)}
+                disabled={currentPlayerIndex !== 0 || selectingTarget}
+                className={`border-2 rounded-lg p-2 text-left transition-all w-32 shrink-0 ${
+                  currentPlayerIndex === 0 && !selectingTarget
+                    ? 'border-purple-500 hover:bg-purple-900 cursor-pointer'
+                    : 'border-slate-600 opacity-50 cursor-not-allowed'
+                } ${selectedBooster?.index === index && selectedBooster?.booster === booster ? 'bg-purple-800' : 'bg-slate-800'} ${
+                  newlyDrawnCard?.playerIndex === 0 && newlyDrawnCard?.cardIndex === index
+                    ? 'animate-pulse ring-4 ring-yellow-400 shadow-xl shadow-yellow-400/50'
+                    : ''
+                }`}
+              >
+                <h5 className="text-xs font-bold text-white mb-1 truncate">{booster.name}</h5>
+                <p className="text-[9px] text-slate-300 line-clamp-3">{booster.description}</p>
+              </button>
+            ))}
             {selectingTarget && selectedBooster && currentPlayerIndex === 0 && (
               <button
-                onClick={() => {
-                  setSelectedBooster(null);
-                  setSelectingTarget(false);
-                }}
-                className="mt-2 w-full px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition"
+                onClick={() => { setSelectedBooster(null); setSelectingTarget(false); }}
+                className="border-2 border-red-500 rounded-lg px-3 py-2 bg-red-900 text-white text-xs font-semibold shrink-0"
               >
                 Cancel
               </button>
@@ -1512,166 +1511,101 @@ export default function PlayGame() {
           </div>
         </div>
 
-        {/* Middle Section - Info + Draw */}
-        <div className="flex-1 flex flex-col gap-3 h-full">
-          {/* Game Info - Top */}
-          <div className="bg-slate-800 rounded-lg p-5 w-56 mx-auto">
-            <div className="text-center">
-              <h3 className="text-3xl font-bold text-white mb-3">Game Info</h3>
-              <p className="text-slate-300 text-base mb-4">Turn: {currentPlayer.name}</p>
-              {selectingTarget && (
-                <p className="text-yellow-400 text-sm mb-2 font-semibold">
-                  ⚡ Click a character to apply {selectedBooster?.booster.name}
-                </p>
-              )}
-              {selectingJutsuTarget && selectedJutsu && (
-                <p className="text-yellow-400 text-sm mb-2 font-semibold">
-                  🎯 Select target for {selectedJutsu.name}
-                </p>
-              )}
-              <div className="flex gap-2 justify-center flex-col">
-                <button
-                  onClick={endTurn}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition">
-                  Skip Turn
-                </button>
-                <button
-                  onClick={resetGame}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition">
-                  Reset Game
-                </button>
-                <button
-                  onClick={() => setShowRulesModal(true)}
-                  className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg transition text-center">
-                  📖 Rules
-                </button>
-                {isSelectingSplashTargets && (
-                  <>
-                    <hr className="border-slate-600 my-3" />
-                    <div className="bg-purple-600 text-white px-4 py-3 rounded-lg shadow border-2 border-yellow-400">
-                      <p className="text-sm font-bold mb-1">💥 Splash Damage Active!</p>
-                      <p className="text-xs mb-2">Select up to 3 enemy targets ({splashTargets.length}/3 selected)</p>
-                      <div className="flex flex-col gap-2">
-                        <button
-                          onClick={executeSplashDamageJutsu}
-                          disabled={splashTargets.length === 0}
-                          className={`w-full px-3 py-2 rounded-lg font-semibold transition ${
-                            splashTargets.length === 0
-                              ? 'bg-gray-500 cursor-not-allowed'
-                              : 'bg-green-500 hover:bg-green-600'
-                          }`}
-                        >
-                          Confirm ({splashTargets.length} targets)
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsSelectingSplashTargets(false);
-                            setSplashTargets([]);
-                            setSelectingJutsuTarget(false);
-                            setSelectedJutsu(null);
-                            setShowJutsuSelector(true);
-                          }}
-                          className="w-full px-3 py-2 bg-red-500 hover:bg-red-900 rounded-lg font-semibold transition"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                )}
-                {selectingJutsuTarget && !isSelectingSplashTargets && selectedJutsu && (
-                  <>
-                    <hr className="border-slate-600 my-3" />
-                    <div className="bg-blue-600 text-white px-4 py-3 rounded-lg shadow border-2 border-cyan-400">
-                      <p className="text-sm font-bold mb-1">🎯 {selectedJutsu.name}</p>
-                      <p className="text-xs mb-2">Select a target for this jutsu</p>
-                      <button
-                        onClick={() => {
-                          setSelectingJutsuTarget(false);
-                          setSelectedJutsu(null);
-                          setSelectedCharacter(null);
-                          setShowJutsuSelector(false);
-                        }}
-                        className="w-full px-3 py-2 bg-red-500 hover:bg-red-900 rounded-lg font-semibold transition"
-                      >
-                        Cancel Jutsu
-                      </button>
-                    </div>
-                  </>
-                )}
+        {/* Game Info — center */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="bg-slate-800 rounded-xl p-4 w-56 text-center">
+            <h3 className="text-xl font-bold text-white mb-2">Game Info</h3>
+            <p className={`text-sm font-semibold mb-3 px-3 py-1 rounded-lg ${currentPlayerIndex === 0 ? 'bg-green-600 text-white' : 'bg-orange-600 text-white'}`}>
+              Turn: {currentPlayer.name}
+            </p>
+            {selectingTarget && (
+              <p className="text-yellow-400 text-xs mb-2 font-semibold">⚡ Click a character to apply {selectedBooster?.booster.name}</p>
+            )}
+            {selectingJutsuTarget && selectedJutsu && (
+              <p className="text-yellow-400 text-xs mb-2 font-semibold">🎯 Select target for {selectedJutsu.name}</p>
+            )}
+            {isSelectingSplashTargets && (
+              <div className="bg-purple-600 text-white px-3 py-2 rounded-lg mb-2 border-2 border-yellow-400">
+                <p className="text-xs font-bold mb-1">💥 Select up to 3 enemies ({splashTargets.length}/3)</p>
+                <div className="flex gap-1 flex-col">
+                  <button onClick={executeSplashDamageJutsu} disabled={splashTargets.length === 0} className={`w-full px-2 py-1 rounded text-xs font-semibold ${splashTargets.length === 0 ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}>Confirm</button>
+                  <button onClick={() => { setIsSelectingSplashTargets(false); setSplashTargets([]); setSelectingJutsuTarget(false); setSelectedJutsu(null); setShowJutsuSelector(true); }} className="w-full px-2 py-1 bg-red-500 hover:bg-red-900 rounded text-xs font-semibold">Cancel</button>
+                </div>
               </div>
+            )}
+            {selectingJutsuTarget && !isSelectingSplashTargets && selectedJutsu && (
+              <div className="bg-blue-600 text-white px-3 py-2 rounded-lg mb-2 border-2 border-cyan-400">
+                <p className="text-xs font-bold mb-1">🎯 {selectedJutsu.name}</p>
+                <button onClick={() => { setSelectingJutsuTarget(false); setSelectedJutsu(null); setSelectedCharacter(null); setShowJutsuSelector(false); }} className="w-full px-2 py-1 bg-red-500 hover:bg-red-900 rounded text-xs font-semibold">Cancel</button>
+              </div>
+            )}
+            <div className="flex gap-2 flex-col mt-2">
+              <button onClick={endTurn} className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition">Skip Turn</button>
+              <button onClick={resetGame} className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-lg transition">Reset Game</button>
+              <button onClick={() => setShowRulesModal(true)} className="px-3 py-1.5 bg-purple-500 hover:bg-purple-600 text-white text-sm font-semibold rounded-lg transition">📖 Rules</button>
             </div>
           </div>
         </div>
 
-        {/* Player 2 Section - Right Side */}
-        <div className="flex gap-3 h-full">
-          {/* Player 2 Attribute Card Box */}
-          <div className="bg-slate-800 rounded-lg p-3 w-56 h-fit flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-lg font-bold text-white">Booster Hand ({boosterHands[1].length}/5)</h4>
-            </div>
-            <hr className="border-slate-600 mb-3" />
-            <div className="space-y-2">
-              {boosterHands[1].map((booster, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleBoosterClick(booster, index)}
-                  disabled={currentPlayerIndex !== 1 || selectingTarget}
-                  className={`border-2 rounded-lg p-2 w-full text-left transition-all h-16 ${
-                    currentPlayerIndex === 1 && !selectingTarget
-                      ? 'border-purple-500 hover:bg-purple-900 cursor-pointer'
-                      : 'border-slate-600 opacity-50 cursor-not-allowed'
-                  } ${
-                    selectedBooster?.index === index && selectedBooster?.booster === booster ? 'bg-purple-800' : ''
-                  } ${
-                    newlyDrawnCard?.playerIndex === 1 && newlyDrawnCard?.cardIndex === index
-                      ? 'animate-pulse ring-4 ring-yellow-400 shadow-xl shadow-yellow-400/50'
-                      : ''
-                  }`}
-                >
-                  <h5 className="text-xs font-bold text-white mb-1">{booster.name}</h5>
-                  <p className="text-[9px] text-slate-300 line-clamp-2">{booster.description}</p>
-                </button>
-              ))}
-            </div>
+        {/* Player 2 Booster Hand — right, horizontal, aligned bottom */}
+        <div className="flex flex-col justify-end w-fit">
+          <div className="flex gap-2 mb-1">
+            {boosterHands[1].map((booster, index) => (
+              <button
+                key={index}
+                onClick={() => handleBoosterClick(booster, index)}
+                disabled={currentPlayerIndex !== 1 || selectingTarget}
+                className={`border-2 rounded-lg p-2 text-left transition-all w-32 shrink-0 ${
+                  currentPlayerIndex === 1 && !selectingTarget
+                    ? 'border-purple-500 hover:bg-purple-900 cursor-pointer'
+                    : 'border-slate-600 opacity-50 cursor-not-allowed'
+                } ${selectedBooster?.index === index && selectedBooster?.booster === booster ? 'bg-purple-800' : 'bg-slate-800'} ${
+                  newlyDrawnCard?.playerIndex === 1 && newlyDrawnCard?.cardIndex === index
+                    ? 'animate-pulse ring-4 ring-yellow-400 shadow-xl shadow-yellow-400/50'
+                    : ''
+                }`}
+              >
+                <h5 className="text-xs font-bold text-white mb-1 truncate">{booster.name}</h5>
+                <p className="text-[9px] text-slate-300 line-clamp-3">{booster.description}</p>
+              </button>
+            ))}
             {selectingTarget && selectedBooster && currentPlayerIndex === 1 && (
               <button
-                onClick={() => {
-                  setSelectedBooster(null);
-                  setSelectingTarget(false);
-                }}
-                className="mt-2 w-full px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition"
+                onClick={() => { setSelectedBooster(null); setSelectingTarget(false); }}
+                className="border-2 border-red-500 rounded-lg px-3 py-2 bg-red-900 text-white text-xs font-semibold shrink-0"
               >
                 Cancel
               </button>
             )}
           </div>
-          
-          {/* Player 2 Hand */}
-          <div className="bg-slate-800 rounded-lg p-3 w-auto h-fit flex flex-col">
-            <div className="grid grid-cols-3 gap-3">
-              {players[1].hand.map((card, index) => (
-                <div
-                  key={index}
-                  className={`w-auto cursor-pointer ${isCardGrayedOut(1) ? 'opacity-50' : ''}`}
-                  onClick={() => handleCharacterClick(1, index)}
-                >
-                  <CharacterCardComponent
-                    card={card}
-                    onClick={() => {}}
-                    isSelectable={
-                      (selectingTarget && currentPlayerIndex === 1) ||
-                      (selectingJutsuTarget && currentPlayerIndex === 1) ||
-                      (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
-                    }
-                    isHealer={isHealer(card)}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider text-right">P2 Boosters ({boosterHands[1].length}/5)</p>
         </div>
+
+      </div>
+
+      {/* ── BOTTOM: Player 2 cards row ── */}
+      <div className={`shrink-0 px-3 pt-1 pb-3 border-t-2 transition-all duration-500 ${currentPlayerIndex === 1 ? 'border-green-400 shadow-[0_-4px_20px_rgba(74,222,128,0.4)]' : 'border-slate-700 opacity-60'}`}>
+        <div className="flex gap-2">
+          {players[1].hand.map((card, index) => (
+            <div
+              key={index}
+              className={`cursor-pointer shrink-0 w-[11%] ${isCardGrayedOut(1) ? 'opacity-50' : ''} ${splashTargets.some(t => t.playerIndex === 1 && t.cardIndex === index) ? 'ring-4 ring-yellow-400 rounded-xl' : ''}`}
+              onClick={() => handleCharacterClick(1, index)}
+            >
+              <CharacterCardComponent
+                card={card}
+                onClick={() => {}}
+                isSelectable={
+                  (selectingTarget && currentPlayerIndex === 1) ||
+                  (selectingJutsuTarget && currentPlayerIndex === 1) ||
+                  (currentPlayerIndex === 1 && !selectingTarget && !selectingJutsuTarget)
+                }
+                isHealer={isHealer(card)}
+              />
+            </div>
+          ))}
+        </div>
+        <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">Player 2</p>
       </div>
 
       {/* Jutsu Selector Modal */}
@@ -2105,3 +2039,4 @@ export default function PlayGame() {
     </div>
   );
 }
+

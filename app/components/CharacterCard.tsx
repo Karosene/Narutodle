@@ -48,7 +48,7 @@ export function CharacterCardComponent({
       `}
     >
       {/* Character Image Background */}
-      <div className="relative h-28 overflow-hidden bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 shrink-0">
+      <div className="relative h-36 overflow-hidden bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 shrink-0">
         <img 
           src={formData.imageUrl} 
           alt={card.name}
